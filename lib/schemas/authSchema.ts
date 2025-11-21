@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const signinSchema = z.object({
   email: z.string().email('Enter a valid email address.'),
-  password: z.string().min(6, 'Password must be at least 6 characters long.'),
+  password: z.string().min(8, 'Password must be at least 8 characters long.'),
 });
 
 export const forgotPasswordSchema = z.object({
@@ -10,7 +10,6 @@ export const forgotPasswordSchema = z.object({
 });
 
 export const verifyOtpSchema = z.object({
-  email: z.string().email('Enter a valid email address.'),
   code: z.string().min(6, 'Code must be at least 6 characters long.'),
 });
 

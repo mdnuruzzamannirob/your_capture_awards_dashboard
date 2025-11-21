@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Kumbh_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 import { cn } from '@/lib/utils';
+import { Toaster } from 'sonner';
 
 const kumbhSans = Kumbh_Sans({
   variable: '--font-kumbh-sans',
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={cn('antialiased', kumbhSans.className)}>{children}</body>
+      <body className={cn('antialiased', kumbhSans.className)}>
+        <Toaster closeButton richColors />
+        {children}
+      </body>
     </html>
   );
 }

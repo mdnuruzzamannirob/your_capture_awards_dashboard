@@ -3,6 +3,7 @@
 import AuthTitle from '@/components/common/AuthTitle';
 import FormField from '@/components/common/FormField';
 import { Spinner } from '@/components/ui/spinner';
+import { defaultError } from '@/constants';
 import { SigninFormData, signinSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,16 +30,17 @@ const Signin = () => {
   const signInSubmit = async () => {
     try {
       // await signin({ email: data?.email, password: data?.password }).unwrap();
-      toast.success('Login Successful', {
-        description: 'Welcome back!',
+
+      toast.success('Sign in successful!', {
+        description: 'Redirecting you to the dashboard.',
       });
       signinForm.reset();
-      router.push('/contest/joined');
+      router.push('/');
     } catch (err: any) {
-      toast.error('Oops! Something went wrong', {
-        description:
-          err?.data?.message || err?.error || 'Please check your credentials and try again.',
-      });
+      toast.error(
+        err?.data?.message || err?.message || defaultError.title,
+        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+      );
     }
   };
 
