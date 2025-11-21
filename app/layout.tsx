@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={cn('antialiased', kumbhSans.className)}>
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={cn('antialiased', kumbhSans.className)} suppressHydrationWarning>
         <Toaster closeButton richColors />
         {children}
       </body>
