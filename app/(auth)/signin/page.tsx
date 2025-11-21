@@ -31,7 +31,7 @@ const Signin = () => {
     try {
       // await signin({ email: data?.email, password: data?.password }).unwrap();
 
-      toast.success('Sign in successful!', {
+      toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',
       });
       signinForm.reset();
