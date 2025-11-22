@@ -27,8 +27,8 @@ const ForgotPassword = () => {
       toast.success('Code Sent Successfully', {
         description: 'Check your email for the verification code.',
       });
-      resetForm.reset();
       router.push('/verify-otp');
+      resetForm.reset();
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,

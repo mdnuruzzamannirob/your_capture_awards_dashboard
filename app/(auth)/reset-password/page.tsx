@@ -39,8 +39,8 @@ const ResetPassword = () => {
       toast.success('Password Updated', {
         description: 'Use your new password to sign in.',
       });
-      resetForm.reset();
       router.push('/signin');
+      resetForm.reset();
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,

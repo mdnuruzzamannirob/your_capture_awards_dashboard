@@ -34,8 +34,8 @@ const Signin = () => {
       toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',
       });
-      signinForm.reset();
       router.push('/dashboard');
+      signinForm.reset();
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,

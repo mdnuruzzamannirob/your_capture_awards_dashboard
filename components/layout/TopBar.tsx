@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import UserMenu from './UserMenu';
+import Notification from './Notification';
 
 interface TopBarProps {
   isExpanded: boolean;
@@ -13,8 +14,9 @@ const TopBar = ({ isExpanded }: TopBarProps) => {
         isExpanded ? 'pl-[260px]' : 'pl-20',
       )}
     >
-      <p>Logo</p>
+      <p></p>
       <div className="flex items-center gap-5">
+        <Notification />
         <UserMenu />
       </div>
     </header>
