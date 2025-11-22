@@ -131,7 +131,7 @@ const Signin = () => {
 
             <span
               className={cn(
-                'transition-all duration-500',
+                'transition-all duration-300',
                 isLoading ? 'translate-x-2' : 'translate-x-0',
               )}
             >

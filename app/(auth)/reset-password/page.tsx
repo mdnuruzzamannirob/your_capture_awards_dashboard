@@ -37,7 +37,7 @@ const ResetPassword = () => {
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,
-        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
       );
     }
   };
@@ -133,7 +133,7 @@ const ResetPassword = () => {
 
             <span
               className={cn(
-                'transition-all duration-500',
+                'transition-all duration-300',
                 isLoading ? 'translate-x-2' : 'translate-x-0',
               )}
             >
