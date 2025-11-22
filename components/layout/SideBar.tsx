@@ -7,19 +7,19 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { SideLinkGroup, SideLinkItem } from '@/app/(dashboard)/layout';
+import { SideMenu } from '@/types';
+import { sideMenus } from '@/constants/menus';
 
 interface SidebarProps {
-  sideLinks: SideLinkGroup[];
-  isExpanded: boolean; // Controlled from parent
+  isExpanded: boolean;
   setIsExpanded: (value: boolean) => void;
 }
 
-const SideBar = ({ sideLinks, isExpanded, setIsExpanded }: SidebarProps) => {
+const SideBar = ({ isExpanded, setIsExpanded }: SidebarProps) => {
   const pathname = usePathname();
 
-  const [isSidebarHovered, setSidebarHovered] = useState(false);
-  const [isPinned, setIsPinned] = useState(false);
+  const [isSidebarHovered, setSidebarHovered] = useState(true);
+  const [isPinned, setIsPinned] = useState(true);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [hoveredParent, setHoveredParent] = useState<string | null>(null);
 
@@ -42,7 +42,7 @@ const SideBar = ({ sideLinks, isExpanded, setIsExpanded }: SidebarProps) => {
   };
 
   // Render main menu and its nested submenu
-  const renderMainMenu = (items: SideLinkItem[]) =>
+  const renderMainMenu = (items: SideMenu[]) =>
     items.map((link) => {
       const hasChildren = !!link.children?.length;
       const isActive = pathname.includes(link.href);
@@ -135,7 +135,7 @@ const SideBar = ({ sideLinks, isExpanded, setIsExpanded }: SidebarProps) => {
             alt="Logo"
             width={142}
             height={54}
-            className="mt-1 ml-[1.45px] h-[54px] w-auto"
+            className="mt-1 ml-px h-[35.1px] w-auto"
           />
         ) : (
           <Image
@@ -149,13 +149,7 @@ const SideBar = ({ sideLinks, isExpanded, setIsExpanded }: SidebarProps) => {
       </Link>
 
       {/* Main menu */}
-      <div className="flex flex-col gap-4 p-4">
-        {sideLinks.map((group) => (
-          <div key={group.group} className="flex flex-col gap-1">
-            {renderMainMenu(group.items)}
-          </div>
-        ))}
-      </div>
+      <div className="flex flex-col gap-4 p-4">{renderMainMenu(sideMenus)}</div>
 
       {/* Pin/Collapse button */}
       <button
