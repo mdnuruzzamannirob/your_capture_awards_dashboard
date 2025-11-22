@@ -6,6 +6,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { defaultError } from '@/constants';
 import { SigninFormData, signinSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
+import { useSigninMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -18,18 +19,17 @@ import { toast } from 'sonner';
 const Signin = () => {
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading] = useState(false);
 
-  // const [signin, { isLoading }] = useSigninMutation();
+  const [signin, { isLoading }] = useSigninMutation();
 
   const router = useRouter();
   const signinForm = useForm<SigninFormData>({
     resolver: zodResolver(signinSchema),
   });
 
-  const signInSubmit = async () => {
+  const signInSubmit = async (data: SigninFormData) => {
     try {
-      // await signin({ email: data?.email, password: data?.password }).unwrap();
+      await signin({ email: data?.email, password: data?.password }).unwrap();
 
       toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',
@@ -39,7 +39,7 @@ const Signin = () => {
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,
-        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
       );
     }
   };

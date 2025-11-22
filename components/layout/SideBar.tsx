@@ -43,7 +43,7 @@ const SideBar = ({ isExpanded, setIsExpanded }: SidebarProps) => {
     <aside
       className={cn(
         'fixed z-10 h-dvh border-r bg-gray-950 transition-all duration-300',
-        realExpand ? 'w-72' : 'w-16',
+        realExpand ? 'w-60' : 'w-16',
       )}
       onMouseEnter={() => setSidebarHovered(true)}
       onMouseLeave={() => setSidebarHovered(false)}
