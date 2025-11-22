@@ -11,6 +11,23 @@ export const sideMenus: SideMenu[] = [
     name: 'User Management',
     href: '/user-management',
     icon: <LuLayoutDashboard className="size-full" />,
+    children: [
+      {
+        name: 'Add User',
+        href: '/user',
+        icon: <LuLayoutDashboard className="size-full" />,
+      },
+      {
+        name: 'Edit User',
+        href: '/user2',
+        icon: <LuLayoutDashboard className="size-full" />,
+      },
+      {
+        name: 'See User',
+        href: '/user3',
+        icon: <LuLayoutDashboard className="size-full" />,
+      },
+    ],
   },
   {
     name: 'Contest Management',

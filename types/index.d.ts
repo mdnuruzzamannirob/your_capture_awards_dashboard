@@ -1,6 +1,10 @@
 export interface SideMenu {
   name: string;
   href: string;
-  icon: React.JSX.Element;
-  children?: SideMenu[]; // recursive
+  icon: React.ReactNode;
+  children?: {
+    name: string;
+    href: string;
+    icon?: React.ReactNode;
+  }[];
 }

@@ -158,7 +158,7 @@ const VerifyOtp = () => {
 
           {otpError && <p className="text-destructive mt-1 text-center text-xs">{otpError}</p>}
 
-          <p className="text-center text-xs text-gray-400">
+          <p className="text-muted-foreground text-center text-xs">
             Didn&apos;t receive a code?{' '}
             <button
               type="button"
