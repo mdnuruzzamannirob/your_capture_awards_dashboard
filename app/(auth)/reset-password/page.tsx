@@ -4,8 +4,10 @@ import AuthTitle from '@/components/common/AuthTitle';
 import FormField from '@/components/common/FormField';
 import { Spinner } from '@/components/ui/spinner';
 import { defaultError } from '@/constants';
+import useAuth from '@/hooks/useAuth';
 import { ResetPasswordFormData, resetPasswordSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
+import { useResetPasswordMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -16,18 +18,23 @@ import { toast } from 'sonner';
 const ResetPassword = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
-  const [isLoading] = useState(false);
 
-  // const [signin, { isLoading }] = useSigninMutation();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const { tempEmail, tempToken } = useAuth();
 
   const router = useRouter();
   const resetForm = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const resetPasswordSubmit = async () => {
+  const resetPasswordSubmit = async (data: ResetPasswordFormData) => {
     try {
-      // await signin({ email: data?.email, password: data?.password }).unwrap();
+      await resetPassword({
+        password: data.newPassword,
+        confirmPassword: data.confirmNewPassword,
+        token: tempToken ?? '',
+        email: tempEmail ?? '',
+      }).unwrap();
 
       toast.success('Password Updated', {
         description: 'Use your new password to sign in.',
