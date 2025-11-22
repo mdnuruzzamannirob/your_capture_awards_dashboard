@@ -7,18 +7,21 @@ import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { defaultError } from '@/constants';
+import { useForgotPasswordMutation, useVerifyOTPMutation } from '@/store/features/auth/authApi';
+import useAuth from '@/hooks/useAuth';
 
 const VerifyOtp = () => {
   const otpLength = 6;
   const [otp, setOtp] = useState<string[]>(new Array(otpLength).fill(''));
   const [resendCoolDown, setResendCoolDown] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isResendLoading, setIsResendLoading] = useState(false);
   const [otpError, setOtpError] = useState('');
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
 
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const [forgotPassword, { isLoading: isForgotLoading }] = useForgotPasswordMutation();
+  const [verifyOtp, { isLoading }] = useVerifyOTPMutation();
+  const { tempEmail } = useAuth();
   const router = useRouter();
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     if (resendCoolDown <= 0) return;
@@ -80,16 +83,15 @@ const VerifyOtp = () => {
   const verifyOtpSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
-    const otpCode = otp.join('');
+    const code = otp.join('');
 
-    if (otpCode.length < otpLength) {
+    if (code.length < otpLength) {
       highlightEmptyFields();
       return;
     }
 
     try {
-      setIsLoading(true);
-      await new Promise((res) => setTimeout(res, 1000)); // dummy API
+      await verifyOtp({ email: tempEmail as string, code }).unwrap();
 
       toast.success('Verification Complete', {
         description: 'You can now set your new password.',
@@ -99,10 +101,8 @@ const VerifyOtp = () => {
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,
-        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -110,18 +110,15 @@ const VerifyOtp = () => {
     if (resendCoolDown > 0) return;
 
     try {
-      setIsResendLoading(true);
-      await new Promise((res) => setTimeout(res, 1000));
+      await forgotPassword({ email: tempEmail as string }).unwrap();
 
       toast.success('OTP resent successfully.');
       setResendCoolDown(30);
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,
-        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
       );
-    } finally {
-      setIsResendLoading(false);
     }
   };
 
@@ -162,13 +159,13 @@ const VerifyOtp = () => {
             Didn&apos;t receive a code?{' '}
             <button
               type="button"
-              disabled={resendCoolDown > 0 || isResendLoading}
+              disabled={resendCoolDown > 0 || isForgotLoading}
               onClick={handleResend}
               className="text-primary underline disabled:cursor-default disabled:opacity-60"
             >
               {resendCoolDown > 0
                 ? `Resend in ${resendCoolDown}s`
-                : isResendLoading
+                : isForgotLoading
                   ? 'Sending...'
                   : 'Resend'}
             </button>

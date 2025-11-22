@@ -6,25 +6,23 @@ import { Spinner } from '@/components/ui/spinner';
 import { defaultError } from '@/constants';
 import { ForgotPasswordFormData, forgotPasswordSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
+import { useForgotPasswordMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const ForgotPassword = () => {
-  const [isLoading] = useState(false);
-
-  // const [signin, { isLoading }] = useSigninMutation();
+  const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const router = useRouter();
   const resetForm = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const forgotPasswordSubmit = async () => {
+  const forgotPasswordSubmit = async (data: ForgotPasswordFormData) => {
     try {
-      //  await signin({ email: data?.email, password: data?.password }).unwrap();
+      await forgotPassword({ email: data.email }).unwrap();
 
       toast.success('Code Sent Successfully', {
         description: 'Check your email for the verification code.',
@@ -34,7 +32,7 @@ const ForgotPassword = () => {
     } catch (err: any) {
       toast.error(
         err?.data?.message || err?.message || defaultError.title,
-        !(err?.data?.message && err?.message) ? { description: defaultError.body } : undefined,
+        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
       );
     }
   };
