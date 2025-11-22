@@ -145,21 +145,21 @@ const Notification = () => {
     }
 
     return (
-      <div className="scrollbar-thin h-full max-h-[500px] space-y-1 overflow-y-auto">
+      <div className="scrollbar-thin h-full max-h-[400px] space-y-1.5 overflow-y-auto">
         {filteredNotifications?.map((notify, index) => (
           <div
             className={cn(
               'relative flex items-center gap-2 rounded-sm border border-transparent p-3.5',
-              notify.unread ? 'border-gray-700 bg-gray-800' : 'bg-gray-900',
+              notify.unread ? 'border-gray-700/60 bg-gray-800/80' : 'bg-gray-900',
             )}
             key={index}
           >
             <Image
               alt="User Avatar"
               src={notify?.image}
-              width={32}
-              height={32}
-              className="size-10 min-w-10 overflow-hidden rounded-full object-cover"
+              width={28}
+              height={28}
+              className="size-9 min-w-9 overflow-hidden rounded-full object-cover"
             />
 
             <div className="flex flex-1 flex-col gap-1">
@@ -180,20 +180,25 @@ const Notification = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex size-8 min-w-8 items-center justify-center rounded-full bg-gray-900 transition hover:bg-gray-800">
+        <button className="relative flex size-8 min-w-8 items-center justify-center rounded-full bg-gray-900 transition hover:bg-gray-800">
           <RiNotification3Fill />
+
+          {/* Unread dot */}
+          {notifyData.some((n) => n.unread) && (
+            <span className="bg-primary absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-gray-900" />
+          )}
         </button>
       </PopoverTrigger>
 
       <PopoverContent
         align="end"
-        className="w-md space-y-3 rounded-md border border-gray-800 bg-gray-900"
+        className="w-sm space-y-2 rounded-md border border-gray-800 bg-gray-900"
       >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium">Notifications</h3>
+          <h3 className="font-medium">Notifications</h3>
 
-          <button className="flex items-center gap-1 text-sm text-blue-500 hover:underline">
+          <button className="flex items-center gap-1 text-sm text-blue-500">
             <IoCheckmarkDone className="size-5" /> Mark all as read
           </button>
         </div>
@@ -203,8 +208,8 @@ const Notification = () => {
           <button
             onClick={() => setTab('')}
             className={cn(
-              'relative z-10 h-8 flex-1 text-sm',
-              tab === '' ? 'text-white' : 'text-gray-400 hover:bg-gray-800',
+              'relative z-10 h-7 flex-1 text-xs transition',
+              tab === '' ? 'font-medium' : 'text-muted-foreground hover:bg-gray-800',
             )}
           >
             All
@@ -213,8 +218,8 @@ const Notification = () => {
           <button
             onClick={() => setTab('unread')}
             className={cn(
-              'relative z-10 h-8 flex-1 text-sm',
-              tab === 'unread' ? 'text-white' : 'text-gray-400 hover:bg-gray-800',
+              'relative z-10 h-7 flex-1 text-xs transition',
+              tab === 'unread' ? 'font-medium' : 'text-muted-foreground hover:bg-gray-800',
             )}
           >
             Unread

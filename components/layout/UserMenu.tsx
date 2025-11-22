@@ -14,6 +14,7 @@ import { removeUser } from '@/store/features/auth/authSlice';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { DialogTrigger } from '@radix-ui/react-dialog';
+import { LuSettings } from 'react-icons/lu';
 
 const UserMenu = () => {
   const [open, setOpen] = useState(false);
@@ -110,7 +111,7 @@ const UserMenu = () => {
                 : 'text-muted-foreground hover:bg-gray-800',
             )}
           >
-            <ProfileUser className="size-4" />
+            <LuSettings className="size-4" />
             Settings
           </Link>
         </div>
