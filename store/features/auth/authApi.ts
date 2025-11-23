@@ -11,7 +11,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     signin: builder.mutation<{ data: { token: string; user: AuthUser } }, SigninData>({
       query: (credentials) => ({
-        url: '/auth/signin',
+        url: 'auth/admin/signin',
         method: 'POST',
         body: credentials,
       }),
