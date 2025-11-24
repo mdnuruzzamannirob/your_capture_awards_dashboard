@@ -8,13 +8,10 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { sideMenus } from '@/constants/menus';
+import useDashboard from '@/hooks/useDashboard';
 
-interface SidebarProps {
-  isExpanded: boolean;
-  setIsExpanded: (value: boolean) => void;
-}
-
-const SideBar = ({ isExpanded, setIsExpanded }: SidebarProps) => {
+const SideBar = () => {
+  const { isSidebarVisible, setIsSidebarVisible } = useDashboard();
   const pathname = usePathname();
 
   const [isSidebarHovered, setSidebarHovered] = useState(true);
@@ -25,8 +22,8 @@ const SideBar = ({ isExpanded, setIsExpanded }: SidebarProps) => {
 
   // Sync parent expansion state
   useEffect(() => {
-    if (isExpanded !== realExpand) setIsExpanded(realExpand);
-  }, [realExpand, isExpanded, setIsExpanded]);
+    if (isSidebarVisible !== realExpand) setIsSidebarVisible(realExpand);
+  }, [realExpand, isSidebarVisible, setIsSidebarVisible]);
 
   // Logo swap with delay
   const [showLogo, setShowLogo] = useState(realExpand);
@@ -42,7 +39,7 @@ const SideBar = ({ isExpanded, setIsExpanded }: SidebarProps) => {
   return (
     <aside
       className={cn(
-        'fixed z-10 h-dvh border-r bg-gray-950 transition-all duration-300',
+        'bg-background fixed z-50 h-dvh border-r transition-all duration-300',
         realExpand ? 'w-60' : 'w-16',
       )}
       onMouseEnter={() => setSidebarHovered(true)}

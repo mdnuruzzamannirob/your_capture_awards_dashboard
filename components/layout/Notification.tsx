@@ -14,13 +14,13 @@ const Notification = () => {
   const notifyData = [
     {
       text: 'New message received',
-      unread: true,
+      unread: false,
       date: '2025-11-28T14:32:12.000Z',
       image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
     },
     {
       text: 'Your file is ready to download',
-      unread: true,
+      unread: false,
       date: '2025-11-28T14:29:03.000Z',
       image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
     },

@@ -1,5 +1,6 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { decodeToken } from '@/lib/utils';
+import { DashboardProvider } from '@/providers/DashboardProvider';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ReactNode } from 'react';
@@ -23,7 +24,11 @@ const Layout = async ({ children }: { children: ReactNode }) => {
     redirect('/signin');
   }
 
-  return <DashboardLayout>{children}</DashboardLayout>;
+  return (
+    <DashboardProvider>
+      <DashboardLayout>{children}</DashboardLayout>
+    </DashboardProvider>
+  );
 };
 
 export default Layout;
