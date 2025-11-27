@@ -11,8 +11,8 @@ import { Button } from '@/components/ui/button';
 import { ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
-
-import { DataTableDemo } from './Table';
+import { DataTable } from './payments/data-table';
+import { columns, tableData } from './payments/columns';
 
 const contestHighlightsData = [
   {
@@ -115,8 +115,9 @@ const Dashboard = () => {
 
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
+
   return (
-    <section className="grid grid-cols-3 gap-5">
+    <section className="grid grid-cols-3 gap-5 p-5">
       <div className="col-span-2 space-y-5">
         <div className="flex items-center justify-between gap-5">
           {contestHighlightsData.map((highlight, index) => (
@@ -207,19 +208,19 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <DataTableDemo />
+          <DataTable columns={columns} data={tableData} />
         </div>
       </div>
       <div className="space-y-5">
         <div className="space-y-2 rounded-xl bg-gray-900 p-5">
           <h3 className="flex-1 text-xl font-medium">Active Users</h3>
 
-          <DataTableDemo />
+          <DataTable columns={columns} data={tableData} />
         </div>{' '}
         <div className="space-y-2 rounded-xl bg-gray-900 p-5">
           <h3 className="flex-1 text-xl font-medium">Inactive Users</h3>
 
-          <DataTableDemo />
+          <DataTable columns={columns} data={tableData} />
         </div>
       </div>
     </section>

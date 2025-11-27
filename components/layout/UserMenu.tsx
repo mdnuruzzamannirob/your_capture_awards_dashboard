@@ -55,10 +55,7 @@ const UserMenu = () => {
           </button>
         )}
       </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="text-foreground w-full max-w-72 rounded-md border border-gray-800 bg-gray-900 p-0 sm:max-w-72"
-      >
+      <PopoverContent align="end" className="w-full max-w-72 rounded-md p-0 sm:max-w-72">
         <div className="flex items-center gap-3 p-3">
           {user?.avatar ? (
             <Image

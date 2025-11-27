@@ -9,6 +9,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      'react-hooks/incompatible-library': 'off',
     },
   },
 ]);
