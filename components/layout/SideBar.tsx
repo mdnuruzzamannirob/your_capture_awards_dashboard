@@ -6,26 +6,26 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { sideMenus } from '@/constants/menus';
 import useDashboard from '@/hooks/useDashboard';
 
 const SideBar = () => {
-  const { isSidebarVisible, setIsSidebarVisible } = useDashboard();
+  const { setIsSidebarVisible } = useDashboard();
   const pathname = usePathname();
 
-  const [isSidebarHovered, setSidebarHovered] = useState(true);
   const [isPinned, setIsPinned] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
-  const realExpand = isPinned || isSidebarHovered;
+  const realExpand = isPinned || isHovered;
 
-  // Sync parent expansion state
+  // Sync with parent layout
   useEffect(() => {
-    if (isSidebarVisible !== realExpand) setIsSidebarVisible(realExpand);
-  }, [realExpand, isSidebarVisible, setIsSidebarVisible]);
+    setIsSidebarVisible(realExpand);
+  }, [realExpand, setIsSidebarVisible]);
 
-  // Logo swap with delay
+  // Logo smooth toggle
   const [showLogo, setShowLogo] = useState(realExpand);
   useEffect(() => {
     const timeout = setTimeout(() => setShowLogo(realExpand), realExpand ? 100 : 0);
@@ -39,11 +39,11 @@ const SideBar = () => {
   return (
     <aside
       className={cn(
-        'bg-background fixed z-50 h-dvh border-r transition-all duration-300',
+        'bg-background fixed z-50 h-dvh overflow-hidden border-r transition-all duration-300',
         realExpand ? 'w-60' : 'w-16',
       )}
-      onMouseEnter={() => setSidebarHovered(true)}
-      onMouseLeave={() => setSidebarHovered(false)}
+      onMouseEnter={() => !isPinned && setIsHovered(true)}
+      onMouseLeave={() => !isPinned && setIsHovered(false)}
     >
       {/* Logo */}
       <Link href="/dashboard" className="flex h-[57px] items-center border-b px-4">
@@ -66,7 +66,7 @@ const SideBar = () => {
         )}
       </Link>
 
-      {/* Main menu */}
+      {/* Menu */}
       <div className="flex flex-col gap-3 p-3">
         {sideMenus.map((item) => {
           const hasChildren = !!item.children?.length;
@@ -75,7 +75,6 @@ const SideBar = () => {
 
           return (
             <div key={item.name} className="flex flex-col">
-              {/* Parent Item */}
               {hasChildren ? (
                 <button
                   onClick={() => toggleGroup(item.name)}
@@ -95,7 +94,6 @@ const SideBar = () => {
                   >
                     {item.name}
                   </span>
-
                   <IoIosArrowForward
                     className={cn('transition-all duration-300', isOpen ? 'rotate-90' : 'rotate-0')}
                   />
@@ -122,7 +120,7 @@ const SideBar = () => {
                 </Link>
               )}
 
-              {/* Nested Children */}
+              {/* Nested children */}
               {hasChildren && isOpen && realExpand && (
                 <div className="mt-1 ml-5 flex flex-col gap-1">
                   {item.children!.map((child) => {

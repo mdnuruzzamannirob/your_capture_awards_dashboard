@@ -94,7 +94,7 @@ const ContestDetailsPage = () => {
       </div>
 
       {/* Content */}
-      <div className="rounded-xl p-5">{renderTabContent()}</div>
+      <div className="p-5">{renderTabContent()}</div>
     </section>
   );
 };
