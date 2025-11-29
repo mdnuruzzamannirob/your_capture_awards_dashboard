@@ -74,7 +74,7 @@ const ContestDetailsPage = () => {
             }}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'relative z-10 px-5 py-2 text-sm whitespace-nowrap transition',
+              'relative z-10 px-5 py-3 text-sm whitespace-nowrap transition',
               activeTab === tab.key
                 ? 'text-primary font-medium'
                 : 'text-muted-foreground hover:bg-gray-800',

@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -11,16 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Info, Pencil } from 'lucide-react';
-import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { CalendarIcon, Info, Pencil } from 'lucide-react';
+import { format } from 'date-fns';
 
 const DetailsTab = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     title: 'Lorem ipsum dolor sit amet',
     description:
-      'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem deserunt vero inventore illum sapiente ipsum, doloremque, nulla modi officia veniam sit. Praesentium aliquid asperiores animi perferendis ducimus. Commodi, quo iure?',
+      'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem deserunt vero inventore',
     moneyContest: true,
     vote: 7500,
     participant: 55,
@@ -29,8 +32,10 @@ const DetailsTab = () => {
     maxUpload: 4,
     minPrize: 200,
     maxPrize: 4000,
-    startDate: '2025-01-16',
-    endDate: '2025-01-20',
+    startDate: new Date('2025-01-16'),
+    startTime: '10:00',
+    endDate: new Date('2025-01-20'),
+    endTime: '18:00',
   });
 
   const handleChange = (key: string, value: any) => {
@@ -130,49 +135,41 @@ const DetailsTab = () => {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 sm:max-h-[80vh] sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Edit Details</DialogTitle>
           </DialogHeader>
-
-          <div className="space-y-4">
-            <div>
+          <form className="size-full overflow-y-auto">
+            {/* Title */}
+            <div className="flex flex-col gap-2">
               <Label>Title</Label>
               <Input
                 value={formData.title}
                 onChange={(e) => handleChange('title', e.target.value)}
-                placeholder="Enter contest title"
               />
             </div>
 
-            <div>
+            {/* Description */}
+            <div className="flex flex-col gap-2">
               <Label>Description</Label>
-              <Textarea
+              <Input
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                placeholder="Enter contest description"
-                className="resize-none"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-2 gap-5 space-y-5">
+              {/* Money Contest */}
+              <div className="flex flex-col gap-2">
                 <Label>Money Contest</Label>
-                <Select
-                  value={formData.moneyContest ? 'true' : 'false'}
-                  onValueChange={(val) => handleChange('moneyContest', val === 'true')}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="true">True</SelectItem>
-                    <SelectItem value="false">False</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Switch
+                  checked={formData.moneyContest}
+                  onCheckedChange={(val) => handleChange('moneyContest', val)}
+                />
               </div>
 
-              <div>
+              {/* Status */}
+              <div className="flex flex-col gap-2">
                 <Label>Status</Label>
                 <Select
                   value={formData.status}
@@ -189,7 +186,8 @@ const DetailsTab = () => {
                 </Select>
               </div>
 
-              <div>
+              {/* Mode */}
+              <div className="flex flex-col gap-2">
                 <Label>Mode</Label>
                 <Select value={formData.mode} onValueChange={(val) => handleChange('mode', val)}>
                   <SelectTrigger>
@@ -202,82 +200,82 @@ const DetailsTab = () => {
                 </Select>
               </div>
 
-              <div>
-                <Label>Max Upload</Label>
-                <Input
-                  type="number"
-                  value={formData.maxUpload}
-                  onChange={(e) => handleChange('maxUpload', parseInt(e.target.value))}
-                  placeholder="Max upload per participant"
-                />
-              </div>
+              {/* Numbers */}
+              {['maxUpload', 'participant', 'minPrize', 'maxPrize'].map((key) => (
+                <div key={key} className="flex flex-col gap-2">
+                  <Label>{key}</Label>
+                  <Input
+                    type="number"
+                    value={formData[key as keyof typeof formData] as number}
+                    onChange={(e) => handleChange(key, parseInt(e.target.value) || 0)}
+                  />
+                </div>
+              ))}
 
-              <div>
-                <Label>Vote</Label>
-                <Input
-                  type="number"
-                  value={formData.vote}
-                  onChange={(e) => handleChange('vote', parseInt(e.target.value))}
-                  placeholder="Vote count"
-                />
-              </div>
-
-              <div>
-                <Label>Participant</Label>
-                <Input
-                  type="number"
-                  value={formData.participant}
-                  onChange={(e) => handleChange('participant', parseInt(e.target.value))}
-                  placeholder="Number of participants"
-                />
-              </div>
-
-              <div>
-                <Label>Min Prize</Label>
-                <Input
-                  type="number"
-                  value={formData.minPrize}
-                  onChange={(e) => handleChange('minPrize', parseInt(e.target.value))}
-                  placeholder="Minimum prize"
-                />
-              </div>
-
-              <div>
-                <Label>Max Prize</Label>
-                <Input
-                  type="number"
-                  value={formData.maxPrize}
-                  onChange={(e) => handleChange('maxPrize', parseInt(e.target.value))}
-                  placeholder="Maximum prize"
-                />
-              </div>
-
-              <div>
+              {/* Dates */}
+              <div className="flex flex-col gap-2">
                 <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-between">
+                      {format(formData.startDate, 'PPP')}
+                      <CalendarIcon className="ml-2 size-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0">
+                    <Calendar
+                      mode="single"
+                      selected={formData.startDate}
+                      onSelect={(date) => handleChange('startDate', date)}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>Start Time</Label>
                 <Input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => handleChange('startDate', e.target.value)}
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => handleChange('startTime', e.target.value)}
                 />
               </div>
 
-              <div>
+              <div className="flex flex-col gap-2">
                 <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="justify-between">
+                      {format(formData.endDate, 'PPP')}
+                      <CalendarIcon className="ml-2 size-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-fit p-0">
+                    <Calendar
+                      mode="single"
+                      selected={formData.endDate}
+                      onSelect={(date) => handleChange('endDate', date)}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label>End Time</Label>
                 <Input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => handleChange('endDate', e.target.value)}
+                  type="time"
+                  value={formData.endTime}
+                  onChange={(e) => handleChange('endTime', e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="mt-2 flex justify-end gap-3">
+            {/* Actions */}
+            <div className="mt-4 flex justify-end gap-3">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
               <Button onClick={handleSubmit}>Save</Button>
             </div>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
