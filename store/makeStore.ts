@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '@/store/features/auth/authSlice';
 import { authApi } from './features/auth/authApi';
-// import { userApi } from './features/user/userApi';
+import { userApi } from './features/user/userApi';
 // import { contestApi } from './features/contest/contestApi';
 
 export const makeStore = (preloadedState = {}) => {
@@ -9,7 +9,7 @@ export const makeStore = (preloadedState = {}) => {
     reducer: {
       auth: authReducer,
       [authApi.reducerPath]: authApi.reducer,
-      // [userApi.reducerPath]: userApi.reducer,
+      [userApi.reducerPath]: userApi.reducer,
       // [profileApi.reducerPath]: profileApi.reducer,
       // [contestApi.reducerPath]: contestApi.reducer,
     },
@@ -18,7 +18,7 @@ export const makeStore = (preloadedState = {}) => {
         serializableCheck: false,
       }).concat(
         authApi.middleware,
-        // userApi.middleware,
+        userApi.middleware,
         // profileApi.middleware,
         // contestApi.middleware,
       ),
@@ -26,7 +26,3 @@ export const makeStore = (preloadedState = {}) => {
     devTools: process.env.NODE_ENV !== 'production',
   });
 };
-
-export type AppStore = ReturnType<typeof makeStore>;
-export type RootState = ReturnType<AppStore['getState']>;
-export type AppDispatch = AppStore['dispatch'];

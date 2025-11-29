@@ -1,9 +1,9 @@
 'use client';
 
 import { makeStore } from '@/store/makeStore';
-import { Provider as ReduxProvider } from 'react-redux';
+import { Provider } from 'react-redux';
 
-const Provider = ({
+const ReduxProvider = ({
   children,
   preloadedState,
 }: {
@@ -12,7 +12,7 @@ const Provider = ({
 }) => {
   const store = makeStore(preloadedState);
 
-  return <ReduxProvider store={store}>{children}</ReduxProvider>;
+  return <Provider store={store}>{children}</Provider>;
 };
 
-export default Provider;
+export default ReduxProvider;

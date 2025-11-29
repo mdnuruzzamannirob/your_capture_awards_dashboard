@@ -3,9 +3,9 @@ import { Kumbh_Sans } from 'next/font/google';
 import '@/styles/globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from 'sonner';
-import Provider from './providers';
 import { authApi } from '@/store/features/auth/authApi';
 import { makeStore } from '@/store/makeStore';
+import ReduxProvider from '../providers/ReduxProviders';
 
 const kumbhSans = Kumbh_Sans({
   variable: '--font-kumbh-sans',
@@ -32,10 +32,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={cn('antialiased', kumbhSans.className)} suppressHydrationWarning>
-        <Provider preloadedState={preloadedState}>
+        <ReduxProvider preloadedState={preloadedState}>
           <Toaster closeButton richColors />
           {children}
-        </Provider>
+        </ReduxProvider>
       </body>
     </html>
   );
