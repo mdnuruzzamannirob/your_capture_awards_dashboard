@@ -8,3 +8,5 @@ export interface SideMenu {
     icon?: React.ReactNode;
   }[];
 }
+
+export type ContestDetailsTabKey = 'details' | 'winners' | 'rules' | 'prizes' | 'rank';

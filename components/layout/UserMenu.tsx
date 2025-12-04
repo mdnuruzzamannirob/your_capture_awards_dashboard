@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { LogOut, User as ProfileUser } from 'lucide-react';
 import Link from 'next/link';
@@ -19,11 +19,16 @@ import { LuSettings } from 'react-icons/lu';
 const UserMenu = () => {
   const [open, setOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { user, token } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleLogout = () => {
     router.push('/signin');
@@ -32,6 +37,9 @@ const UserMenu = () => {
     setOpen(false);
   };
 
+  if (!isMounted) {
+    return;
+  }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

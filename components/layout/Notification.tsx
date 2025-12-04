@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { RiNotification3Fill } from 'react-icons/ri';
 import { IoCheckmarkDone } from 'react-icons/io5';
@@ -10,6 +10,11 @@ import Image from 'next/image';
 const Notification = () => {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const notifyData = [
     {
@@ -176,7 +181,9 @@ const Notification = () => {
       </div>
     );
   };
-
+  if (!isMounted) {
+    return;
+  }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>

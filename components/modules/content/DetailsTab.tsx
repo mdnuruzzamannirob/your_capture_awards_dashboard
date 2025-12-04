@@ -26,8 +26,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
   const [contest] = useState(data);
   const [formData, setFormData] = useState({
     title: contest?.title,
-    description:
-      'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem deserunt vero inventore',
+    description: 'Lorem, ipsum dolor sit ',
     moneyContest: true,
     vote: 7500,
     participant: 55,
@@ -36,9 +35,9 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
     maxUpload: 4,
     minPrize: 200,
     maxPrize: 4000,
-    startDate: new Date('2025-01-16'),
+    startDate: '2025-01-16',
     startTime: '10:00',
-    endDate: new Date('2025-01-20'),
+    endDate: '2025-01-20',
     endTime: '18:00',
   });
 
@@ -268,7 +267,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
                   <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
-                      selected={formData.startDate}
+                      selected={contest.startDate}
                       onSelect={(date) => handleChange('startDate', date)}
                     />
                   </PopoverContent>
@@ -295,7 +294,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
                   <PopoverContent className="w-fit p-0">
                     <Calendar
                       mode="single"
-                      selected={formData.endDate}
+                      selected={contest.endDate}
                       onSelect={(date) => handleChange('endDate', date)}
                     />
                   </PopoverContent>
