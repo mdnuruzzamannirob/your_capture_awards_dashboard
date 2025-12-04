@@ -17,11 +17,15 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, Info, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
+import Image from 'next/image';
+import { GoDotFill } from 'react-icons/go';
 
-const DetailsTab = () => {
+const DetailsTab = ({ contest: data }: { contest: any }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [contest] = useState(data);
   const [formData, setFormData] = useState({
-    title: 'Lorem ipsum dolor sit amet',
+    title: contest?.title,
     description:
       'Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem deserunt vero inventore',
     moneyContest: true,
@@ -37,6 +41,23 @@ const DetailsTab = () => {
     endDate: new Date('2025-01-20'),
     endTime: '18:00',
   });
+
+  const {
+    day: startDay,
+    hours: startHours,
+    minutes: startMinutes,
+    month: startMonth,
+    timeZone: startTimeZone,
+    year: startYear,
+  } = formatDateWithTime(contest.startDate);
+  const {
+    day: endDay,
+    hours: endHours,
+    minutes: endMinutes,
+    month: endMonth,
+    timeZone: endTimeZone,
+    year: endYear,
+  } = formatDateWithTime(contest.endDate);
 
   const handleChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -63,73 +84,95 @@ const DetailsTab = () => {
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Creator</h1>
           <div className="flex items-center gap-2">
-            <p className="size-8 rounded-full bg-gray-500"></p>
-            <p className="text-base font-medium">Md. Nuruzzaman</p>
+            <Image
+              alt="Profile"
+              src={contest?.creator?.avatar}
+              width={40}
+              height={40}
+              className="size-10 min-w-10 overflow-hidden rounded-full bg-gray-900 object-cover"
+            />
+            <div className="">
+              <h3 className="font-medium">{contest?.creator?.fullName}</h3>
+              <p className="text-muted-foreground text-sm">{contest?.creator?.email}</p>
+            </div>
           </div>
         </div>
 
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Title</h1>
-          <h1 className="text-base font-semibold">Lorem ipsum dolor sit amet</h1>
+          <h1 className="text-base font-semibold">{contest?.title}</h1>
         </div>
 
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Description</h1>
-          <p className="text-base">
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quidem deserunt vero inventore
-            illum sapiente ipsum, doloremque, nulla modi officia veniam sit. Praesentium aliquid
-            asperiores animi perferendis ducimus. Commodi, quo iure?
-          </p>
+          <p className="text-base">{contest?.description}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-5 text-sm">
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Money Contest</h1>
-            <p className="text-base font-semibold">True</p>
+            <p className="text-base font-semibold">{contest?.isMoneyContest ? 'Yes' : 'No'}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Vote</h1>
-            <p className="text-base font-semibold">7500</p>
+            <p className="text-base font-semibold">{contest?.totalVotes ?? 0}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Participant</h1>
-            <p className="text-base font-semibold">55</p>
+            <p className="text-base font-semibold">N/A</p>
           </div>
           <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Status</h1>
-            <p className="text-base font-semibold">ACTIVE</p>
+            <h1 className="text-muted-foreground font-medium">Status</h1>{' '}
+            <button
+              className={cn(
+                'text-foreground flex cursor-default items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
+                contest?.status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
+                contest?.status === 'CLOSED' && 'bg-red-500/20 text-red-600',
+                contest?.status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
+              )}
+            >
+              <GoDotFill /> {contest?.status}
+            </button>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Mode</h1>
-            <p className="text-base font-semibold">Solo</p>
+            <p className="text-base font-semibold">{contest?.mode}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Max Upload</h1>
-            <p className="text-base font-semibold">4</p>
+            <p className="text-base font-semibold">{contest.maxUploads}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Min Prize</h1>
-            <p className="text-base font-semibold">$200</p>
+            <p className="text-base font-semibold">${contest.minPrize ?? 0}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Max Prize</h1>
-            <p className="text-base font-semibold">$4000</p>
+            <p className="text-base font-semibold">${contest.maxPrize ?? 0}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Start Date</h1>
-            <p className="text-base font-semibold">16 Jan 2025</p>
+            <p className="text-base font-semibold">
+              {' '}
+              {startDay} {startMonth} {startYear}, {startHours}:{startMinutes}{' '}
+              <span className="text-muted-foreground text-xs font-medium">{startTimeZone}</span>
+            </p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">End Date</h1>
-            <p className="text-base font-semibold">20 Jan 2025</p>
+            <p className="text-base font-semibold">
+              {' '}
+              {endDay} {endMonth} {endYear}, {endHours}:{endMinutes}{' '}
+              <span className="text-muted-foreground text-xs font-medium">{endTimeZone}</span>
+            </p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Updated At</h1>
-            <p className="text-base font-semibold">16 Jan 2025</p>
+            <p className="text-base font-semibold">{formatDateToDayMonYear(contest.updatedAt)}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Created At</h1>
-            <p className="text-base font-semibold">15 Jan 2025</p>
+            <p className="text-base font-semibold">{formatDateToDayMonYear(contest.createdAt)}</p>
           </div>
         </div>
       </div>
