@@ -1,13 +1,37 @@
 'use client';
 
-import { columns, tableData } from './contest-columns';
-import { DataTable } from './contest-data-table';
+import { DataTable, FilterableColumn } from '@/components/common/DataTable';
+import { columns } from './contest-columns';
+import { useState } from 'react';
+import { useGetContestsQuery } from '@/store/features/contest/contestApi';
+import { useRouter } from 'next/navigation';
 
 const ContestTable = () => {
+  const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+
+  const { data, isLoading, isFetching } = useGetContestsQuery({ page, limit });
+
+  const filterColumns: FilterableColumn[] = [{ id: 'title', placeholder: 'Filter by name...' }];
   return (
-    <div className="w-full space-y-5 rounded-xl bg-gray-900 p-5">
-      <DataTable columns={columns} data={tableData} />
-    </div>
+    <DataTable
+      columns={columns}
+      data={data?.data ?? []}
+      page={page}
+      pageSize={limit}
+      total={data?.data?.length ?? 0}
+      filterableColumns={filterColumns}
+      onPageChange={setPage}
+      onPageSizeChange={(size) => {
+        setLimit(size);
+        setPage(1);
+      }}
+      onRowClick={(value) => {
+        router.push(`/contest/${value.id}`);
+      }}
+      isLoading={isLoading || isFetching}
+    />
   );
 };
 

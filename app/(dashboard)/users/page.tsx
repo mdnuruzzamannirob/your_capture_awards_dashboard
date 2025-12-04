@@ -1,3 +1,4 @@
+import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
 import { cn } from '@/lib/utils';
 import ReduxProvider from '@/providers/ReduxProviders';
@@ -60,6 +61,7 @@ const UsersPage = async () => {
           ))}
         </div>
 
+        <Title title="Users" description="Manage all users" />
         <UserTable />
       </section>
     </ReduxProvider>

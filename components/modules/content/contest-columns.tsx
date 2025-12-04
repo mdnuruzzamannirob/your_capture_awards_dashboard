@@ -1,475 +1,118 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
-
+import { Pen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { DataTableColumnHeader } from '@/components/common/data-table-column-header';
+import Image from 'next/image';
+import { cn, formatDateWithTime } from '@/lib/utils';
+import { GoDotFill } from 'react-icons/go';
 
-export const tableData: Payment[] = [
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-  {
-    id: '1',
-    amount: 316,
-    status: 'success',
-    email: 'ken99@example.com',
-  },
-  {
-    id: '2',
-    amount: 242,
-    status: 'success',
-    email: 'Abe45@example.com',
-  },
-  {
-    id: '3',
-    amount: 837,
-    status: 'processing',
-    email: 'Monserrat44@example.com',
-  },
-  {
-    id: '4',
-    amount: 874,
-    status: 'success',
-    email: 'Silas22@example.com',
-  },
-  {
-    id: '5',
-    amount: 721,
-    status: 'failed',
-    email: 'carmella@example.com',
-  },
-];
-
-export type Payment = {
-  id: string;
-  amount: number;
-  status: 'pending' | 'processing' | 'success' | 'failed';
-  email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     id: 'sl',
     header: 'SL',
     cell: ({ row }) => <div>{row.index + 1}</div>,
   },
-
   {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('status')}</div>,
+    id: 'title',
+    header: 'Title',
+    cell: ({ row }) => <div className="capitalize">{row.original.title}</div>,
   },
   {
-    accessorKey: 'email',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
-    cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
-  },
-  {
-    accessorKey: 'amount',
-    header: () => <div className="text-right">Amount</div>,
+    accessorKey: 'creator',
+    header: 'Creator',
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue('amount'));
+      const { creator } = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <Image
+            alt="Profile"
+            src={creator?.avatar}
+            width={32}
+            height={32}
+            className="size-8 min-w-8 overflow-hidden rounded-full bg-gray-900 object-cover"
+          />
+          <div className="">
+            <h3 className="text-sm font-medium">{creator?.fullName}</h3>
+            <p className="text-muted-foreground text-xs">{creator?.email}</p>
+          </div>
+        </div>
+      );
+    },
+  },
 
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(amount);
+  {
+    id: 'maxUpload',
+    header: 'Max Upload',
+    cell: ({ row }) => <div className="capitalize">{row.original.maxUploads}</div>,
+  },
+  {
+    id: 'mode',
+    header: 'Mode',
+    cell: ({ row }) => <div className="capitalize">{row.original.mode}</div>,
+  },
+  {
+    id: 'startDate',
+    header: 'Start Date',
+    cell: ({ row }) => {
+      const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
+        row.original.startDate,
+      );
 
-      return <div className="text-right font-medium">{formatted}</div>;
+      return (
+        <div className="capitalize">
+          {day} {month} {year}, {hours}:{minutes}{' '}
+          <span className="text-muted-foreground text-xs font-medium">{timeZone}</span>
+        </div>
+      );
     },
   },
   {
-    id: 'actions',
-    enableHiding: false,
+    id: 'endDate',
+    header: 'End Date',
     cell: ({ row }) => {
-      const payment = row.original;
+      const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
+        row.original.endDate,
+      );
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}>
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="capitalize">
+          {day} {month} {year}, {hours}:{minutes}{' '}
+          <span className="text-muted-foreground text-xs font-medium">{timeZone}</span>
+        </div>
+      );
+    },
+  },
+
+  {
+    id: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.original.status;
+
+      return (
+        <button
+          className={cn(
+            'text-foreground flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
+            status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
+            status === 'CLOSED' && 'bg-red-500/20 text-red-600',
+            status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
+          )}
+        >
+          <GoDotFill /> {status}
+        </button>
+      );
+    },
+  },
+
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: () => {
+      return (
+        <Button variant="outline" onClick={(event) => event.stopPropagation()}>
+          <Pen className="size-3" />
+        </Button>
       );
     },
   },

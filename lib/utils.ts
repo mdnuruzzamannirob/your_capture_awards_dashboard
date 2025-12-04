@@ -63,3 +63,29 @@ export const formatDateToDayMonYear = (isoString: string) => {
 
   return `${day} ${month} ${year}`;
 };
+
+export const formatDateWithTime = (isoString: string) => {
+  // Check for falsy values (null, undefined, empty string)
+  if (!isoString) {
+    return {};
+  }
+
+  const date = new Date(isoString);
+
+  // Check if the Date object is valid (NaN check)
+  if (isNaN(date.getTime())) {
+    return {};
+  }
+
+  // Date Components (UTC)
+  const day = date.getUTCDate();
+  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+  const year = date.getUTCFullYear();
+
+  // Time Components (UTC)
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+  // Combining Date and Time
+  return { day, month, year, hours, minutes, timeZone: 'UTC' };
+};
