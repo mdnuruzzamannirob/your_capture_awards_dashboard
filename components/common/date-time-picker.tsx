@@ -1,4 +1,3 @@
-// components/date-time-picker.tsx
 'use client';
 
 import { format } from 'date-fns';
@@ -35,13 +34,13 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex items-center gap-2">
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant={'outline'}
             className={cn(
-              'w-full justify-start border-gray-800 bg-gray-900 text-left font-normal hover:bg-gray-800',
+              'flex-1 justify-start border-gray-800 bg-gray-900 text-left font-normal hover:bg-gray-800',
               !date && 'text-muted-foreground',
             )}
           >
@@ -74,7 +73,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
           type="time"
           value={time}
           onChange={handleTimeChange}
-          className="border-gray-800 bg-gray-900 pl-10 text-white [color-scheme:dark]"
+          className="border-gray-800 bg-gray-900 pl-10 text-white scheme-dark"
         />
       </div>
     </div>

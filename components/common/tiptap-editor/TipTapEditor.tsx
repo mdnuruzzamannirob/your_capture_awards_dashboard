@@ -52,7 +52,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   onChange,
   placeholder = 'Start typing...',
   minHeightClass = 'min-h-[120px]',
-  maxHeightClass = 'max-h-[500px]',
+  maxHeightClass = 'max-h-[600px]',
   className,
 }) => {
   const [mounted, setMounted] = useState(false);

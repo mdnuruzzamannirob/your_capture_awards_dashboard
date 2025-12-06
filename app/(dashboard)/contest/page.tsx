@@ -1,10 +1,9 @@
 import Title from '@/components/common/Title';
 import ContestTable from '@/components/modules/content/ContestTable';
-import { Button } from '@/components/ui/button';
+import CreateContestModal from '@/components/modules/content/CreateContestModal';
 import ReduxProvider from '@/providers/ReduxProviders';
 import { contestApi } from '@/store/features/contest/contestApi';
 import { makeStore } from '@/store/makeStore';
-import Link from 'next/link';
 
 const ContestPage = async () => {
   const store = makeStore();
@@ -19,10 +18,7 @@ const ContestPage = async () => {
       <section className="space-y-5 p-5">
         <div className="flex items-center justify-between gap-5">
           <Title title="Contest" description="Manage all contest" />
-          <Link href="/contest/create-contest">
-            {' '}
-            <Button className="text-foreground">Create Contest</Button>
-          </Link>
+          <CreateContestModal />
         </div>
 
         <ContestTable />
