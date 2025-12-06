@@ -1,8 +1,6 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Pen } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { cn, formatDateWithTime } from '@/lib/utils';
 import { GoDotFill } from 'react-icons/go';
@@ -11,16 +9,19 @@ export const columns: ColumnDef<any>[] = [
   {
     id: 'sl',
     header: 'SL',
-    cell: ({ row }) => <div>{row.index + 1}</div>,
+    cell: ({ row, table }) => {
+      const { pageIndex, pageSize } = table.getState().pagination;
+      return pageIndex * pageSize + row.index + 1;
+    },
   },
   {
     id: 'title',
-    header: 'Title',
+    header: 'TITLE',
     cell: ({ row }) => <div className="capitalize">{row.original.title}</div>,
   },
   {
     accessorKey: 'creator',
-    header: 'Creator',
+    header: 'CREATOR',
     cell: ({ row }) => {
       const { creator } = row.original;
       return (
@@ -43,17 +44,17 @@ export const columns: ColumnDef<any>[] = [
 
   {
     id: 'maxUpload',
-    header: 'Max Upload',
+    header: 'MAX UPLOAD',
     cell: ({ row }) => <div className="capitalize">{row.original.maxUploads}</div>,
   },
   {
     id: 'mode',
-    header: 'Mode',
+    header: 'MODE',
     cell: ({ row }) => <div className="capitalize">{row.original.mode}</div>,
   },
   {
     id: 'startDate',
-    header: 'Start Date',
+    header: 'START DATE',
     cell: ({ row }) => {
       const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
         row.original.startDate,
@@ -69,7 +70,7 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     id: 'endDate',
-    header: 'End Date',
+    header: 'END DATE',
     cell: ({ row }) => {
       const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
         row.original.endDate,
@@ -86,7 +87,7 @@ export const columns: ColumnDef<any>[] = [
 
   {
     id: 'status',
-    header: 'Status',
+    header: 'STATUS',
     cell: ({ row }) => {
       const status = row.original.status;
 
@@ -101,18 +102,6 @@ export const columns: ColumnDef<any>[] = [
         >
           <GoDotFill /> {status}
         </button>
-      );
-    },
-  },
-
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: () => {
-      return (
-        <Button variant="outline" onClick={(event) => event.stopPropagation()}>
-          <Pen className="size-3" />
-        </Button>
       );
     },
   },
