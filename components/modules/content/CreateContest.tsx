@@ -56,11 +56,11 @@ const STEPS = [
     id: 0,
     title: 'Details',
     icon: FileText,
-    fields: ['title', 'description', 'startDate', 'endDate'] as const,
+    fields: ['title', 'description', 'startDate', 'endDate'],
   },
-  { id: 1, title: 'Rules', icon: Scale, fields: ['rules'] as const },
-  { id: 2, title: 'Prizes', icon: Trophy, fields: ['prizes'] as const },
-  { id: 3, title: 'Review', icon: ClipboardCheck, fields: [] as const },
+  { id: 1, title: 'Rules', icon: Scale, fields: ['rules'] },
+  { id: 2, title: 'Prizes', icon: Trophy, fields: ['prizes'] },
+  { id: 3, title: 'Review', icon: ClipboardCheck, fields: [] },
 ];
 
 const RULE_ICONS = [
@@ -164,11 +164,439 @@ const CreateContest: React.FC = () => {
   // only process final submit when on last step
   const onSubmit = (data: ContestValues) => {
     if (currentStep !== STEPS.length - 1) {
-      // guard: shouldn't happen (Next buttons are type="button"), but safe-guard here
       return;
     }
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
     alert('Contest Created! Check console for data.');
+  };
+
+  const stepContent = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-2 grid grid-cols-1 gap-5 md:grid-cols-2">
+            <h1 className="col-span-full flex items-center gap-2 border-b pb-4 text-lg font-semibold">
+              <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                <FileText className="size-5" />
+              </span>{' '}
+              Details
+            </h1>
+
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Contest Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Neon Nights 2025" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Date Pickers */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-400">Start Date & Time</FormLabel>
+                  <FormControl>
+                    <DateTimePicker
+                      date={field.value}
+                      setDate={field.onChange}
+                      label="Select Start Date"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-400">End Date & Time</FormLabel>
+                  <FormControl>
+                    <DateTimePicker
+                      date={field.value}
+                      setDate={field.onChange}
+                      label="Select End Date"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Full Description</FormLabel>
+                    <FormControl>
+                      <TipTapEditor
+                        value={field.value}
+                        onChange={field.onChange}
+                        minHeight="h-48"
+                        placeholder="Describe the contest theme, rules, and inspiration in detail..."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        );
+      case 1:
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
+            <div className="flex items-center justify-between border-b pb-4">
+              <h1 className="flex items-center gap-2 text-lg font-semibold">
+                <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                  <Scale className="size-5" />
+                </span>{' '}
+                Contest Rules{' '}
+                <span>
+                  {' '}
+                  (<span className="text-primary">{ruleFields.length}</span>)
+                </span>
+              </h1>
+
+              <Button
+                type="button"
+                onClick={() => appendRule({ title: '', icon: 'info', description: '' })}
+                variant="outline"
+                className="border-gray-700 text-white hover:bg-gray-700"
+              >
+                <Plus className="mr-2 size-4" /> Add New Rule
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-10">
+              {ruleFields.map((f, index) => (
+                <div
+                  key={f.id}
+                  className="relative rounded-lg border bg-gray-950/50 p-5 transition-all duration-300"
+                >
+                  <div className="absolute top-1 right-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeRule(index)}
+                      className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
+                      disabled={ruleFields.length === 1}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-4">
+                    {/* Icon Select */}
+                    <FormField
+                      control={form.control}
+                      name={`rules.${index}.icon`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-400">Rule Icon</FormLabel>
+                          <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
+                            <Select
+                              value={field.value || ''}
+                              onValueChange={(val) => field.onChange(val)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Icon" />
+                              </SelectTrigger>
+                              <SelectContent align="start" className="max-h-60 overflow-y-auto">
+                                {RULE_ICONS.map((icon) => {
+                                  const IconComp = icon.icon;
+                                  return (
+                                    <SelectItem key={icon.value} value={icon.value}>
+                                      <div className="flex items-center gap-3">
+                                        <IconComp className="text-primary size-4" />
+                                        <span>{icon.label}</span>
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Title Input */}
+                    <div className="col-span-3">
+                      <FormField
+                        control={form.control}
+                        name={`rules.${index}.title`}
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="text-gray-400">Rule Title</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g. Originality Requirement"
+                                className="h-11"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Description */}
+                    <div className="col-span-full">
+                      <FormField
+                        control={form.control}
+                        name={`rules.${index}.description`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-400">Rule Description</FormLabel>
+                            <FormControl>
+                              <TipTapEditor
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Explain this rule in detail..."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* array-level error */}
+            {form.formState.errors.rules && (
+              <div className="text-sm text-red-400">
+                {(form.formState.errors.rules as any).message}
+              </div>
+            )}
+          </div>
+        );
+      case 2:
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-4 space-y-5">
+            <div className="flex items-center justify-between border-b pb-4">
+              <h3 className="flex items-center gap-2 text-lg font-semibold">
+                <Trophy /> Prizes & Rewards ({prizeFields.length})
+              </h3>
+              <Button
+                type="button"
+                onClick={() =>
+                  appendPrize({
+                    type: 'photo_winner',
+                    title: '',
+                    amount: '',
+                    boost: 0,
+                    key: 0,
+                    swap: 0,
+                    description: '',
+                  })
+                }
+                variant="outline"
+                className="border-gray-700 text-white hover:bg-gray-700"
+              >
+                <Plus className="mr-2 size-4" /> Add Prize
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              {prizeFields.map((f, index) => (
+                <div
+                  key={f.id}
+                  className="relative rounded-xl border bg-gray-950/50 p-5 transition-all duration-300"
+                >
+                  <div className="absolute top-4 right-4">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removePrize(index)}
+                      className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
+                      disabled={prizeFields.length === 1}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-6">
+                    <div className="md:col-span-full">
+                      <FormField
+                        control={form.control}
+                        name={`prizes.${index}.type`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-400">Prize Category</FormLabel>
+                            <FormControl className="min-h-11 ring-white/20 focus:ring-2">
+                              <Select
+                                value={field.value || ''}
+                                onValueChange={(v) => field.onChange(v)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent align="start" className="max-h-60 overflow-y-auto">
+                                  {PRIZE_TYPES.map((type) => {
+                                    const IconComp = type.icon;
+                                    return (
+                                      <SelectItem key={type.value} value={type.value}>
+                                        <div className="flex items-center gap-2">
+                                          <IconComp className="size-4 text-yellow-500" />
+                                          <span>{type.label}</span>
+                                        </div>
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Prize Title and Amount */}
+                    <FormField
+                      control={form.control}
+                      name={`prizes.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-3">
+                          <FormLabel className="text-gray-400">Prize Title</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="e.g. Grand Prize"
+                              className="h-11 border-gray-700 bg-gray-900 text-white"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`prizes.${index}.amount`}
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-3">
+                          <FormLabel className="text-gray-400">
+                            Value / Amount (e.g. $100)
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="$500 USD" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Key Boost and Swap */}
+                    <FormField
+                      control={form.control}
+                      name={`prizes.${index}.key`}
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel className="text-gray-400">Key (Units)</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="10" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`prizes.${index}.boost`}
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel className="text-gray-400">Boost (Units)</FormLabel>
+                          <FormControl>
+                            <Input type="number" placeholder="10" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name={`prizes.${index}.swap`}
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel className="text-gray-400">Swap (Units)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              placeholder="5"
+                              className="h-11 border-gray-700 bg-gray-900 text-white"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            {form.formState.errors.prizes && (
+              <div className="text-sm text-red-400">
+                {(form.formState.errors.prizes as any).message}
+              </div>
+            )}
+          </div>
+        );
+      case 3:
+        return (
+          <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6">
+            <h3 className="text-2xl font-semibold text-white">Final Review</h3>
+            <div className="space-y-6 rounded-lg border border-gray-800 bg-gray-950 p-6">
+              <div className="grid grid-cols-2">
+                <p className="text-gray-500">Title</p>
+                <p className="font-semibold text-white">{form.getValues('title')}</p>
+                <p className="text-gray-500">Start Time</p>
+                <p className="font-semibold text-white">
+                  {form.getValues('startDate')
+                    ? format(form.getValues('startDate')!, 'PPpp')
+                    : 'N/A'}
+                </p>
+                <p className="text-gray-500">End Time</p>
+                <p className="font-semibold text-white">
+                  {form.getValues('endDate') ? format(form.getValues('endDate')!, 'PPpp') : 'N/A'}
+                </p>
+              </div>
+              <Separator className="bg-gray-800" />
+              <h4 className="text-xl font-semibold text-white">Rules & Prizes</h4>
+              <p className="text-gray-400">
+                ({form.getValues('rules').length} Rules, {form.getValues('prizes').length} Prizes)
+              </p>
+            </div>
+          </div>
+        );
+
+      default:
+        return;
+    }
   };
 
   return (
@@ -223,430 +651,7 @@ const CreateContest: React.FC = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
         >
-          {/* --- STEP 1: DETAILS --- */}
-          {currentStep === 0 && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 grid grid-cols-1 gap-5 md:grid-cols-2">
-              <h1 className="col-span-full flex items-center gap-2 border-b pb-4 text-lg font-semibold">
-                <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
-                  <FileText className="size-5" />
-                </span>{' '}
-                Details
-              </h1>
-
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">Contest Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g. Neon Nights 2025" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Date Pickers */}
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-400">Start Date & Time</FormLabel>
-                    <FormControl>
-                      <DateTimePicker
-                        date={field.value}
-                        setDate={field.onChange}
-                        label="Select Start Date"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="endDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-400">End Date & Time</FormLabel>
-                    <FormControl>
-                      <DateTimePicker
-                        date={field.value}
-                        setDate={field.onChange}
-                        label="Select End Date"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="md:col-span-2">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-400">Full Description</FormLabel>
-                      <FormControl>
-                        <TipTapEditor
-                          value={field.value}
-                          onChange={field.onChange}
-                          minHeight="h-48"
-                          placeholder="Describe the contest theme, rules, and inspiration in detail..."
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* --- STEP 2: RULES --- */}
-          {currentStep === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
-              <div className="flex items-center justify-between border-b pb-4">
-                <h1 className="flex items-center gap-2 text-lg font-semibold">
-                  <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
-                    <Scale className="size-5" />
-                  </span>{' '}
-                  Contest Rules{' '}
-                  <span>
-                    {' '}
-                    (<span className="text-primary">{ruleFields.length}</span>)
-                  </span>
-                </h1>
-
-                <Button
-                  type="button"
-                  onClick={() => appendRule({ title: '', icon: 'info', description: '' })}
-                  variant="outline"
-                  className="border-gray-700 text-white hover:bg-gray-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Add New Rule
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-10">
-                {ruleFields.map((f, index) => (
-                  <div
-                    key={f.id}
-                    className="relative rounded-lg border bg-gray-950/50 p-5 transition-all duration-300"
-                  >
-                    <div className="absolute top-1 right-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeRule(index)}
-                        className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
-                        disabled={ruleFields.length === 1}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="grid gap-5 md:grid-cols-4">
-                      {/* Icon Select */}
-                      <FormField
-                        control={form.control}
-                        name={`rules.${index}.icon`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400">Rule Icon</FormLabel>
-                            <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
-                              <Select
-                                value={field.value || ''}
-                                onValueChange={(val) => field.onChange(val)}
-                              >
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select Icon" />
-                                </SelectTrigger>
-                                <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                  {RULE_ICONS.map((icon) => {
-                                    const IconComp = icon.icon;
-                                    return (
-                                      <SelectItem key={icon.value} value={icon.value}>
-                                        <div className="flex items-center gap-3">
-                                          <IconComp className="text-primary h-4 w-4" />
-                                          <span>{icon.label}</span>
-                                        </div>
-                                      </SelectItem>
-                                    );
-                                  })}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Title Input */}
-                      <div className="col-span-3">
-                        <FormField
-                          control={form.control}
-                          name={`rules.${index}.title`}
-                          render={({ field }) => (
-                            <FormItem className="md:col-span-2">
-                              <FormLabel className="text-gray-400">Rule Title</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="e.g. Originality Requirement"
-                                  className="h-11"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Description */}
-                      <div className="col-span-full">
-                        <FormField
-                          control={form.control}
-                          name={`rules.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-400">Rule Description</FormLabel>
-                              <FormControl>
-                                <TipTapEditor
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  placeholder="Explain this rule in detail..."
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {/* array-level error */}
-              {form.formState.errors.rules && (
-                <div className="text-sm text-red-400">
-                  {(form.formState.errors.rules as any).message}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* --- STEP 3: PRIZES --- */}
-          {currentStep === 2 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-5">
-              <div className="flex items-center justify-between border-b pb-4">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Trophy /> Prizes & Rewards ({prizeFields.length})
-                </h3>
-                <Button
-                  type="button"
-                  onClick={() =>
-                    appendPrize({
-                      type: 'photo_winner',
-                      title: '',
-                      amount: '',
-                      boost: 0,
-                      key: 0,
-                      swap: 0,
-                      description: '',
-                    })
-                  }
-                  variant="outline"
-                  className="border-gray-700 text-white hover:bg-gray-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" /> Add Prize
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                {prizeFields.map((f, index) => (
-                  <div
-                    key={f.id}
-                    className="relative rounded-xl border bg-gray-950/50 p-5 transition-all duration-300"
-                  >
-                    <div className="absolute top-4 right-4">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removePrize(index)}
-                        className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
-                        disabled={prizeFields.length === 1}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    <div className="grid gap-5 md:grid-cols-6">
-                      <div className="md:col-span-full">
-                        <FormField
-                          control={form.control}
-                          name={`prizes.${index}.type`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-400">Prize Category</FormLabel>
-                              <FormControl className="min-h-11 ring-white/20 focus:ring-2">
-                                <Select
-                                  value={field.value || ''}
-                                  onValueChange={(v) => field.onChange(v)}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select type" />
-                                  </SelectTrigger>
-                                  <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                    {PRIZE_TYPES.map((type) => {
-                                      const IconComp = type.icon;
-                                      return (
-                                        <SelectItem key={type.value} value={type.value}>
-                                          <div className="flex items-center gap-2">
-                                            <IconComp className="h-4 w-4 text-yellow-500" />
-                                            <span>{type.label}</span>
-                                          </div>
-                                        </SelectItem>
-                                      );
-                                    })}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-
-                      {/* Prize Title and Amount */}
-                      <FormField
-                        control={form.control}
-                        name={`prizes.${index}.title`}
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-3">
-                            <FormLabel className="text-gray-400">Prize Title</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g. Grand Prize"
-                                className="h-11 border-gray-700 bg-gray-900 text-white"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`prizes.${index}.amount`}
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-3">
-                            <FormLabel className="text-gray-400">
-                              Value / Amount (e.g. $100)
-                            </FormLabel>
-                            <FormControl>
-                              <Input placeholder="$500 USD" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* Key Boost and Swap */}
-                      <FormField
-                        control={form.control}
-                        name={`prizes.${index}.key`}
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel className="text-gray-400">Key (Units)</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="10" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`prizes.${index}.boost`}
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel className="text-gray-400">Boost (Units)</FormLabel>
-                            <FormControl>
-                              <Input type="number" placeholder="10" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name={`prizes.${index}.swap`}
-                        render={({ field }) => (
-                          <FormItem className="md:col-span-2">
-                            <FormLabel className="text-gray-400">Swap (Units)</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="5"
-                                className="h-11 border-gray-700 bg-gray-900 text-white"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {form.formState.errors.prizes && (
-                <div className="text-sm text-red-400">
-                  {(form.formState.errors.prizes as any).message}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* --- STEP 4: REVIEW --- */}
-          {currentStep === 3 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6">
-              <h3 className="text-2xl font-semibold text-white">Final Review</h3>
-              <div className="space-y-6 rounded-lg border border-gray-800 bg-gray-950 p-6">
-                <div className="grid grid-cols-2">
-                  <p className="text-gray-500">Title</p>
-                  <p className="font-semibold text-white">{form.getValues('title')}</p>
-                  <p className="text-gray-500">Start Time</p>
-                  <p className="font-semibold text-white">
-                    {form.getValues('startDate')
-                      ? format(form.getValues('startDate')!, 'PPpp')
-                      : 'N/A'}
-                  </p>
-                  <p className="text-gray-500">End Time</p>
-                  <p className="font-semibold text-white">
-                    {form.getValues('endDate') ? format(form.getValues('endDate')!, 'PPpp') : 'N/A'}
-                  </p>
-                </div>
-                <Separator className="bg-gray-800" />
-                <h4 className="text-xl font-semibold text-white">Rules & Prizes</h4>
-                <p className="text-gray-400">
-                  ({form.getValues('rules').length} Rules, {form.getValues('prizes').length} Prizes)
-                </p>
-              </div>
-            </div>
-          )}
+          {stepContent()}
 
           {/* Footer Buttons */}
           <div className="flex justify-between pb-4">
@@ -656,27 +661,30 @@ const CreateContest: React.FC = () => {
               size="lg"
               onClick={handleBack}
               disabled={currentStep === 0}
-              className={`px-6 text-gray-400 hover:bg-gray-800 hover:text-white ${currentStep === 0 ? 'invisible' : 'visible'}`}
+              className={cn(
+                'px-5 text-gray-400 hover:bg-gray-800 hover:text-white',
+                currentStep === 0 ? 'invisible' : 'visible',
+              )}
             >
-              <ArrowLeft className="mr-2 h-4 w-4" /> Back
+              <ArrowLeft className="mr-2 size-4" /> Back
             </Button>
 
             {currentStep === STEPS.length - 1 ? (
               <Button
                 type="submit"
                 size="lg"
-                className="bg-green-600 px-8 font-bold text-white hover:bg-green-700"
+                className="bg-green-600 px-5 text-white hover:bg-green-700"
               >
                 Launch Contest
               </Button>
             ) : (
               <Button
-                type="button" // <-- ensure not submit
+                type="button"
                 onClick={handleNext}
                 size="lg"
-                className="bg-white px-6 font-semibold text-black hover:bg-gray-200"
+                className="bg-white px-5 font-semibold text-black hover:bg-gray-200"
               >
-                Next Step <ArrowRight className="ml-2 h-4 w-4" />
+                Next Step <ArrowRight className="ml-2 size-4" />
               </Button>
             )}
           </div>
