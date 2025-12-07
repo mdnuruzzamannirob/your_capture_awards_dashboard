@@ -171,7 +171,7 @@ const CreateContest: React.FC = () => {
       case 0:
         return (
           <div className="animate-in fade-in slide-in-from-bottom-2 grid grid-cols-1 gap-5 md:grid-cols-2">
-            <h1 className="col-span-full flex items-center gap-2 border-b pb-4 text-lg font-semibold">
+            <h1 className="col-span-full flex items-center gap-2 border-b pb-5 text-lg font-semibold">
               <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
                 <FileText className="size-5" />
               </span>{' '}
@@ -393,7 +393,7 @@ const CreateContest: React.FC = () => {
             />
 
             {/* Min / Max prize — disabled when isMoneyContest is false */}
-            <div className="grid grid-cols-2 gap-4 md:col-span-2">
+            <div className="grid grid-cols-2 gap-5 md:col-span-2">
               <FormField
                 control={control}
                 name="minPrize"
@@ -516,7 +516,7 @@ const CreateContest: React.FC = () => {
                 variant="outline"
                 className="border-gray-700 text-white hover:bg-gray-700"
               >
-                <Plus className="mr-2 size-4" /> Add New Rule
+                <Plus className="size-5" /> Add New Rule
               </Button>
             </div>
 
@@ -652,7 +652,7 @@ const CreateContest: React.FC = () => {
                 variant="outline"
                 className="border-gray-700 text-white hover:bg-gray-700"
               >
-                <Plus className="mr-2 size-4" /> Add Prize
+                <Plus className="size-5" /> Add Prize
               </Button>
             </div>
 
@@ -851,23 +851,20 @@ const CreateContest: React.FC = () => {
       </div>
 
       <Form {...(form as any)}>
-        <form className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10">
+        <form className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 xl:col-span-10">
           {stepContent()}
 
           {/* Footer Buttons */}
-          <div className="flex justify-between pb-4">
+          <div className="flex justify-between pb-5">
             <Button
               type="button"
               variant="ghost"
               size="lg"
               onClick={handleBack}
               disabled={currentStep === 0}
-              className={cn(
-                'px-5 text-gray-400 hover:bg-gray-800 hover:text-white',
-                currentStep === 0 ? 'invisible' : 'visible',
-              )}
+              className={currentStep === 0 ? 'invisible' : 'visible'}
             >
-              <ArrowLeft className="mr-2 size-4" /> Back
+              <ArrowLeft className="size-5" /> Back
             </Button>
 
             {currentStep === CREATE_CONTEST_STEPS.length - 1 ? (
@@ -875,18 +872,13 @@ const CreateContest: React.FC = () => {
                 type="button"
                 size="lg"
                 onClick={handleFinalSubmit}
-                className="bg-green-600 px-5 text-white hover:bg-green-700"
+                className="bg-green-600 text-white hover:bg-green-700"
               >
                 Launch Contest
               </Button>
             ) : (
-              <Button
-                type="button"
-                onClick={handleNext}
-                size="lg"
-                className="bg-white px-5 font-semibold text-black hover:bg-gray-200"
-              >
-                Next Step <ArrowRight className="ml-2 size-4" />
+              <Button type="button" onClick={handleNext} size="lg" className="text-white">
+                Next Step <ArrowRight className="size-5" />
               </Button>
             )}
           </div>
