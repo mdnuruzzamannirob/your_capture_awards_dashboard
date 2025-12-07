@@ -123,10 +123,16 @@ const CreateContest: React.FC = () => {
     if (currentStep > 0) setCurrentStep((prev) => prev - 1);
   };
 
-  const onSubmit = (data: ContestValues) => {
-    if (currentStep !== CREATE_CONTEST_STEPS.length - 1) {
+  const handleFinalSubmit = async () => {
+    // validate ALL fields explicitly
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      window.scrollTo(0, 0);
       return;
     }
+
+    const data = form.getValues();
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
     alert('Contest Created! Check console for data.');
   };
@@ -608,10 +614,7 @@ const CreateContest: React.FC = () => {
       </div>
 
       <Form {...(form as any)}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
-        >
+        <form className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10">
           {stepContent()}
 
           {/* Footer Buttons */}
@@ -632,8 +635,9 @@ const CreateContest: React.FC = () => {
 
             {currentStep === CREATE_CONTEST_STEPS.length - 1 ? (
               <Button
-                type="submit"
+                type="button"
                 size="lg"
+                onClick={handleFinalSubmit}
                 className="bg-green-600 px-5 text-white hover:bg-green-700"
               >
                 Launch Contest
