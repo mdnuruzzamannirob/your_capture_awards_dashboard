@@ -42,7 +42,7 @@ import {
   CREATE_CONTEST_RULE_ICONS,
   CREATE_CONTEST_STEPS,
   RECURRING_TYPES,
-} from '@/constants';
+} from '@/lib/constants';
 import Image from 'next/image';
 
 const CreateContest: React.FC = () => {

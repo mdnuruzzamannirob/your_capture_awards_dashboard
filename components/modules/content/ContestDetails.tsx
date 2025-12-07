@@ -6,7 +6,7 @@ import PrizesTab from '@/components/modules/content/PrizesTab';
 import RankTab from '@/components/modules/content/RankTab';
 import RulesTab from '@/components/modules/content/RulesTab';
 import WinnerTab from '@/components/modules/content/WinnerTab';
-import { CONTEST_DETAILS_TABS } from '@/constants';
+import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useGetContestQuery } from '@/store/features/contest/contestApi';
 import { ContestDetailsTabKey } from '@/types';

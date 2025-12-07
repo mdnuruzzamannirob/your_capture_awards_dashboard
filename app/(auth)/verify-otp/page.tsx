@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DEFAULT_ERROR } from '@/constants';
+import { DEFAULT_ERROR } from '@/lib/constants';
 import { useForgotPasswordMutation, useVerifyOTPMutation } from '@/store/features/auth/authApi';
 import useAuth from '@/hooks/useAuth';
 

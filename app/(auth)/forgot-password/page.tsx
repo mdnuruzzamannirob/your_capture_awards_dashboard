@@ -3,7 +3,7 @@
 import AuthTitle from '@/components/common/AuthTitle';
 import FormField from '@/components/common/FormField';
 import { Spinner } from '@/components/ui/spinner';
-import { DEFAULT_ERROR } from '@/constants';
+import { DEFAULT_ERROR } from '@/lib/constants';
 import { ForgotPasswordFormData, forgotPasswordSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { useForgotPasswordMutation } from '@/store/features/auth/authApi';

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { sideMenus } from '@/constants/menus';
+import { sideMenus } from '@/lib/constants/menus';
 import useDashboard from '@/hooks/useDashboard';
 
 const SideBar = () => {
