@@ -19,8 +19,9 @@ export const contestSchema = z
       .max(2000, 'Description is too long'),
 
     banner: z
-      .instanceof(File)
-      .refine(Boolean, 'Banner image is required')
+      .custom<File>((file) => file instanceof File, {
+        message: 'Banner image is required',
+      })
       .refine(
         (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
         'Only JPG, PNG or WEBP images are allowed',
@@ -67,7 +68,6 @@ export const contestSchema = z
           key: z.coerce.number().min(0).default(0),
           boost: z.coerce.number().min(0).default(0),
           swap: z.coerce.number().min(0).default(0),
-          description: z.string().optional(),
         }),
       )
       .min(1, 'At least one prize required'),

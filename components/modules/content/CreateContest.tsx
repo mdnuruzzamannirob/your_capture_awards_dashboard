@@ -71,7 +71,6 @@ const CreateContest: React.FC = () => {
           key: 0,
           boost: 0,
           swap: 0,
-          description: '',
         },
       ],
     },
@@ -161,9 +160,8 @@ const CreateContest: React.FC = () => {
       window.scrollTo(0, 0);
       return;
     }
-
-    const data = getValues();
-
+    const raw = getValues();
+    const data = contestSchema.parse(raw);
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
     alert('Contest Created! Check console for data.');
   };
@@ -649,7 +647,6 @@ const CreateContest: React.FC = () => {
                     boost: 0,
                     key: 0,
                     swap: 0,
-                    description: '',
                   })
                 }
                 variant="outline"
@@ -854,10 +851,7 @@ const CreateContest: React.FC = () => {
       </div>
 
       <Form {...(form as any)}>
-        <form
-          className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
-          onSubmit={(e) => e.preventDefault()}
-        >
+        <form className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10">
           {stepContent()}
 
           {/* Footer Buttons */}
