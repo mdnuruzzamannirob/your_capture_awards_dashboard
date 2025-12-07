@@ -40,7 +40,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
           <Button
             variant={'outline'}
             className={cn(
-              'flex-1 justify-start border-gray-800 bg-gray-900 text-left font-normal hover:bg-gray-800',
+              'h-11 flex-1 justify-start border-gray-800 bg-gray-900 text-left font-normal hover:bg-gray-800',
               !date && 'text-muted-foreground',
             )}
           >
@@ -67,13 +67,13 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
         </PopoverContent>
       </Popover>
 
-      <div className="relative">
-        <Clock className="absolute top-2.5 left-3 h-4 w-4 text-gray-500" />
+      <div className="relative flex items-center">
+        <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" />
         <Input
           type="time"
           value={time}
           onChange={handleTimeChange}
-          className="border-gray-800 bg-gray-900 pl-10 text-white scheme-dark"
+          className="h-11 pl-10 scheme-dark"
         />
       </div>
     </div>

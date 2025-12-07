@@ -17,7 +17,9 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
   if (!editor) return null;
 
   return (
-    <div className={`flex flex-wrap gap-1 border-b bg-gray-900 p-2 ${className ?? ''}`}>
+    <div
+      className={`bg-input/30 flex h-11 flex-wrap items-center gap-1 border-b px-2 ${className ?? ''}`}
+    >
       {/* Bold */}
       <Toggle
         size="sm"

@@ -42,8 +42,8 @@ export interface TipTapEditorProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  minHeightClass?: string;
-  maxHeightClass?: string;
+  minHeight?: string;
+  maxHeight?: string;
   className?: string;
 }
 
@@ -51,8 +51,8 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   value,
   onChange,
   placeholder = 'Start typing...',
-  minHeightClass = 'min-h-[120px]',
-  maxHeightClass = 'max-h-[600px]',
+  minHeight = 'min-h-[120px]',
+  maxHeight = 'max-h-[600px]',
   className,
 }) => {
   const [mounted, setMounted] = useState(false);
@@ -102,12 +102,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: cn(
-          'p-3 focus:outline-none overflow-y-auto',
-          proseBaseStyles,
-          minHeightClass,
-          maxHeightClass,
-        ),
+        class: cn('p-3 focus:outline-none overflow-y-auto', proseBaseStyles, minHeight, maxHeight),
       },
     },
   }) as Editor | null;
@@ -117,8 +112,8 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
       <div
         className={cn(
           'flex w-full items-center justify-center rounded-md border bg-gray-900 p-3',
-          minHeightClass,
-          maxHeightClass,
+          minHeight,
+          maxHeight,
         )}
       >
         <p className="text-muted-foreground flex items-center gap-2">

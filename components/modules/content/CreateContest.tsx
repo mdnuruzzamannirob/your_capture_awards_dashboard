@@ -1,30 +1,30 @@
 'use client';
 
-import { contestSchema, ContestValues } from '@/lib/schemas/contestSchema';
+import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { ContestValues, contestSchema } from '@/lib/schemas/contestSchema';
 import {
   Trophy,
   FileText,
+  Scale,
+  ClipboardCheck,
   Info,
-  Crown,
-  Image as ImageIcon,
-  User,
+  AlertCircle,
+  TrendingUp,
   Camera,
   Scissors,
   DollarSign,
   Zap,
   RotateCw,
   Lightbulb,
-  TrendingUp,
-  AlertCircle,
+  Crown,
+  Image as ImageIcon,
+  User,
   Trash2,
   Plus,
   ArrowLeft,
   ArrowRight,
-  Scale,
-  ClipboardCheck,
   CheckCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,7 +37,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -49,21 +48,20 @@ import { Separator } from '@/components/ui/separator';
 import { DateTimePicker } from '@/components/common/date-time-picker';
 import { format } from 'date-fns';
 import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
+import { cn } from '@/lib/utils';
 
-// --- Constants & Expanded Rules Icons ---
 const STEPS = [
   {
     id: 0,
     title: 'Details',
     icon: FileText,
-    fields: ['title', 'description', 'startDate', 'endDate'],
+    fields: ['title', 'description', 'startDate', 'endDate'] as const,
   },
-  { id: 1, title: 'Rules', icon: Scale, fields: ['rules'] },
-  { id: 2, title: 'Prizes', icon: Trophy, fields: ['prizes'] },
-  { id: 3, title: 'Review', icon: ClipboardCheck, fields: [] },
+  { id: 1, title: 'Rules', icon: Scale, fields: ['rules'] as const },
+  { id: 2, title: 'Prizes', icon: Trophy, fields: ['prizes'] as const },
+  { id: 3, title: 'Review', icon: ClipboardCheck, fields: [] as const },
 ];
 
-// Expanded Icon List for Rules
 const RULE_ICONS = [
   { value: 'info', label: 'General', icon: Info },
   { value: 'alert', label: 'Warning', icon: AlertCircle },
@@ -82,24 +80,24 @@ const PRIZE_TYPES = [
   { value: 'yc_top_winner', label: 'YC Top Choice', icon: Crown },
 ];
 
-const CreateContest = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [html, setHtml] = useState('<p>Hello world</p>');
+const CreateContest: React.FC = () => {
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
   const form = useForm<ContestValues>({
     resolver: zodResolver(contestSchema),
     defaultValues: {
       title: '',
       description: '',
-      startDate: undefined,
-      endDate: undefined,
+      startDate: new Date(),
+      endDate: new Date(),
       rules: [{ title: 'General Rules', icon: 'info', description: 'Original photos only.' }],
       prizes: [
         {
           type: 'photo_winner',
           title: '1st Place',
           amount: '$500',
-          keyBoost: 10,
+          key: 10,
+          boost: 10,
           swap: 5,
           description: '',
         },
@@ -112,7 +110,7 @@ const CreateContest = () => {
     fields: ruleFields,
     append: appendRule,
     remove: removeRule,
-  } = useFieldArray({
+  } = useFieldArray<ContestValues, 'rules'>({
     control: form.control,
     name: 'rules',
   });
@@ -121,16 +119,23 @@ const CreateContest = () => {
     fields: prizeFields,
     append: appendPrize,
     remove: removePrize,
-  } = useFieldArray({
+  } = useFieldArray<ContestValues, 'prizes'>({
     control: form.control,
     name: 'prizes',
   });
 
-  // Navigation Logic
-  const handleNext = async () => {
-    const fields = STEPS[currentStep].fields as any;
+  // Navigate with validation when moving forward
+  const goToStep = async (targetIndex: number) => {
+    if (targetIndex === currentStep) return;
+    if (targetIndex < currentStep) {
+      setCurrentStep(targetIndex);
+      window.scrollTo(0, 0);
+      return;
+    }
 
-    // Custom check for rules/prizes to ensure array is not empty
+    // moving forward: validate current step fields first
+    const fieldsToValidate = STEPS[currentStep].fields as readonly string[];
+    // if currentStep has a special case where we require arrays not empty, guard it:
     if (currentStep === 1 && form.getValues('rules').length === 0) {
       form.setError('rules', { type: 'manual', message: 'Please add at least one rule.' });
       return;
@@ -140,14 +145,16 @@ const CreateContest = () => {
       return;
     }
 
-    const isValid = await form.trigger(fields);
-
-    if (isValid) {
-      if (currentStep < STEPS.length - 1) {
-        setCurrentStep((prev) => prev + 1);
-        window.scrollTo(0, 0);
-      }
+    const ok = await form.trigger(fieldsToValidate as any);
+    if (ok) {
+      setCurrentStep(targetIndex);
+      window.scrollTo(0, 0);
     }
+  };
+
+  const handleNext = async () => {
+    // reuse goToStep to validate and move to next
+    await goToStep(Math.min(currentStep + 1, STEPS.length - 1));
   };
 
   const handleBack = () => {
@@ -160,32 +167,44 @@ const CreateContest = () => {
   };
 
   return (
-    <>
-      <div className="relative flex items-center justify-between">
-        <div className="absolute top-5 right-10 left-10 z-0 hidden h-0.5 bg-gray-800 md:block" />
+    <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
+      <div className="sticky top-[77px] z-40 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border bg-gray-900 p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
+        <div className="bg-muted absolute top-10 z-0 max-xl:right-10 max-xl:left-10 max-xl:h-0.5 xl:top-5 xl:bottom-5 xl:left-10 xl:w-0.5" />
+
         {STEPS.map((step, index) => {
           const Icon = step.icon;
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
           const colorClass = isCompleted
-            ? 'bg-green-500 border-green-500 text-black'
+            ? 'bg-green-600 border-green-600 text-white'
             : isActive
-              ? 'bg-white border-white text-gray-950 shadow-white/30'
-              : 'bg-gray-900 border-gray-700 text-gray-500';
+              ? 'bg-white border-white text-gray-950 shadow shadow-white/30'
+              : 'bg-gray-700 border-muted text-gray-300';
 
           return (
-            <div key={step.id} className="group relative z-10 flex flex-col items-center">
+            <div
+              key={step.id}
+              className="group relative z-10 flex cursor-pointer flex-col items-center justify-center gap-2 transition duration-300 xl:flex-row"
+              onClick={() => goToStep(index)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') goToStep(index);
+              }}
+            >
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full border-2 shadow-md transition-all duration-300 ${colorClass}`}
-              >
-                {isCompleted ? (
-                  <CheckCircle className="h-5 w-5 text-white" />
-                ) : (
-                  <Icon className="h-5 w-5" />
+                className={cn(
+                  'flex h-10 w-10 min-w-10 items-center justify-center rounded-full border-2 transition-all duration-300',
+                  colorClass,
                 )}
+              >
+                {isCompleted ? <CheckCircle className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
               </div>
               <span
-                className={`mt-3 text-sm font-medium ${isActive ? 'text-white' : 'text-gray-500'}`}
+                className={cn(
+                  'font-medium whitespace-nowrap transition duration-300 max-md:text-sm',
+                  isActive ? 'text-white' : 'text-gray-400 group-hover:text-white',
+                )}
               >
                 {step.title}
               </span>
@@ -194,12 +213,21 @@ const CreateContest = () => {
         })}
       </div>
 
-      {/* FORM AREA */}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
+        >
           {/* --- STEP 1: DETAILS --- */}
           {currentStep === 0 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="animate-in fade-in slide-in-from-bottom-2 grid grid-cols-1 gap-5 md:grid-cols-2">
+              <h1 className="col-span-full flex items-center gap-2 border-b pb-4 text-lg font-semibold">
+                <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                  <FileText className="size-5" />
+                </span>{' '}
+                Details
+              </h1>
+
               <div className="md:col-span-2">
                 <FormField
                   control={form.control}
@@ -208,11 +236,7 @@ const CreateContest = () => {
                     <FormItem>
                       <FormLabel className="text-gray-400">Contest Title</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="e.g. Neon Nights 2025"
-                          className="h-11 border-gray-800 bg-gray-950 text-lg text-white placeholder:text-gray-600 focus-visible:ring-white/20"
-                          {...field}
-                        />
+                        <Input placeholder="e.g. Neon Nights 2025" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -268,7 +292,7 @@ const CreateContest = () => {
                         <TipTapEditor
                           value={field.value}
                           onChange={field.onChange}
-                          minHeight="h-[200px]"
+                          minHeight="h-48"
                           placeholder="Describe the contest theme, rules, and inspiration in detail..."
                         />
                       </FormControl>
@@ -282,14 +306,19 @@ const CreateContest = () => {
 
           {/* --- STEP 2: RULES --- */}
           {currentStep === 1 && (
-            <div className="animate-in fade-in slide-in-from-bottom-4 space-y-5">
+            <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
               <div className="flex items-center justify-between border-b pb-4">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Scale /> Contest Rules{' '}
+                <h1 className="flex items-center gap-2 text-lg font-semibold">
+                  <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                    <Scale className="size-5" />
+                  </span>{' '}
+                  Contest Rules{' '}
                   <span>
+                    {' '}
                     (<span className="text-primary">{ruleFields.length}</span>)
                   </span>
-                </h3>
+                </h1>
+
                 <Button
                   type="button"
                   onClick={() => appendRule({ title: '', icon: 'info', description: '' })}
@@ -300,11 +329,11 @@ const CreateContest = () => {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 gap-5">
-                {ruleFields.map((field, index) => (
+              <div className="grid grid-cols-1 gap-10">
+                {ruleFields.map((f, index) => (
                   <div
-                    key={field.id}
-                    className="relative rounded-lg border p-5 transition-all duration-300 hover:border-gray-600"
+                    key={f.id}
+                    className="relative rounded-lg border bg-gray-950/50 p-5 transition-all duration-300"
                   >
                     <div className="absolute top-1 right-1">
                       <Button
@@ -327,26 +356,30 @@ const CreateContest = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-400">Rule Icon</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
+                            <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
+                              <Select
+                                value={field.value || ''}
+                                onValueChange={(val) => field.onChange(val)}
+                              >
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select Icon" />
                                 </SelectTrigger>
-                              </FormControl>
-                              <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                {RULE_ICONS.map((icon) => {
-                                  const IconComp = icon.icon;
-                                  return (
-                                    <SelectItem key={icon.value} value={icon.value}>
-                                      <div className="flex items-center gap-3">
-                                        <IconComp className="text-primary h-4 w-4" />
-                                        <span>{icon.label}</span>
-                                      </div>
-                                    </SelectItem>
-                                  );
-                                })}
-                              </SelectContent>
-                            </Select>
+                                <SelectContent align="start" className="max-h-60 overflow-y-auto">
+                                  {RULE_ICONS.map((icon) => {
+                                    const IconComp = icon.icon;
+                                    return (
+                                      <SelectItem key={icon.value} value={icon.value}>
+                                        <div className="flex items-center gap-3">
+                                          <IconComp className="text-primary h-4 w-4" />
+                                          <span>{icon.label}</span>
+                                        </div>
+                                      </SelectItem>
+                                    );
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
                           </FormItem>
                         )}
                       />
@@ -384,7 +417,6 @@ const CreateContest = () => {
                                 <TipTapEditor
                                   value={field.value}
                                   onChange={field.onChange}
-                                  minHeight="h-24"
                                   placeholder="Explain this rule in detail..."
                                 />
                               </FormControl>
@@ -397,7 +429,12 @@ const CreateContest = () => {
                   </div>
                 ))}
               </div>
-              <FormMessage>{form.formState.errors.rules?.root?.message}</FormMessage>
+              {/* array-level error */}
+              {form.formState.errors.rules && (
+                <div className="text-sm text-red-400">
+                  {(form.formState.errors.rules as any).message}
+                </div>
+              )}
             </div>
           )}
 
@@ -415,7 +452,8 @@ const CreateContest = () => {
                       type: 'photo_winner',
                       title: '',
                       amount: '',
-                      keyBoost: 0,
+                      boost: 0,
+                      key: 0,
                       swap: 0,
                       description: '',
                     })
@@ -427,11 +465,11 @@ const CreateContest = () => {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 gap-5">
-                {prizeFields.map((field, index) => (
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                {prizeFields.map((f, index) => (
                   <div
-                    key={field.id}
-                    className="relative rounded-xl border border-gray-700 bg-gray-950 p-6 transition-all duration-300 hover:border-yellow-500/50"
+                    key={f.id}
+                    className="relative rounded-xl border bg-gray-950/50 p-5 transition-all duration-300"
                   >
                     <div className="absolute top-4 right-4">
                       <Button
@@ -446,34 +484,38 @@ const CreateContest = () => {
                       </Button>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-4">
-                      <div className="md:col-span-4">
+                    <div className="grid gap-5 md:grid-cols-6">
+                      <div className="md:col-span-full">
                         <FormField
                           control={form.control}
                           name={`prizes.${index}.type`}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel className="text-gray-400">Prize Category</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="h-11 border-gray-700 bg-gray-900 text-white">
+                              <FormControl className="min-h-11 ring-white/20 focus:ring-2">
+                                <Select
+                                  value={field.value || ''}
+                                  onValueChange={(v) => field.onChange(v)}
+                                >
+                                  <SelectTrigger>
                                     <SelectValue placeholder="Select type" />
                                   </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="border-gray-800 bg-gray-900 text-white">
-                                  {PRIZE_TYPES.map((type) => {
-                                    const IconComp = type.icon;
-                                    return (
-                                      <SelectItem key={type.value} value={type.value}>
-                                        <div className="flex items-center gap-2">
-                                          <IconComp className="h-4 w-4 text-yellow-500" />
-                                          <span>{type.label}</span>
-                                        </div>
-                                      </SelectItem>
-                                    );
-                                  })}
-                                </SelectContent>
-                              </Select>
+                                  <SelectContent align="start" className="max-h-60 overflow-y-auto">
+                                    {PRIZE_TYPES.map((type) => {
+                                      const IconComp = type.icon;
+                                      return (
+                                        <SelectItem key={type.value} value={type.value}>
+                                          <div className="flex items-center gap-2">
+                                            <IconComp className="h-4 w-4 text-yellow-500" />
+                                            <span>{type.label}</span>
+                                          </div>
+                                        </SelectItem>
+                                      );
+                                    })}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
                             </FormItem>
                           )}
                         />
@@ -484,7 +526,7 @@ const CreateContest = () => {
                         control={form.control}
                         name={`prizes.${index}.title`}
                         render={({ field }) => (
-                          <FormItem className="md:col-span-2">
+                          <FormItem className="md:col-span-3">
                             <FormLabel className="text-gray-400">Prize Title</FormLabel>
                             <FormControl>
                               <Input
@@ -502,16 +544,12 @@ const CreateContest = () => {
                         control={form.control}
                         name={`prizes.${index}.amount`}
                         render={({ field }) => (
-                          <FormItem className="md:col-span-2">
+                          <FormItem className="md:col-span-3">
                             <FormLabel className="text-gray-400">
                               Value / Amount (e.g. $100)
                             </FormLabel>
                             <FormControl>
-                              <Input
-                                placeholder="$500 USD"
-                                className="h-11 border-gray-700 bg-gray-900 text-white"
-                                {...field}
-                              />
+                              <Input placeholder="$500 USD" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -521,17 +559,26 @@ const CreateContest = () => {
                       {/* Key Boost and Swap */}
                       <FormField
                         control={form.control}
-                        name={`prizes.${index}.keyBoost`}
+                        name={`prizes.${index}.key`}
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-400">Key Boost (Units)</FormLabel>
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="text-gray-400">Key (Units)</FormLabel>
                             <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="10"
-                                className="h-11 border-gray-700 bg-gray-900 text-white"
-                                {...field}
-                              />
+                              <Input type="number" placeholder="10" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name={`prizes.${index}.boost`}
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="text-gray-400">Boost (Units)</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="10" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -542,7 +589,7 @@ const CreateContest = () => {
                         control={form.control}
                         name={`prizes.${index}.swap`}
                         render={({ field }) => (
-                          <FormItem>
+                          <FormItem className="md:col-span-2">
                             <FormLabel className="text-gray-400">Swap (Units)</FormLabel>
                             <FormControl>
                               <Input
@@ -556,33 +603,15 @@ const CreateContest = () => {
                           </FormItem>
                         )}
                       />
-
-                      <div className="md:col-span-4">
-                        <FormField
-                          control={form.control}
-                          name={`prizes.${index}.description`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-gray-400">
-                                Description (Optional)
-                              </FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  placeholder="Specific details about the prize delivery..."
-                                  className="min-h-20 border-gray-700 bg-gray-900 text-white"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
                     </div>
                   </div>
                 ))}
               </div>
-              <FormMessage>{form.formState.errors.prizes?.root?.message}</FormMessage>
+              {form.formState.errors.prizes && (
+                <div className="text-sm text-red-400">
+                  {(form.formState.errors.prizes as any).message}
+                </div>
+              )}
             </div>
           )}
 
@@ -596,11 +625,13 @@ const CreateContest = () => {
                   <p className="font-semibold text-white">{form.getValues('title')}</p>
                   <p className="text-gray-500">Start Time</p>
                   <p className="font-semibold text-white">
-                    {format(form.getValues('startDate')!, 'PPpp')}
+                    {form.getValues('startDate')
+                      ? format(form.getValues('startDate')!, 'PPpp')
+                      : 'N/A'}
                   </p>
                   <p className="text-gray-500">End Time</p>
                   <p className="font-semibold text-white">
-                    {format(form.getValues('endDate')!, 'PPpp')}
+                    {form.getValues('endDate') ? format(form.getValues('endDate')!, 'PPpp') : 'N/A'}
                   </p>
                 </div>
                 <Separator className="bg-gray-800" />
@@ -617,6 +648,7 @@ const CreateContest = () => {
             <Button
               type="button"
               variant="ghost"
+              size="lg"
               onClick={handleBack}
               disabled={currentStep === 0}
               className={`px-6 text-gray-400 hover:bg-gray-800 hover:text-white ${currentStep === 0 ? 'invisible' : 'visible'}`}
@@ -645,7 +677,7 @@ const CreateContest = () => {
           </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 };
 
