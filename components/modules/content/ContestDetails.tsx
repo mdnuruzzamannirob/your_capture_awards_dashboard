@@ -6,7 +6,7 @@ import PrizesTab from '@/components/modules/content/PrizesTab';
 import RankTab from '@/components/modules/content/RankTab';
 import RulesTab from '@/components/modules/content/RulesTab';
 import WinnerTab from '@/components/modules/content/WinnerTab';
-import { contestDetailsTabs } from '@/constants';
+import { CONTEST_DETAILS_TABS } from '@/constants';
 import { cn } from '@/lib/utils';
 import { useGetContestQuery } from '@/store/features/contest/contestApi';
 import { ContestDetailsTabKey } from '@/types';
@@ -28,7 +28,7 @@ const ContestDetails = () => {
   const { data, isLoading, isFetching } = useGetContestQuery({ id: params?.id as string });
   const contest = data?.data ?? {};
 
-  const activeIndex = contestDetailsTabs.findIndex((t) => t.key === activeTab);
+  const activeIndex = CONTEST_DETAILS_TABS.findIndex((t) => t.key === activeTab);
 
   useEffect(() => {
     setIsMounted(true);
@@ -63,7 +63,7 @@ const ContestDetails = () => {
   };
 
   if (isLoading || isFetching) {
-    return <ContestDetailsSkeleton tabs={contestDetailsTabs} />;
+    return <ContestDetailsSkeleton tabs={CONTEST_DETAILS_TABS} />;
   }
 
   if (!isMounted) {
@@ -84,7 +84,7 @@ const ContestDetails = () => {
 
       {/* Tabs */}
       <div className="relative flex overflow-x-auto border-b">
-        {contestDetailsTabs.map((tab, index) => (
+        {CONTEST_DETAILS_TABS.map((tab, index) => (
           <button
             key={tab.key}
             ref={(el) => {

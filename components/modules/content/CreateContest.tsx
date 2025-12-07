@@ -9,19 +9,6 @@ import {
   Trophy,
   FileText,
   Scale,
-  ClipboardCheck,
-  Info,
-  AlertCircle,
-  TrendingUp,
-  Camera,
-  Scissors,
-  DollarSign,
-  Zap,
-  RotateCw,
-  Lightbulb,
-  Crown,
-  Image as ImageIcon,
-  User,
   Trash2,
   Plus,
   ArrowLeft,
@@ -50,36 +37,11 @@ import { DateTimePicker } from '@/components/common/date-time-picker';
 import { format } from 'date-fns';
 import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
 import { cn } from '@/lib/utils';
-
-const STEPS = [
-  {
-    id: 0,
-    title: 'Details',
-    icon: FileText,
-    fields: ['title', 'description', 'startDate', 'endDate'],
-  },
-  { id: 1, title: 'Rules', icon: Scale, fields: ['rules'] },
-  { id: 2, title: 'Prizes', icon: Trophy, fields: ['prizes'] },
-  { id: 3, title: 'Review', icon: ClipboardCheck, fields: [] },
-];
-
-const RULE_ICONS = [
-  { value: 'info', label: 'General', icon: Info },
-  { value: 'alert', label: 'Warning', icon: AlertCircle },
-  { value: 'star', label: 'Important', icon: TrendingUp },
-  { value: 'camera', label: 'Submission', icon: Camera },
-  { value: 'edit', label: 'Editing Limit', icon: Scissors },
-  { value: 'money', label: 'Financial', icon: DollarSign },
-  { value: 'boost', label: 'Boost Use', icon: Zap },
-  { value: 'swap', label: 'Swap Use', icon: RotateCw },
-  { value: 'idea', label: 'Theme/Concept', icon: Lightbulb },
-];
-
-const PRIZE_TYPES = [
-  { value: 'photo_winner', label: 'Best Photo Winner', icon: ImageIcon },
-  { value: 'photographer_winner', label: 'Best Photographer', icon: User },
-  { value: 'yc_top_winner', label: 'YC Top Choice', icon: Crown },
-];
+import {
+  CREATE_CONTEST_PRIZE_TYPES,
+  CREATE_CONTEST_RULE_ICONS,
+  CREATE_CONTEST_STEPS,
+} from '@/constants';
 
 const CreateContest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -135,7 +97,7 @@ const CreateContest: React.FC = () => {
     }
 
     // moving forward: validate current step fields first
-    const fieldsToValidate = STEPS[currentStep].fields as readonly string[];
+    const fieldsToValidate = CREATE_CONTEST_STEPS[currentStep].fields as readonly string[];
 
     if (currentStep === 1 && form.getValues('rules').length === 0) {
       form.setError('rules', { type: 'manual', message: 'Please add at least one rule.' });
@@ -154,16 +116,15 @@ const CreateContest: React.FC = () => {
   };
 
   const handleNext = async () => {
-    await goToStep(Math.min(currentStep + 1, STEPS.length - 1));
+    await goToStep(Math.min(currentStep + 1, CREATE_CONTEST_STEPS.length - 1));
   };
 
   const handleBack = () => {
     if (currentStep > 0) setCurrentStep((prev) => prev - 1);
   };
 
-  // only process final submit when on last step
   const onSubmit = (data: ContestValues) => {
-    if (currentStep !== STEPS.length - 1) {
+    if (currentStep !== CREATE_CONTEST_STEPS.length - 1) {
       return;
     }
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
@@ -318,7 +279,7 @@ const CreateContest: React.FC = () => {
                                 <SelectValue placeholder="Select Icon" />
                               </SelectTrigger>
                               <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                {RULE_ICONS.map((icon) => {
+                                {CREATE_CONTEST_RULE_ICONS.map((icon) => {
                                   const IconComp = icon.icon;
                                   return (
                                     <SelectItem key={icon.value} value={icon.value}>
@@ -453,7 +414,7 @@ const CreateContest: React.FC = () => {
                                   <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                                 <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                  {PRIZE_TYPES.map((type) => {
+                                  {CREATE_CONTEST_PRIZE_TYPES.map((type) => {
                                     const IconComp = type.icon;
                                     return (
                                       <SelectItem key={type.value} value={type.value}>
@@ -604,7 +565,7 @@ const CreateContest: React.FC = () => {
       <div className="sticky top-[77px] z-40 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border bg-gray-900 p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
         <div className="bg-muted absolute top-10 z-0 max-xl:right-10 max-xl:left-10 max-xl:h-0.5 xl:top-5 xl:bottom-5 xl:left-10 xl:w-0.5" />
 
-        {STEPS.map((step, index) => {
+        {CREATE_CONTEST_STEPS.map((step, index) => {
           const Icon = step.icon;
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
@@ -669,7 +630,7 @@ const CreateContest: React.FC = () => {
               <ArrowLeft className="mr-2 size-4" /> Back
             </Button>
 
-            {currentStep === STEPS.length - 1 ? (
+            {currentStep === CREATE_CONTEST_STEPS.length - 1 ? (
               <Button
                 type="submit"
                 size="lg"

@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { defaultError } from '@/constants';
+import { DEFAULT_ERROR } from '@/constants';
 import { useForgotPasswordMutation, useVerifyOTPMutation } from '@/store/features/auth/authApi';
 import useAuth from '@/hooks/useAuth';
 
@@ -100,8 +100,8 @@ const VerifyOtp = () => {
       router.push('/reset-password');
     } catch (err: any) {
       toast.error(
-        err?.data?.message || err?.message || defaultError.title,
-        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
+        err?.data?.message || err?.message || DEFAULT_ERROR.title,
+        !err?.data?.message && !err?.message ? { description: DEFAULT_ERROR.body } : undefined,
       );
     }
   };
@@ -116,8 +116,8 @@ const VerifyOtp = () => {
       setResendCoolDown(30);
     } catch (err: any) {
       toast.error(
-        err?.data?.message || err?.message || defaultError.title,
-        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
+        err?.data?.message || err?.message || DEFAULT_ERROR.title,
+        !err?.data?.message && !err?.message ? { description: DEFAULT_ERROR.body } : undefined,
       );
     }
   };

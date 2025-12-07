@@ -3,7 +3,7 @@
 import AuthTitle from '@/components/common/AuthTitle';
 import FormField from '@/components/common/FormField';
 import { Spinner } from '@/components/ui/spinner';
-import { defaultError } from '@/constants';
+import { DEFAULT_ERROR } from '@/constants';
 import { ForgotPasswordFormData, forgotPasswordSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { useForgotPasswordMutation } from '@/store/features/auth/authApi';
@@ -31,8 +31,8 @@ const ForgotPassword = () => {
       resetForm.reset();
     } catch (err: any) {
       toast.error(
-        err?.data?.message || err?.message || defaultError.title,
-        !err?.data?.message && !err?.message ? { description: defaultError.body } : undefined,
+        err?.data?.message || err?.message || DEFAULT_ERROR.title,
+        !err?.data?.message && !err?.message ? { description: DEFAULT_ERROR.body } : undefined,
       );
     }
   };
