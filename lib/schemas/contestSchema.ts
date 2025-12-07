@@ -5,29 +5,8 @@ export const contestSchema = z.object({
   title: z.string().min(5, 'Title is too short'),
   description: z.string().min(20, 'Description must be detailed'),
 
-  startDate: z.preprocess(
-    (arg) => {
-      if (arg instanceof Date) return arg;
-      if (typeof arg === 'string' || typeof arg === 'number') {
-        const d = new Date(arg);
-        return isNaN(d.getTime()) ? undefined : d;
-      }
-      return undefined;
-    },
-    z.date({ message: 'Start date is required' }),
-  ),
-
-  endDate: z.preprocess(
-    (arg) => {
-      if (arg instanceof Date) return arg;
-      if (typeof arg === 'string' || typeof arg === 'number') {
-        const d = new Date(arg);
-        return isNaN(d.getTime()) ? undefined : d;
-      }
-      return undefined;
-    },
-    z.date({ message: 'End date is required' }),
-  ),
+  startDate: z.coerce.date({ message: 'Start date is required' }),
+  endDate: z.coerce.date({ message: 'End date is required' }),
 
   // Step 2: Rules (Array)
   rules: z

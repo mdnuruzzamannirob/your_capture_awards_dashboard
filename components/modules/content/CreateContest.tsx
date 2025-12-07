@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { Resolver } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { ContestValues, contestSchema } from '@/lib/schemas/contestSchema';
 import {
@@ -84,7 +85,7 @@ const CreateContest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
 
   const form = useForm<ContestValues>({
-    resolver: zodResolver(contestSchema),
+    resolver: zodResolver(contestSchema) as Resolver<ContestValues>,
     defaultValues: {
       title: '',
       description: '',
@@ -110,7 +111,7 @@ const CreateContest: React.FC = () => {
     fields: ruleFields,
     append: appendRule,
     remove: removeRule,
-  } = useFieldArray<ContestValues, 'rules'>({
+  } = useFieldArray({
     control: form.control,
     name: 'rules',
   });
@@ -119,7 +120,7 @@ const CreateContest: React.FC = () => {
     fields: prizeFields,
     append: appendPrize,
     remove: removePrize,
-  } = useFieldArray<ContestValues, 'prizes'>({
+  } = useFieldArray({
     control: form.control,
     name: 'prizes',
   });
@@ -135,7 +136,7 @@ const CreateContest: React.FC = () => {
 
     // moving forward: validate current step fields first
     const fieldsToValidate = STEPS[currentStep].fields as readonly string[];
-    // if currentStep has a special case where we require arrays not empty, guard it:
+
     if (currentStep === 1 && form.getValues('rules').length === 0) {
       form.setError('rules', { type: 'manual', message: 'Please add at least one rule.' });
       return;
@@ -153,7 +154,6 @@ const CreateContest: React.FC = () => {
   };
 
   const handleNext = async () => {
-    // reuse goToStep to validate and move to next
     await goToStep(Math.min(currentStep + 1, STEPS.length - 1));
   };
 
@@ -161,7 +161,12 @@ const CreateContest: React.FC = () => {
     if (currentStep > 0) setCurrentStep((prev) => prev - 1);
   };
 
+  // only process final submit when on last step
   const onSubmit = (data: ContestValues) => {
+    if (currentStep !== STEPS.length - 1) {
+      // guard: shouldn't happen (Next buttons are type="button"), but safe-guard here
+      return;
+    }
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
     alert('Contest Created! Check console for data.');
   };
@@ -213,7 +218,7 @@ const CreateContest: React.FC = () => {
         })}
       </div>
 
-      <Form {...form}>
+      <Form {...(form as any)}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
@@ -666,7 +671,7 @@ const CreateContest: React.FC = () => {
               </Button>
             ) : (
               <Button
-                type="button"
+                type="button" // <-- ensure not submit
                 onClick={handleNext}
                 size="lg"
                 className="bg-white px-6 font-semibold text-black hover:bg-gray-200"
