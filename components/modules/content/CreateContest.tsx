@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Resolver } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -41,7 +41,9 @@ import {
   CREATE_CONTEST_PRIZE_TYPES,
   CREATE_CONTEST_RULE_ICONS,
   CREATE_CONTEST_STEPS,
+  RECURRING_TYPES,
 } from '@/constants';
+import Image from 'next/image';
 
 const CreateContest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -51,17 +53,24 @@ const CreateContest: React.FC = () => {
     defaultValues: {
       title: '',
       description: '',
+      banner: undefined,
+      maxUploads: 4,
+      minPrize: 0,
+      maxPrize: 0,
+      isMoneyContest: false,
+      recurring: false,
+      recurringType: 'DAILY',
+      mode: 'SOLO',
       startDate: new Date(),
-      endDate: new Date(),
-      rules: [{ title: 'General Rules', icon: 'info', description: 'Original photos only.' }],
+      endDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      rules: [{ name: '', icon: 'info', description: '' }],
       prizes: [
         {
-          type: 'photo_winner',
-          title: '1st Place',
-          amount: '$500',
-          key: 10,
-          boost: 10,
-          swap: 5,
+          category: 'TOP_PHOTOGRAPHER',
+          icon: 'User',
+          key: 0,
+          boost: 0,
+          swap: 0,
           description: '',
         },
       ],
@@ -69,12 +78,34 @@ const CreateContest: React.FC = () => {
     mode: 'onChange',
   });
 
+  const { watch, setValue, getValues, control, formState, trigger } = form;
+  const watchRecurring = watch('recurring');
+  const watchIsMoney = watch('isMoneyContest');
+
+  useEffect(() => {
+    if (!watchRecurring) {
+      setValue('recurringType', undefined as unknown as ContestValues['recurringType']);
+      void trigger('recurringType');
+    } else {
+      const val = getValues('recurringType');
+      if (!val) setValue('recurringType', 'DAILY' as any);
+    }
+  }, [watchRecurring]);
+
+  useEffect(() => {
+    if (!watchIsMoney) {
+      setValue('minPrize', 0);
+      setValue('maxPrize', 0);
+      void trigger(['minPrize', 'maxPrize']);
+    }
+  }, [watchIsMoney]);
+
   const {
     fields: ruleFields,
     append: appendRule,
     remove: removeRule,
   } = useFieldArray({
-    control: form.control,
+    control,
     name: 'rules',
   });
 
@@ -83,7 +114,7 @@ const CreateContest: React.FC = () => {
     append: appendPrize,
     remove: removePrize,
   } = useFieldArray({
-    control: form.control,
+    control,
     name: 'prizes',
   });
 
@@ -99,11 +130,11 @@ const CreateContest: React.FC = () => {
     // moving forward: validate current step fields first
     const fieldsToValidate = CREATE_CONTEST_STEPS[currentStep].fields as readonly string[];
 
-    if (currentStep === 1 && form.getValues('rules').length === 0) {
+    if (currentStep === 1 && getValues('rules').length === 0) {
       form.setError('rules', { type: 'manual', message: 'Please add at least one rule.' });
       return;
     }
-    if (currentStep === 2 && form.getValues('prizes').length === 0) {
+    if (currentStep === 2 && getValues('prizes').length === 0) {
       form.setError('prizes', { type: 'manual', message: 'Please add at least one prize.' });
       return;
     }
@@ -124,7 +155,6 @@ const CreateContest: React.FC = () => {
   };
 
   const handleFinalSubmit = async () => {
-    // validate ALL fields explicitly
     const isValid = await form.trigger();
 
     if (!isValid) {
@@ -132,7 +162,8 @@ const CreateContest: React.FC = () => {
       return;
     }
 
-    const data = form.getValues();
+    const data = getValues();
+
     console.log('FINAL CONTEST SUBMISSION DATA:', data);
     alert('Contest Created! Check console for data.');
   };
@@ -149,9 +180,10 @@ const CreateContest: React.FC = () => {
               Details
             </h1>
 
+            {/* Title */}
             <div className="md:col-span-2">
               <FormField
-                control={form.control}
+                control={control}
                 name="title"
                 render={({ field }) => (
                   <FormItem>
@@ -165,9 +197,253 @@ const CreateContest: React.FC = () => {
               />
             </div>
 
-            {/* Date Pickers */}
             <FormField
               control={form.control}
+              name="banner"
+              render={({ field }) => {
+                const file = field.value as File | undefined;
+                const preview = file ? URL.createObjectURL(file) : null;
+
+                return (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Banner Image</FormLabel>
+
+                    {/* Hidden input */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="banner-upload"
+                      className="hidden"
+                      onChange={(e) => {
+                        const selected = e.target.files?.[0];
+                        field.onChange(selected);
+                      }}
+                    />
+
+                    {/* Custom UI */}
+                    <FormControl>
+                      <label
+                        htmlFor="banner-upload"
+                        className={cn(
+                          'flex h-52 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition',
+                          preview
+                            ? 'border-gray-700 hover:border-gray-500'
+                            : 'border-gray-600 hover:border-gray-400',
+                        )}
+                      >
+                        {preview ? (
+                          <Image
+                            src={preview}
+                            alt="Banner preview"
+                            width={2000}
+                            height={300}
+                            className="h-full w-full rounded-xl object-cover"
+                          />
+                        ) : (
+                          <div className="text-center text-gray-400">
+                            <p className="text-sm">Click to upload banner</p>
+                            <p className="text-xs">PNG / JPG / WEBP (max 2MB)</p>
+                          </div>
+                        )}
+                      </label>
+                    </FormControl>
+
+                    {/* Remove button */}
+                    {preview && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="mt-2 text-red-400"
+                        onClick={() => field.onChange(undefined)}
+                      >
+                        Remove image
+                      </Button>
+                    )}
+
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+
+            {/* Mode */}
+            <FormField
+              control={control}
+              name="mode"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-gray-400">Contest Mode</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={(v) => field.onChange(v as any)}>
+                      <SelectTrigger className="min-h-11">
+                        <SelectValue placeholder="Select Mode" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="SOLO">Solo</SelectItem>
+                        <SelectItem value="TEAM">Team</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Recurring toggle */}
+            <FormField
+              control={control}
+              name="recurring"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-gray-400">Recurring Contest?</FormLabel>
+                  <FormControl>
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={!!field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                      <span className="text-sm text-gray-300">
+                        Repeat this contest periodically
+                      </span>
+                    </label>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Recurring Type (conditional AND disabled when recurring false) */}
+            <FormField
+              control={control}
+              name="recurringType"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-gray-400">Recurring Type</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value ?? ''}
+                      onValueChange={(v) => field.onChange(v as any)}
+                      // the UI is disabled if recurring is false
+                      // when disabled we also display the control so user sees it
+                      // but they cannot change it
+                      // This mirrors the isMoneyContest behavior that you used for prizes
+                      // (we also clear the value in a useEffect when recurring=false)
+                      disabled={!watchRecurring}
+                    >
+                      <SelectTrigger className="min-h-11">
+                        <SelectValue placeholder="Select recurring frequency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RECURRING_TYPES.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Max Uploads */}
+            <FormField
+              control={control}
+              name="maxUploads"
+              render={({ field }) => (
+                <FormItem className="md:col-span-1">
+                  <FormLabel className="text-gray-400">Max Uploads</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={10}
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Is money contest toggle */}
+            <FormField
+              control={control}
+              name="isMoneyContest"
+              render={({ field }) => (
+                <FormItem className="md:col-span-1">
+                  <FormLabel className="text-gray-400">Money Prize?</FormLabel>
+                  <FormControl>
+                    <label className="inline-flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={!!field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                      <span className="text-sm text-gray-300">Has cash prize</span>
+                    </label>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Min / Max prize — disabled when isMoneyContest is false */}
+            <div className="grid grid-cols-2 gap-4 md:col-span-2">
+              <FormField
+                control={control}
+                name="minPrize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Min Prize</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        disabled={!watchIsMoney}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={control}
+                name="maxPrize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Max Prize</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        disabled={!watchIsMoney}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Date Pickers */}
+            <FormField
+              control={control}
               name="startDate"
               render={({ field }) => (
                 <FormItem>
@@ -185,7 +461,7 @@ const CreateContest: React.FC = () => {
             />
 
             <FormField
-              control={form.control}
+              control={control}
               name="endDate"
               render={({ field }) => (
                 <FormItem>
@@ -204,7 +480,7 @@ const CreateContest: React.FC = () => {
 
             <div className="md:col-span-2">
               <FormField
-                control={form.control}
+                control={control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
@@ -224,24 +500,21 @@ const CreateContest: React.FC = () => {
             </div>
           </div>
         );
+
       case 1:
         return (
           <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
-            <div className="flex items-center justify-between border-b pb-4">
+            <div className="flex items-center justify-between border-b pb-5">
               <h1 className="flex items-center gap-2 text-lg font-semibold">
                 <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
                   <Scale className="size-5" />
                 </span>{' '}
-                Contest Rules{' '}
-                <span>
-                  {' '}
-                  (<span className="text-primary">{ruleFields.length}</span>)
-                </span>
+                Contest Rules <span className="text-primary">({ruleFields.length})</span>
               </h1>
 
               <Button
                 type="button"
-                onClick={() => appendRule({ title: '', icon: 'info', description: '' })}
+                onClick={() => appendRule({ name: '', icon: 'info', description: '' })}
                 variant="outline"
                 className="border-gray-700 text-white hover:bg-gray-700"
               >
@@ -255,13 +528,13 @@ const CreateContest: React.FC = () => {
                   key={f.id}
                   className="relative rounded-lg border bg-gray-950/50 p-5 transition-all duration-300"
                 >
-                  <div className="absolute top-1 right-1">
+                  <div className="absolute top-5 right-5">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       onClick={() => removeRule(index)}
-                      className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
+                      className="text-gray-500 hover:text-red-400"
                       disabled={ruleFields.length === 1}
                     >
                       <Trash2 className="size-4" />
@@ -271,7 +544,7 @@ const CreateContest: React.FC = () => {
                   <div className="grid gap-5 md:grid-cols-4">
                     {/* Icon Select */}
                     <FormField
-                      control={form.control}
+                      control={control}
                       name={`rules.${index}.icon`}
                       render={({ field }) => (
                         <FormItem>
@@ -305,10 +578,10 @@ const CreateContest: React.FC = () => {
                     />
 
                     {/* Title Input */}
-                    <div className="col-span-3">
+                    <div className="col-span-4">
                       <FormField
-                        control={form.control}
-                        name={`rules.${index}.title`}
+                        control={control}
+                        name={`rules.${index}.name`}
                         render={({ field }) => (
                           <FormItem className="md:col-span-2">
                             <FormLabel className="text-gray-400">Rule Title</FormLabel>
@@ -328,7 +601,7 @@ const CreateContest: React.FC = () => {
                     {/* Description */}
                     <div className="col-span-full">
                       <FormField
-                        control={form.control}
+                        control={control}
                         name={`rules.${index}.description`}
                         render={({ field }) => (
                           <FormItem>
@@ -349,28 +622,30 @@ const CreateContest: React.FC = () => {
                 </div>
               ))}
             </div>
+
             {/* array-level error */}
-            {form.formState.errors.rules && (
-              <div className="text-sm text-red-400">
-                {(form.formState.errors.rules as any).message}
-              </div>
+            {formState.errors.rules && (
+              <div className="text-sm text-red-400">{(formState.errors.rules as any).message}</div>
             )}
           </div>
         );
+
       case 2:
         return (
-          <div className="animate-in fade-in slide-in-from-bottom-4 space-y-5">
-            <div className="flex items-center justify-between border-b pb-4">
-              <h3 className="flex items-center gap-2 text-lg font-semibold">
-                <Trophy /> Prizes & Rewards ({prizeFields.length})
-              </h3>
+          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
+            <div className="flex items-center justify-between border-b pb-5">
+              <h1 className="flex items-center gap-2 text-lg font-semibold">
+                <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                  <Trophy className="size-5" />
+                </span>{' '}
+                Prizes <span className="text-primary">({prizeFields.length})</span>
+              </h1>
               <Button
                 type="button"
                 onClick={() =>
                   appendPrize({
-                    type: 'photo_winner',
-                    title: '',
-                    amount: '',
+                    category: 'TOP_PHOTOGRAPHER',
+                    icon: 'User',
                     boost: 0,
                     key: 0,
                     swap: 0,
@@ -390,13 +665,13 @@ const CreateContest: React.FC = () => {
                   key={f.id}
                   className="relative rounded-xl border bg-gray-950/50 p-5 transition-all duration-300"
                 >
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute top-5 right-5">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       onClick={() => removePrize(index)}
-                      className="text-gray-500 hover:bg-red-950/30 hover:text-red-400"
+                      className="text-gray-500 hover:text-red-400"
                       disabled={prizeFields.length === 1}
                     >
                       <Trash2 className="size-4" />
@@ -406,15 +681,15 @@ const CreateContest: React.FC = () => {
                   <div className="grid gap-5 md:grid-cols-6">
                     <div className="md:col-span-full">
                       <FormField
-                        control={form.control}
-                        name={`prizes.${index}.type`}
+                        control={control}
+                        name={`prizes.${index}.category`}
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-400">Prize Category</FormLabel>
                             <FormControl className="min-h-11 ring-white/20 focus:ring-2">
                               <Select
                                 value={field.value || ''}
-                                onValueChange={(v) => field.onChange(v)}
+                                onValueChange={(v) => field.onChange(v as any)}
                               >
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select type" />
@@ -440,48 +715,13 @@ const CreateContest: React.FC = () => {
                       />
                     </div>
 
-                    {/* Prize Title and Amount */}
-                    <FormField
-                      control={form.control}
-                      name={`prizes.${index}.title`}
-                      render={({ field }) => (
-                        <FormItem className="md:col-span-3">
-                          <FormLabel className="text-gray-400">Prize Title</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g. Grand Prize"
-                              className="h-11 border-gray-700 bg-gray-900 text-white"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name={`prizes.${index}.amount`}
-                      render={({ field }) => (
-                        <FormItem className="md:col-span-3">
-                          <FormLabel className="text-gray-400">
-                            Value / Amount (e.g. $100)
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="$500 USD" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
                     {/* Key Boost and Swap */}
                     <FormField
-                      control={form.control}
+                      control={control}
                       name={`prizes.${index}.key`}
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel className="text-gray-400">Key (Units)</FormLabel>
+                          <FormLabel className="text-gray-400">Key</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="10" {...field} />
                           </FormControl>
@@ -491,11 +731,11 @@ const CreateContest: React.FC = () => {
                     />
 
                     <FormField
-                      control={form.control}
+                      control={control}
                       name={`prizes.${index}.boost`}
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel className="text-gray-400">Boost (Units)</FormLabel>
+                          <FormLabel className="text-gray-400">Boost</FormLabel>
                           <FormControl>
                             <Input type="number" placeholder="10" {...field} />
                           </FormControl>
@@ -505,18 +745,13 @@ const CreateContest: React.FC = () => {
                     />
 
                     <FormField
-                      control={form.control}
+                      control={control}
                       name={`prizes.${index}.swap`}
                       render={({ field }) => (
                         <FormItem className="md:col-span-2">
-                          <FormLabel className="text-gray-400">Swap (Units)</FormLabel>
+                          <FormLabel className="text-gray-400">Swap</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              placeholder="5"
-                              className="h-11 border-gray-700 bg-gray-900 text-white"
-                              {...field}
-                            />
+                            <Input type="number" placeholder="5" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -526,43 +761,48 @@ const CreateContest: React.FC = () => {
                 </div>
               ))}
             </div>
-            {form.formState.errors.prizes && (
-              <div className="text-sm text-red-400">
-                {(form.formState.errors.prizes as any).message}
-              </div>
+
+            {formState.errors.prizes && (
+              <div className="text-sm text-red-400">{(formState.errors.prizes as any).message}</div>
             )}
           </div>
         );
+
       case 3:
         return (
-          <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6">
+          <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
+            <h1 className="flex items-center gap-2 border-b pb-5 text-lg font-semibold">
+              <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                <Trophy className="size-5" />
+              </span>{' '}
+              Review
+            </h1>
+
             <h3 className="text-2xl font-semibold text-white">Final Review</h3>
             <div className="space-y-6 rounded-lg border border-gray-800 bg-gray-950 p-6">
               <div className="grid grid-cols-2">
                 <p className="text-gray-500">Title</p>
-                <p className="font-semibold text-white">{form.getValues('title')}</p>
+                <p className="font-semibold text-white">{getValues('title')}</p>
                 <p className="text-gray-500">Start Time</p>
                 <p className="font-semibold text-white">
-                  {form.getValues('startDate')
-                    ? format(form.getValues('startDate')!, 'PPpp')
-                    : 'N/A'}
+                  {getValues('startDate') ? format(getValues('startDate')!, 'PPpp') : 'N/A'}
                 </p>
                 <p className="text-gray-500">End Time</p>
                 <p className="font-semibold text-white">
-                  {form.getValues('endDate') ? format(form.getValues('endDate')!, 'PPpp') : 'N/A'}
+                  {getValues('endDate') ? format(getValues('endDate')!, 'PPpp') : 'N/A'}
                 </p>
               </div>
               <Separator className="bg-gray-800" />
               <h4 className="text-xl font-semibold text-white">Rules & Prizes</h4>
               <p className="text-gray-400">
-                ({form.getValues('rules').length} Rules, {form.getValues('prizes').length} Prizes)
+                ({getValues('rules').length} Rules, {getValues('prizes').length} Prizes)
               </p>
             </div>
           </div>
         );
 
       default:
-        return;
+        return null;
     }
   };
 
@@ -614,7 +854,10 @@ const CreateContest: React.FC = () => {
       </div>
 
       <Form {...(form as any)}>
-        <form className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10">
+        <form
+          className="col-span-12 space-y-8 rounded-xl border bg-gray-900 p-5 md:col-span-10"
+          onSubmit={(e) => e.preventDefault()}
+        >
           {stepContent()}
 
           {/* Footer Buttons */}

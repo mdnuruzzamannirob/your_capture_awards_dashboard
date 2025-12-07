@@ -1,9 +1,8 @@
 import { ContestDetailsTabKey } from '@/types';
 import {
   AlertCircle,
-  Camera,
   ClipboardCheck,
-  Crown,
+  // Crown,
   DollarSign,
   FileText,
   ImageIcon,
@@ -45,8 +44,7 @@ export const CREATE_CONTEST_RULE_ICONS = [
   { value: 'info', label: 'General', icon: Info },
   { value: 'alert', label: 'Warning', icon: AlertCircle },
   { value: 'star', label: 'Important', icon: TrendingUp },
-  { value: 'camera', label: 'Submission', icon: Camera },
-  { value: 'edit', label: 'Editing Limit', icon: Scissors },
+  { value: 'editing_limit', label: 'Editing Limit', icon: Scissors },
   { value: 'money', label: 'Financial', icon: DollarSign },
   { value: 'boost', label: 'Boost Use', icon: Zap },
   { value: 'swap', label: 'Swap Use', icon: RotateCw },
@@ -54,7 +52,9 @@ export const CREATE_CONTEST_RULE_ICONS = [
 ];
 
 export const CREATE_CONTEST_PRIZE_TYPES = [
-  { value: 'photo_winner', label: 'Best Photo Winner', icon: ImageIcon },
-  { value: 'photographer_winner', label: 'Best Photographer', icon: User },
-  { value: 'yc_top_winner', label: 'YC Top Choice', icon: Crown },
+  { value: 'TOP_PHOTO', label: 'Top Photo', icon: ImageIcon },
+  { value: 'TOP_PHOTOGRAPHER', label: 'Top Photographer', icon: User },
+  // { value: 'yc_top_winner', label: 'YC Top Choice', icon: Crown },
 ];
+export const RECURRING_TYPES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
+export type RecurringType = (typeof RECURRING_TYPES)[number];
