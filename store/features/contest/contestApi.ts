@@ -6,6 +6,14 @@ export const contestApi = createApi({
   baseQuery: baseQuery(typeof window === 'undefined'),
   tagTypes: ['Contests', 'Contest'],
   endpoints: (builder) => ({
+    createContest: builder.mutation<{ data: unknown }, any>({
+      query: (credentials) => ({
+        url: '/contests',
+        method: 'POST',
+        body: credentials,
+      }),
+    }),
+
     getContests: builder.query<{ data: any }, { page?: number; limit?: number }>({
       query: ({ page = 1, limit = 20 }) => `/contests/all?page=${page}&limit=${limit}`,
       providesTags: (result) =>
@@ -28,6 +36,7 @@ export const contestApi = createApi({
 });
 
 export const {
+  useCreateContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
   useGetContestQuery,

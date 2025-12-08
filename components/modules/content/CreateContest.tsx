@@ -5,7 +5,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { Resolver } from 'react-hook-form';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { ContestValues, contestSchema } from '@/lib/schemas/contestSchema';
-import { Trophy, Scale, Trash2, Plus, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import {
+  Trophy,
+  Scale,
+  Trash2,
+  Plus,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  FileText,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -36,10 +45,15 @@ import {
 } from '@/lib/constants';
 import Image from 'next/image';
 import DynamicIcon from '@/components/common/DynamicIcon';
+import { useCreateContestMutation } from '@/store/features/contest/contestApi';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const CreateContest: React.FC = () => {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
 
+  const [createContest, { isLoading }] = useCreateContestMutation();
   const form = useForm<ContestValues>({
     resolver: zodResolver(contestSchema) as Resolver<ContestValues>,
     defaultValues: {
@@ -152,10 +166,40 @@ const CreateContest: React.FC = () => {
       window.scrollTo(0, 0);
       return;
     }
+
+    // Raw values from form
     const raw = getValues();
+
+    // Validate with Zod
     const data = contestSchema.parse(raw);
-    console.log('FINAL CONTEST SUBMISSION DATA:', data);
-    alert('Contest Created! Check console for data.');
+
+    // Create FormData
+    const formData = new FormData();
+
+    // Loop through keys of data and append to FormData
+    Object.entries(data).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        // If value is an array, append each item
+        value.forEach((v) => formData.append(`${key}[]`, v as any));
+      } else if (value instanceof File) {
+        // If value is a file, append directly
+        formData.append(key, value);
+      } else if (typeof value === 'object' && value !== null) {
+        // Nested object -> convert to JSON string
+        formData.append(key, JSON.stringify(value));
+      } else {
+        // Primitive value
+        formData.append(key, value as any);
+      }
+    });
+
+    try {
+      await createContest(formData).unwrap();
+      toast.success('New Contest Created');
+      router.push('/contest');
+    } catch (err: any) {
+      toast.error(err?.message || err?.data?.message || 'Something went wrong!');
+    }
   };
 
   const stepContent = () => {
@@ -163,6 +207,13 @@ const CreateContest: React.FC = () => {
       case 0:
         return (
           <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
+            <h1 className="flex items-center gap-2 border-b pb-5 text-lg font-semibold">
+              <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
+                <FileText className="size-5" />
+              </span>{' '}
+              Details
+            </h1>
+
             <div className="grid items-start gap-5 rounded-xl border bg-gray-900 p-5 md:grid-cols-2">
               <h1 className="col-span-full text-lg font-semibold">Contest Introduction</h1>
 
@@ -441,7 +492,7 @@ const CreateContest: React.FC = () => {
                         // (we also clear the value in a useEffect when recurring=false)
                         disabled={!watchRecurring}
                       >
-                        <SelectTrigger className="min-h-11 w-full">
+                        <SelectTrigger className="min-h-11 w-full ring-white/20 focus:ring-2">
                           <SelectValue placeholder="Select recurring frequency" />
                         </SelectTrigger>
                         <SelectContent>
@@ -509,7 +560,7 @@ const CreateContest: React.FC = () => {
               {ruleFields.map((f, index) => (
                 <div
                   key={f.id}
-                  className="relative rounded-lg border bg-gray-950/50 p-5 transition-all duration-300"
+                  className="relative rounded-xl border bg-gray-900 p-5 transition-all duration-300"
                 >
                   <div className="absolute top-5 right-5">
                     <Button
@@ -532,12 +583,12 @@ const CreateContest: React.FC = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-gray-400">Rule Icon</FormLabel>
-                          <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
+                          <FormControl>
                             <Select
                               value={field.value || ''}
                               onValueChange={(value) => field.onChange(value)}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className="min-h-11 ring-white/20 focus:ring-2">
                                 <SelectValue placeholder="Select Icon" />
                               </SelectTrigger>
                               <SelectContent align="start" className="max-h-60 overflow-y-auto">
@@ -645,7 +696,7 @@ const CreateContest: React.FC = () => {
               {prizeFields.map((f, index) => (
                 <div
                   key={f.id}
-                  className="relative rounded-xl border bg-gray-950/50 p-5 transition-all duration-300"
+                  className="relative rounded-xl border bg-gray-900 p-5 transition-all duration-300"
                 >
                   <div className="absolute top-5 right-5">
                     <Button
@@ -668,7 +719,7 @@ const CreateContest: React.FC = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="text-gray-400">Prize Category</FormLabel>
-                            <FormControl className="min-h-11 ring-white/20 focus:ring-2">
+                            <FormControl className="ring-white/20 focus:ring-2">
                               <Select
                                 value={field.value || ''}
                                 onValueChange={(value) => {
@@ -683,7 +734,7 @@ const CreateContest: React.FC = () => {
                                   }
                                 }}
                               >
-                                <SelectTrigger>
+                                <SelectTrigger className="min-h-11 ring-white/20 focus:ring-2">
                                   <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                                 <SelectContent align="start" className="max-h-60 overflow-y-auto">
@@ -772,11 +823,12 @@ const CreateContest: React.FC = () => {
               Review
             </h1>
 
-            <h3 className="text-2xl font-semibold text-white">Final Review</h3>
-            <div className="space-y-6 rounded-lg border border-gray-800 bg-gray-950 p-6">
+            <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
               <div className="grid grid-cols-2">
                 <p className="text-gray-500">Title</p>
                 <p className="font-semibold text-white">{getValues('title')}</p>
+                <p className="text-gray-500">Max Upload</p>
+                <p className="font-semibold text-white">{getValues('maxUploads')}</p>
                 <p className="text-gray-500">Start Time</p>
                 <p className="font-semibold text-white">
                   {getValues('startDate') ? format(getValues('startDate')!, 'PPpp') : 'N/A'}
@@ -871,10 +923,11 @@ const CreateContest: React.FC = () => {
               <Button
                 type="button"
                 size="lg"
+                disabled={isLoading}
                 onClick={handleFinalSubmit}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 text-white hover:bg-green-700 disabled:cursor-default disabled:opacity-50"
               >
-                Launch Contest
+                {isLoading ? 'Launching...' : 'Launch Contest'}
               </Button>
             ) : (
               <Button type="button" onClick={handleNext} size="lg" className="text-white">
