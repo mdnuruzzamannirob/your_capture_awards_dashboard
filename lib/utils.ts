@@ -89,3 +89,7 @@ export const formatDateWithTime = (isoString: string) => {
   // Combining Date and Time
   return { day, month, year, hours, minutes, timeZone: 'UTC' };
 };
+
+export const toPascalCase = (str: string) => {
+  return str.replace(/(^\w|-\w)/g, (match) => match.replace('-', '').toUpperCase());
+};

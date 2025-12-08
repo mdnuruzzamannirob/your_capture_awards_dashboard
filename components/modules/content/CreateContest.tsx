@@ -35,6 +35,7 @@ import {
   RECURRING_TYPES,
 } from '@/lib/constants';
 import Image from 'next/image';
+import DynamicIcon from '@/components/common/DynamicIcon';
 
 const CreateContest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
@@ -534,23 +535,23 @@ const CreateContest: React.FC = () => {
                           <FormControl className="min-h-11 w-full ring-white/20 focus:ring-2">
                             <Select
                               value={field.value || ''}
-                              onValueChange={(val) => field.onChange(val)}
+                              onValueChange={(value) => field.onChange(value)}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="Select Icon" />
                               </SelectTrigger>
                               <SelectContent align="start" className="max-h-60 overflow-y-auto">
-                                {CREATE_CONTEST_RULE_ICONS.map((icon) => {
-                                  const IconComp = icon.icon;
-                                  return (
-                                    <SelectItem key={icon.value} value={icon.value}>
-                                      <div className="flex items-center gap-3">
-                                        <IconComp className="text-primary size-4" />
-                                        <span>{icon.label}</span>
-                                      </div>
-                                    </SelectItem>
-                                  );
-                                })}
+                                {CREATE_CONTEST_RULE_ICONS.map((icon) => (
+                                  <SelectItem key={icon.value} value={icon.icon}>
+                                    <div className="flex items-center gap-3">
+                                      <DynamicIcon
+                                        name={icon.icon}
+                                        className="text-primary size-4"
+                                      />
+                                      <span>{icon.label}</span>
+                                    </div>
+                                  </SelectItem>
+                                ))}
                               </SelectContent>
                             </Select>
                           </FormControl>
@@ -670,18 +671,30 @@ const CreateContest: React.FC = () => {
                             <FormControl className="min-h-11 ring-white/20 focus:ring-2">
                               <Select
                                 value={field.value || ''}
-                                onValueChange={(v) => field.onChange(v as any)}
+                                onValueChange={(value) => {
+                                  field.onChange(value);
+
+                                  const matched = CREATE_CONTEST_PRIZE_TYPES.find(
+                                    (t) => t.value === value,
+                                  );
+
+                                  if (matched) {
+                                    setValue(`prizes.${index}.icon`, matched.icon);
+                                  }
+                                }}
                               >
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select type" />
                                 </SelectTrigger>
                                 <SelectContent align="start" className="max-h-60 overflow-y-auto">
                                   {CREATE_CONTEST_PRIZE_TYPES.map((type) => {
-                                    const IconComp = type.icon;
                                     return (
                                       <SelectItem key={type.value} value={type.value}>
                                         <div className="flex items-center gap-2">
-                                          <IconComp className="size-4 text-yellow-500" />
+                                          <DynamicIcon
+                                            name={type.icon}
+                                            className="size-4 text-yellow-500"
+                                          />
                                           <span>{type.label}</span>
                                         </div>
                                       </SelectItem>
@@ -793,7 +806,6 @@ const CreateContest: React.FC = () => {
         <div className="bg-muted absolute top-10 z-0 max-xl:right-10 max-xl:left-10 max-xl:h-0.5 xl:top-5 xl:bottom-5 xl:left-10 xl:w-0.5" />
 
         {CREATE_CONTEST_STEPS.map((step, index) => {
-          const Icon = step.icon;
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
           const colorClass = isCompleted
@@ -819,7 +831,11 @@ const CreateContest: React.FC = () => {
                   colorClass,
                 )}
               >
-                {isCompleted ? <CheckCircle className="size-5" /> : <Icon className="size-5" />}
+                {isCompleted ? (
+                  <CheckCircle className="size-5" />
+                ) : (
+                  <DynamicIcon name={step.icon} className="size-5" />
+                )}
               </div>
               <span
                 className={cn(
