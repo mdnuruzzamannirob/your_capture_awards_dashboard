@@ -4,22 +4,26 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Pen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { User } from '@/store/features/user/types';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { GoDotFill } from 'react-icons/go';
 
 export const columns: ColumnDef<User>[] = [
   {
     id: 'sl',
     header: 'SL',
-    cell: ({ row }) => <div>{row.index + 1}</div>,
+    cell: ({ row, table }) => {
+      const { pageIndex, pageSize } = table.getState().pagination;
+      return pageIndex * pageSize + row.index + 1;
+    },
   },
   {
     accessorKey: 'username',
-    header: 'UID',
+    header: 'USERNAME',
     cell: ({ row }) => <div>{row.getValue('username')}</div>,
   },
   {
     id: 'name',
-    header: 'Name',
+    header: 'NAME',
     cell: ({ row }) => {
       const { firstName, lastName } = row.original;
 
@@ -30,30 +34,36 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: 'email',
-    header: 'Email',
+    header: 'EMAIL',
     cell: ({ row }) => <div>{row.getValue('email')}</div>,
   },
 
   {
     accessorKey: 'country',
-    header: 'Country',
+    header: 'COUNTRY',
     cell: ({ row }) => <div>{row.getValue('country')}</div>,
   },
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: 'ROLE',
     cell: ({ row }) => <div>{row.getValue('role')}</div>,
   },
   {
     id: 'status',
-    header: 'Status',
+    header: 'STATUS',
     cell: ({ row }) => {
-      const status = row.original.isActive ? 'Active' : 'Inactive';
+      const status = row.original.isActive ? 'ACTIVE' : 'INACTIVE';
 
       return (
-        <Badge variant={row.original.isActive ? 'secondary' : 'destructive'} className="capitalize">
-          {status}
-        </Badge>
+        <button
+          className={cn(
+            'text-foreground flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
+            status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
+            status === 'INACTIVE' && 'bg-red-500/20 text-red-600',
+          )}
+        >
+          <GoDotFill /> {status}
+        </button>
       );
     },
   },
@@ -61,9 +71,7 @@ export const columns: ColumnDef<User>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const data = row.original;
-      console.log(data);
+    cell: () => {
       return (
         <Button variant="outline" onClick={(event) => event.stopPropagation()}>
           <Pen />

@@ -17,10 +17,10 @@ const ContestTable = () => {
   return (
     <DataTable
       columns={columns}
-      data={data?.data ?? []}
+      data={data?.data?.contests ?? []}
       page={page}
       pageSize={limit}
-      total={data?.data?.length ?? 0}
+      total={data?.data?.total ?? 0}
       filterableColumns={filterColumns}
       onPageChange={setPage}
       onPageSizeChange={(size) => {

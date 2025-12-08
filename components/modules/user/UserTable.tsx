@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils';
 import { Info } from 'lucide-react';
 import Image from 'next/image';
+import { GoDotFill } from 'react-icons/go';
 
 const UserTable = () => {
   const [page, setPage] = useState(1);
@@ -24,7 +25,7 @@ const UserTable = () => {
         data={data?.data?.users ?? []}
         page={page}
         pageSize={limit}
-        total={data?.data?.count ?? 0}
+        total={data?.data?.total ?? 0}
         onPageChange={setPage}
         onPageSizeChange={(size) => {
           setLimit(size);
@@ -37,12 +38,12 @@ const UserTable = () => {
         isLoading={isLoading || isFetching}
       />
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[95vh] overflow-hidden sm:max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>User Details</DialogTitle>
           </DialogHeader>
           {selectedRow && (
-            <div className="">
+            <div className="max-h-[80vh] overflow-y-auto pb-1">
               <div className="h-54 w-full overflow-hidden rounded-xl border">
                 <Image
                   alt="Cover Photo"
@@ -80,15 +81,29 @@ const UserTable = () => {
                   { title: 'Location', value: selectedRow?.location },
                   { title: 'Country', value: selectedRow?.country },
                   { title: 'Role', value: selectedRow?.role },
-                  { title: 'Status', value: selectedRow?.isActive ? 'Active' : 'Inactive' },
                   { title: 'Level', value: selectedRow?.currentLevel },
                   { title: 'Voting Power', value: selectedRow?.voting_power },
                   { title: 'Subscription Plan', value: 'Free' },
+                  { title: 'Status', value: selectedRow?.isActive ? 'ACTIVE' : 'INACTIVE' },
                   { title: 'Created At', value: '14 Jan 2025' },
                 ].map((item, index) => (
                   <div key={index} className={cn('flex items-center', index !== 0 && 'border-t')}>
                     <h3 className="w-40 border-r px-3 py-2 capitalize">{item.title}</h3>
-                    <p className="px-3 py-2">{item.value}</p>
+
+                    {item.title === 'Status' ? (
+                      <button
+                        key={index}
+                        className={cn(
+                          'text-foreground mx-3 flex items-center justify-center gap-0.5 rounded-full px-1.5 py-1 text-[10px] font-medium capitalize',
+                          item.value === 'ACTIVE' && 'bg-green-500/20 text-green-600',
+                          item.value === 'INACTIVE' && 'bg-red-500/20 text-red-600',
+                        )}
+                      >
+                        <GoDotFill className="mb-0.5 size-2" /> {item.value}
+                      </button>
+                    ) : (
+                      <p className="px-3 py-2">{item.value}</p>
+                    )}
                   </div>
                 ))}
               </div>

@@ -11,7 +11,10 @@ export const contestApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data?.map(({ id }: { id: any }) => ({ type: 'Contest' as const, id })),
+              ...result.data?.contests?.map(({ id }: { id: any }) => ({
+                type: 'Contest' as const,
+                id,
+              })),
               { type: 'Contests', id: 'LIST' },
             ]
           : [{ type: 'Contests', id: 'LIST' }],

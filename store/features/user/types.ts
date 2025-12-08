@@ -17,7 +17,7 @@ export interface User {
 
 export interface GetUsersResponse {
   users: User[];
-  count: number;
+  total: number;
   page: number;
   limit: number;
 }
