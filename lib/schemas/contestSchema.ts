@@ -41,7 +41,7 @@ export const contestSchema = z
     isMoneyContest: z.boolean().default(false),
 
     recurring: z.boolean().default(false),
-    recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
+    recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).default('MONTHLY').optional(),
 
     mode: z.enum(['SOLO', 'TEAM']).default('SOLO'),
 

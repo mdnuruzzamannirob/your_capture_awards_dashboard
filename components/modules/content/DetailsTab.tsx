@@ -1,45 +1,64 @@
 'use client';
 
 import { useState } from 'react';
+import { z } from 'zod';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, Info, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
 import Image from 'next/image';
+import { TipTapEditor } from '@/components/common/tiptap-editor';
+import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import { GoDotFill } from 'react-icons/go';
 
-const DetailsTab = ({ contest: data }: { contest: any }) => {
+// Zod schema
+const contestSchema = z.object({
+  title: z.string().min(3, 'Title must be at least 3 characters'),
+  description: z.string().min(5, 'Description must be at least 5 characters'),
+  maxUpload: z.number().min(1, 'At least 1 upload allowed'),
+  minPrize: z.number().min(0),
+  maxPrize: z.number().min(0),
+  startDate: z.date(),
+  endDate: z.date(),
+});
+
+type ContestFormValues = z.infer<typeof contestSchema>;
+
+const DetailsTab = ({ contest }: { contest: any }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [contest] = useState(data);
-  const [formData, setFormData] = useState({
-    title: contest?.title,
-    description: 'Lorem, ipsum dolor sit ',
-    moneyContest: true,
-    vote: 7500,
-    participant: 55,
-    status: 'ACTIVE',
-    mode: 'Solo',
-    maxUpload: 4,
-    minPrize: 200,
-    maxPrize: 4000,
-    startDate: '2025-01-16',
-    startTime: '10:00',
-    endDate: '2025-01-20',
-    endTime: '18:00',
+
+  const defaultValues: ContestFormValues = {
+    title: contest.title || '',
+    description: contest.description || '',
+    maxUpload: contest.maxUploads || 1,
+    minPrize: contest.minPrize || 0,
+    maxPrize: contest.maxPrize || 0,
+    startDate: new Date(contest.startDate),
+    endDate: new Date(contest.endDate),
+  };
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ContestFormValues>({
+    resolver: zodResolver(contestSchema),
+    defaultValues,
   });
+
+  const onSubmit = (values: ContestFormValues) => {
+    console.log('Updated Data:', values);
+    setIsDialogOpen(false);
+    // send updated data to backend
+  };
 
   const {
     day: startDay,
@@ -49,6 +68,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
     timeZone: startTimeZone,
     year: startYear,
   } = formatDateWithTime(contest.startDate);
+
   const {
     day: endDay,
     hours: endHours,
@@ -57,15 +77,6 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
     timeZone: endTimeZone,
     year: endYear,
   } = formatDateWithTime(contest.endDate);
-
-  const handleChange = (key: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSubmit = () => {
-    console.log('Updated Data:', formData);
-    setIsDialogOpen(false);
-  };
 
   return (
     <div className="space-y-5">
@@ -104,9 +115,10 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
 
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Description</h1>
-          <p className="text-base">{contest?.description}</p>
+          <TipTapViewer content={contest.description} />
         </div>
 
+        {/* Stats */}
         <div className="grid grid-cols-3 gap-5 text-sm">
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Money Contest</h1>
@@ -152,7 +164,6 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Start Date</h1>
             <p className="text-base font-semibold">
-              {' '}
               {startDay} {startMonth} {startYear}, {startHours}:{startMinutes}{' '}
               <span className="text-muted-foreground text-xs font-medium">{startTimeZone}</span>
             </p>
@@ -160,7 +171,6 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">End Date</h1>
             <p className="text-base font-semibold">
-              {' '}
               {endDay} {endMonth} {endYear}, {endHours}:{endMinutes}{' '}
               <span className="text-muted-foreground text-xs font-medium">{endTimeZone}</span>
             </p>
@@ -176,146 +186,105 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
         </div>
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 sm:max-h-[80vh] sm:max-w-3xl">
+        <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 p-0 sm:max-h-[80vh] sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Edit Details</DialogTitle>
+            <DialogTitle className="px-5 pt-5">Edit Details</DialogTitle>
           </DialogHeader>
-          <form className="size-full overflow-y-auto">
+          <form className="size-full overflow-y-auto p-5" onSubmit={handleSubmit(onSubmit)}>
             {/* Title */}
             <div className="flex flex-col gap-2">
               <Label>Title</Label>
-              <Input
-                value={formData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
+              <Input {...register('title')} />
+              {errors.title && <span className="text-sm text-red-500">{errors.title.message}</span>}
             </div>
 
-            {/* Description */}
-            <div className="flex flex-col gap-2">
+            <div className="mt-3 flex flex-col gap-2">
               <Label>Description</Label>
-              <Input
-                value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
+              <Controller
+                control={control}
+                name="description"
+                render={({ field }) => (
+                  <TipTapEditor
+                    value={field.value}
+                    onChange={field.onChange} // react-hook-form e sync korbe
+                  />
+                )}
               />
+              {errors.description && (
+                <span className="text-sm text-red-500">{errors.description.message}</span>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-5 space-y-5">
-              {/* Money Contest */}
-              <div className="flex flex-col gap-2">
-                <Label>Money Contest</Label>
-                <Switch
-                  checked={formData.moneyContest}
-                  onCheckedChange={(val) => handleChange('moneyContest', val)}
-                />
-              </div>
-
-              {/* Status */}
-              <div className="flex flex-col gap-2">
-                <Label>Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(val) => handleChange('status', val)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                    <SelectItem value="INACTIVE">INACTIVE</SelectItem>
-                    <SelectItem value="CLOSED">CLOSED</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Mode */}
-              <div className="flex flex-col gap-2">
-                <Label>Mode</Label>
-                <Select value={formData.mode} onValueChange={(val) => handleChange('mode', val)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select mode" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Solo">Solo</SelectItem>
-                    <SelectItem value="Team">Team</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
+            <div className="mt-5 grid grid-cols-2 gap-5">
               {/* Numbers */}
-              {['maxUpload', 'participant', 'minPrize', 'maxPrize'].map((key) => (
-                <div key={key} className="flex flex-col gap-2">
+              {['maxUpload', 'minPrize', 'maxPrize'].map((key) => (
+                <div key={key} className="mt-3 flex flex-col gap-2">
                   <Label>{key}</Label>
                   <Input
                     type="number"
-                    value={formData[key as keyof typeof formData] as number}
-                    onChange={(e) => handleChange(key, parseInt(e.target.value) || 0)}
+                    {...register(key as keyof ContestFormValues, { valueAsNumber: true })}
                   />
+                  {errors[key as keyof ContestFormValues] && (
+                    <span className="text-sm text-red-500">
+                      {errors[key as keyof ContestFormValues]?.message as string}
+                    </span>
+                  )}
                 </div>
               ))}
 
-              {/* Dates */}
-              <div className="flex flex-col gap-2">
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between">
-                      {format(formData.startDate, 'PPP')}
-                      <CalendarIcon className="ml-2 size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Calendar
-                      mode="single"
-                      selected={contest.startDate}
-                      onSelect={(date) => handleChange('startDate', date)}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Start Time</Label>
-                <Input
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => handleChange('startTime', e.target.value)}
+              {/* Start Date */}
+              <div className="mt-3 flex flex-col gap-2">
+                <Label>Start Date & Time</Label>
+                <Controller
+                  control={control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="justify-between">
+                          {format(field.value, 'PPP p')}
+                          <CalendarIcon className="ml-2 size-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between">
-                      {format(formData.endDate, 'PPP')}
-                      <CalendarIcon className="ml-2 size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-fit p-0">
-                    <Calendar
-                      mode="single"
-                      selected={contest.endDate}
-                      onSelect={(date) => handleChange('endDate', date)}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>End Time</Label>
-                <Input
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => handleChange('endTime', e.target.value)}
+              {/* End Date */}
+              <div className="mt-3 flex flex-col gap-2">
+                <Label>End Date & Time</Label>
+                <Controller
+                  control={control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="justify-between">
+                          {format(field.value, 'PPP p')}
+                          <CalendarIcon className="ml-2 size-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="p-0">
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} />
+                      </PopoverContent>
+                    </Popover>
+                  )}
                 />
               </div>
             </div>
 
             {/* Actions */}
-            <div className="mt-4 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <div className="mt-4 flex shrink justify-end gap-3">
+              <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button type="submit">Save</Button>
             </div>
           </form>
         </DialogContent>

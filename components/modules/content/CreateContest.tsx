@@ -14,6 +14,7 @@ import {
   ArrowRight,
   CheckCircle,
   FileText,
+  ClipboardCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -69,7 +70,7 @@ const CreateContest: React.FC = () => {
       mode: 'SOLO',
       startDate: new Date(),
       endDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      rules: [{ name: '', icon: 'info', description: '' }],
+      rules: [{ name: 'General Rule', description: 'General Rule', icon: 'Info' }],
       prizes: [
         {
           category: 'TOP_PHOTOGRAPHER',
@@ -167,32 +168,26 @@ const CreateContest: React.FC = () => {
       return;
     }
 
-    // Raw values from form
     const raw = getValues();
-
-    // Validate with Zod
     const data = contestSchema.parse(raw);
-
-    // Create FormData
     const formData = new FormData();
 
-    // Loop through keys of data and append to FormData
     Object.entries(data).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        // If value is an array, append each item
+      if (Array.isArray(value) && typeof value[0] === 'object') {
+        // Array of objects -> stringify
+        formData.append(key, JSON.stringify(value));
+      } else if (Array.isArray(value)) {
         value.forEach((v) => formData.append(`${key}[]`, v as any));
       } else if (value instanceof File) {
-        // If value is a file, append directly
         formData.append(key, value);
+      } else if (value instanceof Date) {
+        formData.append(key, value.toISOString());
       } else if (typeof value === 'object' && value !== null) {
-        // Nested object -> convert to JSON string
         formData.append(key, JSON.stringify(value));
       } else {
-        // Primitive value
         formData.append(key, value as any);
       }
     });
-
     try {
       await createContest(formData).unwrap();
       toast.success('New Contest Created');
@@ -282,7 +277,7 @@ const CreateContest: React.FC = () => {
                         <label
                           htmlFor="banner-upload"
                           className={cn(
-                            'flex h-60 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition',
+                            'relative flex h-60 cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition',
                             preview
                               ? 'border-gray-700 hover:border-gray-500'
                               : 'border-gray-600 hover:border-gray-400',
@@ -294,29 +289,33 @@ const CreateContest: React.FC = () => {
                               alt="Banner preview"
                               width={2000}
                               height={300}
-                              className="h-full w-full rounded-xl object-cover"
+                              className="size-full rounded-xl object-cover"
                             />
                           ) : (
                             <div className="text-center text-gray-400">
                               <p className="text-sm">Click to upload banner</p>
-                              <p className="text-xs">PNG / JPG / WEBP (max 2MB)</p>
+                              <p className="text-xs">PNG / JPG / WEBP (max 5MB)</p>
                             </div>
+                          )}
+
+                          {/* Remove button */}
+                          {preview && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute top-5 right-5 text-red-400 hover:text-red-400"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                field.onChange(undefined);
+                              }}
+                            >
+                              <Trash2 />
+                            </Button>
                           )}
                         </label>
                       </FormControl>
-
-                      {/* Remove button */}
-                      {preview && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="mt-2 text-red-400"
-                          onClick={() => field.onChange(undefined)}
-                        >
-                          Remove image
-                        </Button>
-                      )}
 
                       <FormMessage />
                     </FormItem>
@@ -818,7 +817,7 @@ const CreateContest: React.FC = () => {
           <div className="animate-in fade-in slide-in-from-bottom-2 space-y-5">
             <h1 className="flex items-center gap-2 border-b pb-5 text-lg font-semibold">
               <span className="border-muted flex size-10 min-w-10 items-center justify-center rounded-full border-2 bg-gray-700">
-                <Trophy className="size-5" />
+                <ClipboardCheck className="size-5" />
               </span>{' '}
               Review
             </h1>
