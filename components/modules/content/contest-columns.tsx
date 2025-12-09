@@ -94,7 +94,7 @@ export const columns: ColumnDef<any>[] = [
       return (
         <button
           className={cn(
-            'text-foreground flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
+            'text-foreground flex items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
             status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
             status === 'CLOSED' && 'bg-red-500/20 text-red-600',
             status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
