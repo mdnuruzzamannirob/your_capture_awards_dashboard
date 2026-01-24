@@ -16,24 +16,12 @@ export const CREATE_CONTEST_STEPS = [
     id: 0,
     title: 'Details',
     icon: 'FileText',
-    fields: [
-      'title',
-      'description',
-      'banner',
-      'mode',
-      'maxUploads',
-      'isMoneyContest',
-      'minPrize',
-      'maxPrize',
-      'recurring',
-      'recurringType',
-      'startDate',
-      'endDate',
-    ],
+    fields: [],
   },
-  { id: 1, title: 'Rules', icon: 'Scale', fields: ['rules'] },
-  { id: 2, title: 'Prizes', icon: 'Trophy', fields: ['prizes'] },
-  { id: 3, title: 'Review', icon: 'ClipboardCheck', fields: [] },
+  { id: 1, title: 'Prizes', icon: 'DollarSign', fields: [] },
+  { id: 2, title: 'Rules', icon: 'Scale', fields: [] },
+  { id: 3, title: 'Rewards', icon: 'Gift', fields: [] },
+  { id: 4, title: 'Review', icon: 'ClipboardCheck', fields: [] },
 ];
 
 export const CREATE_CONTEST_RULE_ICONS = [
@@ -45,12 +33,19 @@ export const CREATE_CONTEST_RULE_ICONS = [
   { value: 'boost', label: 'Boost Use', icon: 'Zap' },
   { value: 'swap', label: 'Swap Use', icon: 'RotateCw' },
   { value: 'idea', label: 'Theme/Concept', icon: 'Lightbulb' },
+  { value: 'theme', label: 'Follow Theme', icon: 'Palette' },
+  { value: 'original', label: 'Original Work Only', icon: 'BadgeCheck' },
+  { value: 'no_ai', label: 'No AI/Plagiarism', icon: 'ShieldBan' },
+  { value: 'no_watermark', label: 'No Watermarks/Logos', icon: 'BadgeX' },
+  { value: 'content_guidelines', label: 'No NSFW Content', icon: 'EyeOff' },
+  { value: 'format', label: 'Format & Size', icon: 'Image' },
+  { value: 'submission_window', label: 'Submission Window', icon: 'CalendarClock' },
 ];
 
 export const CREATE_CONTEST_PRIZE_TYPES = [
-  { value: 'TOP_PHOTO', label: 'Top Photo', icon: 'ImageIcon' },
+  { value: 'TOP_PHOTO', label: 'Top Photo', icon: 'Image' },
   { value: 'TOP_PHOTOGRAPHER', label: 'Top Photographer', icon: 'User' },
-  // { value: 'yc_top_winner', label: 'YC Top Choice', icon: Crown },
+  // { value: 'yc_top_winner', label: 'YC Top Choice', icon: 'Crown' },
 ];
 export const RECURRING_TYPES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
 export type RecurringType = (typeof RECURRING_TYPES)[number];
