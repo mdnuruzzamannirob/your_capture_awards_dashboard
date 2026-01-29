@@ -36,7 +36,7 @@ const DetailsStep = () => {
         <FileText className="size-5 text-emerald-500" /> Details
       </h2>
 
-      <div className="grid grid-cols-1 gap-4 space-y-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
         <FormField
           control={form.control}
           name="details.title"
