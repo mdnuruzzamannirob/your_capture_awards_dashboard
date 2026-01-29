@@ -149,15 +149,34 @@ const CreateContest: React.FC = () => {
     const formData = new FormData();
 
     const { details, prizes, rules, rewards } = data;
-    const { banner, ...restDetails } = details;
 
-    if (banner) {
-      formData.append('banner', banner);
-    }
-    formData.append('details', JSON.stringify(restDetails));
-    formData.append('prizes', JSON.stringify(prizes));
-    formData.append('rules', JSON.stringify(rules));
-    formData.append('rewards', JSON.stringify(rewards));
+    formData.append('title', details.title);
+    formData.append('description', details.description);
+    formData.append('recurring', String(details.recurring));
+    if (details.recurringType) formData.append('recurringType', details.recurringType);
+    formData.append('startDate', details.startDate.toISOString());
+    formData.append('endDate', details.endDate.toISOString());
+    formData.append('maxUploads', String(details.maxUploads));
+    if (details.banner) formData.append('banner', details.banner);
+
+    formData.append('type', prizes.type);
+    formData.append('isMoneyContest', String(prizes.isMoneyContest));
+    formData.append('minPrize', String(prizes.minPrize));
+    formData.append('maxPrize', String(prizes.maxPrize));
+
+    rules.forEach((rule, idx) => {
+      formData.append(`rules[${idx}][name]`, rule.name);
+      formData.append(`rules[${idx}][description]`, rule.description);
+      formData.append(`rules[${idx}][icon]`, rule.icon);
+    });
+
+    rewards.forEach((reward, idx) => {
+      formData.append(`prize[${idx}][category]`, reward.category);
+      formData.append(`prize[${idx}][boost]`, String(reward.boost));
+      formData.append(`prize[${idx}][key]`, String(reward.key));
+      formData.append(`prize[${idx}][swap]`, String(reward.swap));
+      formData.append(`prize[${idx}][icon]`, reward.icon);
+    });
 
     try {
       await createContest(formData).unwrap();
@@ -209,7 +228,7 @@ const CreateContest: React.FC = () => {
                       color: isActive ? '#34d399' : '#e5e7eb',
                     }}
                   >
-                    {isCompleted ? <CheckCircle className="size-4" /> : index + 1}
+                    {isCompleted ? <CheckCircle className="size-4 min-w-4" /> : index + 1}
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-white">{step.title}</p>
@@ -244,7 +263,7 @@ const CreateContest: React.FC = () => {
                   {isLoading ? 'Submitting...' : 'Create Contest'}
                 </Button>
               ) : (
-                <Button type="button" onClick={handleNext} className="gap-2">
+                <Button type="button" onClick={handleNext} className="gap-2 text-white">
                   Next Step <ArrowRight className="size-4" />
                 </Button>
               )}
