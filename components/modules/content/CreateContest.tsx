@@ -171,11 +171,11 @@ const CreateContest: React.FC = () => {
     });
 
     rewards.forEach((reward, idx) => {
-      formData.append(`prize[${idx}][category]`, reward.category);
-      formData.append(`prize[${idx}][boost]`, String(reward.boost));
-      formData.append(`prize[${idx}][key]`, String(reward.key));
-      formData.append(`prize[${idx}][swap]`, String(reward.swap));
-      formData.append(`prize[${idx}][icon]`, reward.icon);
+      formData.append(`prizes[${idx}][category]`, reward.category);
+      formData.append(`prizes[${idx}][boost]`, String(reward.boost));
+      formData.append(`prizes[${idx}][key]`, String(reward.key));
+      formData.append(`prizes[${idx}][swap]`, String(reward.swap));
+      formData.append(`prizes[${idx}][icon]`, reward.icon);
     });
 
     try {
