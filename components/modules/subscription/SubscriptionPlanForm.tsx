@@ -198,51 +198,6 @@ const SubscriptionPlanForm = ({ plan, onSubmit, isLoading = false }: Subscriptio
                 />
               </div>
 
-              {/* Storage & Photo Limits */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="maxStorage"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max Storage (GB)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="1"
-                          placeholder="50"
-                          disabled={isLoading}
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="maxPhotos"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Max Photos</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min="1"
-                          placeholder="1000"
-                          disabled={isLoading}
-                          {...field}
-                          onChange={(e) => field.onChange(parseInt(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
               {/* Features */}
               <FormItem>
                 <FormLabel>Features</FormLabel>

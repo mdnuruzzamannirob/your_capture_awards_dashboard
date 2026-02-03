@@ -20,7 +20,7 @@ export const subscriptionPlanSchema = z.object({
     .min(1, 'Add at least one feature')
     .max(10, 'Maximum 10 features allowed'),
 
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 export type SubscriptionPlanFormData = z.infer<typeof subscriptionPlanSchema>;
