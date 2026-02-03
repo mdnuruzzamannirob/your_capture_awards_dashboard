@@ -1,5 +1,11 @@
-const Store = () => {
-  return <div>Store</div>;
-};
+'use client';
 
-export default Store;
+import StoreProductManagement from '@/components/modules/store/StoreProductManagement';
+
+export default function StorePage() {
+  return (
+    <section className="space-y-5 p-5">
+      <StoreProductManagement />
+    </section>
+  );
+}
