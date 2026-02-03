@@ -15,7 +15,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <main
         className={cn(
           'size-full pt-[57px] pb-5 transition-all duration-300 ease-in-out',
-          isSidebarVisible ? 'pl-60' : 'pl-16',
+          'lg:block lg:pl-60',
+          !isSidebarVisible && 'lg:pl-16',
         )}
       >
         {children}

@@ -73,7 +73,7 @@ export default function StoreProductForm({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant={product ? 'outline' : 'default'}>
+        <Button variant={product ? 'outline' : 'default'} className="max-sm:w-full">
           {product ? (
             <>
               <Edit2 className="size-4" />
