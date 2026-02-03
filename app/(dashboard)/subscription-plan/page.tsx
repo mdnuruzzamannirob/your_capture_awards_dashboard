@@ -11,9 +11,9 @@ const mockSubscriptionPlans: SubscriptionPlan[] = [
   {
     id: '1',
     planId: 'plan_001',
-    name: 'Basic Plan',
+    name: 'Free',
     description: 'Perfect for getting started with photography sharing',
-    price: 4.99,
+    price: 0,
     currency: 'USD',
     billingCycle: 'monthly',
     features: ['50 GB Storage', 'Up to 1000 Photos', 'Basic Editing Tools', 'Community Access'],
@@ -26,7 +26,7 @@ const mockSubscriptionPlans: SubscriptionPlan[] = [
   {
     id: '2',
     planId: 'plan_002',
-    name: 'Pro Plan',
+    name: 'Pro',
     description: 'For serious photographers and content creators',
     price: 9.99,
     currency: 'USD',
@@ -47,7 +47,7 @@ const mockSubscriptionPlans: SubscriptionPlan[] = [
   {
     id: '3',
     planId: 'plan_003',
-    name: 'Premium Plan',
+    name: 'Premium',
     description: 'Ultimate plan for professional photographers',
     price: 19.99,
     currency: 'USD',
@@ -65,48 +65,6 @@ const mockSubscriptionPlans: SubscriptionPlan[] = [
     stripePriceId: 'price_5544332211',
     createdAt: '2024-03-10T09:15:00Z',
     updatedAt: '2025-02-01T09:15:00Z',
-  },
-  {
-    id: '4',
-    planId: 'plan_004',
-    name: 'Pro Annual',
-    description: 'Annual subscription for pro photographers',
-    price: 99.99,
-    currency: 'USD',
-    billingCycle: 'yearly',
-    features: [
-      '500 GB Storage',
-      'Unlimited Photos',
-      'Advanced Editing',
-      'Priority Support',
-      'Save 16% vs monthly',
-    ],
-    subscribers: 560,
-    isActive: true,
-    stripePriceId: 'price_1122334455',
-    createdAt: '2024-04-05T11:45:00Z',
-    updatedAt: '2025-02-03T11:45:00Z',
-  },
-  {
-    id: '5',
-    planId: 'plan_005',
-    name: 'Premium Annual',
-    description: 'Best value annual plan for professionals',
-    price: 199.99,
-    currency: 'USD',
-    billingCycle: 'yearly',
-    features: [
-      '2 TB Storage',
-      'Unlimited Photos',
-      'Professional Tools',
-      '24/7 Support',
-      'Save 17% vs monthly',
-    ],
-    subscribers: 320,
-    isActive: true,
-    stripePriceId: 'price_9988776655',
-    createdAt: '2024-05-12T13:20:00Z',
-    updatedAt: '2025-01-30T13:20:00Z',
   },
 ];
 
@@ -189,7 +147,7 @@ export default function SubscriptionPlanPage() {
         })}
       </div>
 
-      <SubscriptionManagement />
+      <SubscriptionManagement mockSubscriptionPlans={mockSubscriptionPlans} />
     </section>
   );
 }

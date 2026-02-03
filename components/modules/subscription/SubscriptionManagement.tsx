@@ -5,7 +5,6 @@ import { SubscriptionPlanForm } from './SubscriptionPlanForm';
 import { SubscriptionPlan } from '@/types';
 import { SubscriptionPlanFormData } from '@/lib/schemas/subscriptionSchema';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -16,98 +15,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Trash2, Edit2 } from 'lucide-react';
+import { Trash2, Edit2, Check, Plus } from 'lucide-react';
 
-const mockSubscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: '1',
-    planId: 'plan_001',
-    name: 'Basic Plan',
-    description: 'Perfect for getting started with photography sharing',
-    price: 4.99,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: ['50 GB Storage', 'Up to 1000 Photos', 'Basic Editing Tools', 'Community Access'],
-    subscribers: 2450,
-    isActive: true,
-    stripePriceId: 'price_1234567890',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2025-02-03T10:30:00Z',
-  },
-  {
-    id: '2',
-    planId: 'plan_002',
-    name: 'Pro Plan',
-    description: 'For serious photographers and content creators',
-    price: 9.99,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: ['Unlimited Photos', 'Advanced Editing', 'Priority Support', 'Portfolio Tools'],
-    subscribers: 1850,
-    isActive: true,
-    stripePriceId: 'price_0987654321',
-    createdAt: '2024-02-20T14:00:00Z',
-    updatedAt: '2025-02-02T14:00:00Z',
-  },
-  {
-    id: '3',
-    planId: 'plan_003',
-    name: 'Premium Plan',
-    description: 'Ultimate plan for professional photographers',
-    price: 19.99,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: [
-      'Unlimited Photos',
-      'Professional Tools',
-      '24/7 Support',
-      'Analytics Dashboard',
-      'Team Collaboration',
-    ],
-    subscribers: 890,
-    isActive: true,
-    stripePriceId: 'price_5544332211',
-    createdAt: '2024-03-10T09:15:00Z',
-    updatedAt: '2025-02-01T09:15:00Z',
-  },
-  {
-    id: '4',
-    planId: 'plan_004',
-    name: 'Pro Annual',
-    description: 'Annual subscription for pro photographers',
-    price: 99.99,
-    currency: 'USD',
-    billingCycle: 'yearly',
-    features: ['Unlimited Photos', 'Advanced Editing', 'Priority Support', 'Save 16% vs monthly'],
-    subscribers: 560,
-    isActive: true,
-    stripePriceId: 'price_1122334455',
-    createdAt: '2024-04-05T11:45:00Z',
-    updatedAt: '2025-02-03T11:45:00Z',
-  },
-  {
-    id: '5',
-    planId: 'plan_005',
-    name: 'Premium Annual',
-    description: 'Best value annual plan for professionals',
-    price: 199.99,
-    currency: 'USD',
-    billingCycle: 'yearly',
-    features: ['Unlimited Photos', 'Professional Tools', '24/7 Support', 'Save 17% vs monthly'],
-    subscribers: 320,
-    isActive: true,
-    stripePriceId: 'price_9988776655',
-    createdAt: '2024-05-12T13:20:00Z',
-    updatedAt: '2025-01-30T13:20:00Z',
-  },
-];
-
-const SubscriptionManagement = () => {
+const SubscriptionManagement = ({
+  mockSubscriptionPlans,
+}: {
+  mockSubscriptionPlans: SubscriptionPlan[];
+}) => {
   const [plans, setPlans] = useState<SubscriptionPlan[]>(mockSubscriptionPlans);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<SubscriptionPlan | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const handleCreatePlan = (formData: SubscriptionPlanFormData) => {
     setIsLoading(true);
@@ -162,83 +82,110 @@ const SubscriptionManagement = () => {
     setSelectedPlan(null);
   };
 
+  const filteredPlans = plans.filter((plan) => {
+    if (filter === 'active') return plan.isActive;
+    if (filter === 'inactive') return !plan.isActive;
+    return true;
+  });
+
   return (
     <div className="space-y-6">
       {/* Controls Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-medium">
-            <span className="text-foreground font-bold">{plans.length}</span>
-            <span className="text-muted-foreground"> subscription plans</span>
-          </p>
-          <p className="text-muted-foreground text-xs">
-            <span className="text-foreground font-semibold">
-              {plans.filter((p) => p.isActive).length}
-            </span>
-            {' active'}
-          </p>
+
+      <div className="flex items-center justify-between gap-2">
+        <div className="bg-background/70 flex items-center rounded-lg border p-1">
+          <Button
+            type="button"
+            variant={filter === 'all' ? 'default' : 'ghost'}
+            onClick={() => setFilter('all')}
+          >
+            All
+          </Button>
+          <Button
+            type="button"
+            variant={filter === 'active' ? 'default' : 'ghost'}
+            onClick={() => setFilter('active')}
+          >
+            Active
+          </Button>
+          <Button
+            type="button"
+            variant={filter === 'inactive' ? 'default' : 'ghost'}
+            onClick={() => setFilter('inactive')}
+          >
+            Inactive
+          </Button>
         </div>
         <SubscriptionPlanForm onSubmit={handleCreatePlan} isLoading={isLoading} />
       </div>
 
-      {/* Plans Grid - Simple Layout */}
+      {/* Plans Grid - Modern Layout */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {plans.map((plan) => (
-          <Card key={plan.id} className="hover:border-primary/50 transition-all hover:shadow-lg">
-            <CardContent className="space-y-4 p-6">
-              {/* Plan Name & Status */}
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-lg font-semibold">{plan.name}</h3>
-                  <p className="text-muted-foreground text-sm">{plan.description}</p>
+        {filteredPlans.map((plan) => (
+          <Card key={plan.id} className="flex flex-col overflow-hidden p-0">
+            <CardContent className="flex h-full flex-col p-6">
+              {/* 1. Title & Description */}
+              <div className="mb-4">
+                <div className="flex justify-between">
+                  <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                    {plan.name}
+                  </h3>
+                  {/* 2. Status Badge */}
+                  <p
+                    className={`inline-flex h-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase ${
+                      plan.isActive
+                        ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                    }`}
+                  >
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full ${plan.isActive ? 'bg-emerald-500' : 'bg-zinc-400'}`}
+                    />
+                    {plan.isActive ? 'Active' : 'Inactive'}
+                  </p>
                 </div>
-                <Badge
-                  variant={plan.isActive ? 'default' : 'outline'}
-                  className={plan.isActive ? 'bg-green-600 text-white' : ''}
-                >
-                  {plan.isActive ? 'Active' : 'Inactive'}
-                </Badge>
+
+                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+                  {plan.description}
+                </p>
               </div>
 
-              {/* Price */}
-              <div className="border-t pt-4">
-                <p className="text-muted-foreground text-xs">Price</p>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold">${plan.price}</span>
-                  <span className="text-muted-foreground text-sm">/{plan.billingCycle}</span>
+              {/* 2. Pricing Section */}
+              <div className="mb-6 rounded-lg bg-white/5 p-4">
+                <p className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                  Monthly Price
+                </p>
+                <div className="mt-1 flex items-baseline gap-1">
+                  <span className="text-3xl font-black text-zinc-900 dark:text-white">
+                    ${plan.price}
+                  </span>
+                  <span className="text-sm font-medium text-zinc-500">/{plan.billingCycle}</span>
                 </div>
               </div>
 
-              {/* Features */}
-              <div className="space-y-2 border-t pt-4">
-                <p className="text-muted-foreground text-xs font-semibold">FEATURES</p>
-                <ul className="space-y-1.5">
+              {/* 3. Features */}
+              <div className="mb-6 flex-1">
+                <p className="mb-3 text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
+                  Features Included:
+                </p>
+                <ul className="space-y-2.5">
                   {plan.features.map((feature, index) => (
                     <li
                       key={index}
-                      className="text-muted-foreground flex items-center gap-2 text-sm"
+                      className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400"
                     >
-                      <span className="text-primary h-1.5 w-1.5 rounded-full bg-current" />
+                      <Check className="h-4 w-4 text-emerald-500" strokeWidth={3} />
                       {feature}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-2 border-t pt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingPlan(plan)}
-                  className="flex-1"
-                >
-                  <Edit2 className="mr-1 h-4 w-4" />
-                  Edit
-                </Button>
+              {/* 4. Buttons */}
+              <div className="flex gap-3">
                 <Button
                   variant="destructive"
-                  size="sm"
+                  size="icon-lg"
                   onClick={() => {
                     setSelectedPlan(plan);
                     setIsDeleteOpen(true);
@@ -246,10 +193,36 @@ const SubscriptionManagement = () => {
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
+                <Button
+                  size="lg"
+                  onClick={() => setEditingPlan(plan)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit Plan
+                </Button>
               </div>
             </CardContent>
           </Card>
         ))}
+
+        {/* Empty State - Modernized */}
+        {filteredPlans.length === 0 && (
+          <Card className="col-span-full border border-zinc-200 bg-transparent dark:border-zinc-800">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Button variant="outline" className="mb-4 size-12 rounded-full">
+                <Plus className="size-7" />
+              </Button>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                No plans available
+              </h3>
+              <p className="text-muted-foreground text-center text-sm">
+                It seems you haven&apos;t created any plans yet. <br /> Start by adding a new one!
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Edit Plan Modal */}

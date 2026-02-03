@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { StoreProductForm } from './StoreProductForm';
 import { StoreProduct } from '@/types';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
@@ -15,20 +13,34 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GoDotFill } from 'react-icons/go';
-import { DollarSign, ShoppingCart, Edit2, Trash2, Package } from 'lucide-react';
-
-const typeColors = {
-  key: 'border-amber-500/50 bg-amber-500/10 text-amber-600',
-  boost: 'border-purple-500/50 bg-purple-500/10 text-purple-600',
-  swap: 'border-pink-500/50 bg-pink-500/10 text-pink-600',
-};
+import { Card, CardContent } from '@/components/ui/card';
+import { Edit2, Trash2, Key, Zap, RefreshCw } from 'lucide-react';
 
 const typeIcons = {
-  key: '🔑',
-  boost: '⚡',
-  swap: '🔄',
+  key: Key,
+  boost: Zap,
+  swap: RefreshCw,
+};
+
+const typeColors = {
+  key: {
+    bg: 'bg-amber-50 dark:bg-amber-950/20',
+    border: 'border-amber-200 dark:border-amber-800/30',
+    icon: 'text-amber-600 dark:text-amber-400',
+    text: 'text-amber-700 dark:text-amber-300',
+  },
+  boost: {
+    bg: 'bg-purple-50 dark:bg-purple-950/20',
+    border: 'border-purple-200 dark:border-purple-800/30',
+    icon: 'text-purple-600 dark:text-purple-400',
+    text: 'text-purple-700 dark:text-purple-300',
+  },
+  swap: {
+    bg: 'bg-cyan-50 dark:bg-cyan-950/20',
+    border: 'border-cyan-200 dark:border-cyan-800/30',
+    icon: 'text-cyan-600 dark:text-cyan-400',
+    text: 'text-cyan-700 dark:text-cyan-300',
+  },
 };
 
 // Mock data
@@ -41,8 +53,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'key',
     price: 9.99,
     currency: 'USD',
-    totalPurchases: 1245,
-    totalRevenue: 12373.55,
+    quantity: 150,
     isActive: true,
     stripeProductId: 'prod_1234567890',
     stripePriceId: 'price_1234567890',
@@ -57,8 +68,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'key',
     price: 19.99,
     currency: 'USD',
-    totalPurchases: 680,
-    totalRevenue: 13593.2,
+    quantity: 89,
     isActive: true,
     stripeProductId: 'prod_0987654321',
     stripePriceId: 'price_0987654321',
@@ -73,8 +83,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'boost',
     price: 4.99,
     currency: 'USD',
-    totalPurchases: 3450,
-    totalRevenue: 17215.5,
+    quantity: 320,
     isActive: true,
     stripeProductId: 'prod_5544332211',
     stripePriceId: 'price_5544332211',
@@ -89,8 +98,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'boost',
     price: 7.99,
     currency: 'USD',
-    totalPurchases: 2340,
-    totalRevenue: 18696.6,
+    quantity: 215,
     isActive: true,
     stripeProductId: 'prod_9988776655',
     stripePriceId: 'price_9988776655',
@@ -105,8 +113,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'boost',
     price: 14.99,
     currency: 'USD',
-    totalPurchases: 890,
-    totalRevenue: 13341.1,
+    quantity: 75,
     isActive: true,
     stripeProductId: 'prod_3344556677',
     stripePriceId: 'price_3344556677',
@@ -121,8 +128,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'swap',
     price: 2.99,
     currency: 'USD',
-    totalPurchases: 1980,
-    totalRevenue: 5920.2,
+    quantity: 500,
     isActive: true,
     stripeProductId: 'prod_2233445566',
     stripePriceId: 'price_2233445566',
@@ -137,8 +143,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'swap',
     price: 3.99,
     currency: 'USD',
-    totalPurchases: 1560,
-    totalRevenue: 6224.4,
+    quantity: 340,
     isActive: true,
     stripeProductId: 'prod_7788990011',
     stripePriceId: 'price_7788990011',
@@ -153,8 +158,7 @@ const mockStoreProducts: StoreProduct[] = [
     productType: 'swap',
     price: 5.99,
     currency: 'USD',
-    totalPurchases: 1400,
-    totalRevenue: 8386.0,
+    quantity: 0,
     isActive: false,
     stripeProductId: 'prod_5566778899',
     stripePriceId: 'price_5566778899',
@@ -163,10 +167,17 @@ const mockStoreProducts: StoreProduct[] = [
   },
 ];
 
-export default function StoreProductManagement() {
-  const [products, setProducts] = useState<StoreProduct[]>(mockStoreProducts);
+interface StoreProductManagementProps {
+  mockStoreProducts?: StoreProduct[];
+}
+
+export default function StoreProductManagement({
+  mockStoreProducts: initialProducts,
+}: StoreProductManagementProps = {}) {
+  const [products, setProducts] = useState<StoreProduct[]>(initialProducts || mockStoreProducts);
   const [editingProduct, setEditingProduct] = useState<StoreProduct | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(null);
+  const [filter, setFilter] = useState<'all' | 'key' | 'boost' | 'swap'>('all');
 
   const handleCreateProduct = (formData: any) => {
     const newProduct: StoreProduct = {
@@ -177,8 +188,7 @@ export default function StoreProductManagement() {
       productType: formData.productType,
       price: formData.price,
       currency: 'USD',
-      totalPurchases: 0,
-      totalRevenue: 0,
+      quantity: formData.quantity || 0,
       isActive: formData.isActive,
       stripeProductId: `stripe_prod_${Date.now()}`,
       stripePriceId: `stripe_price_${Date.now()}`,
@@ -199,6 +209,7 @@ export default function StoreProductManagement() {
                 description: formData.description,
                 productType: formData.productType,
                 price: formData.price,
+                quantity: formData.quantity || 0,
                 isActive: formData.isActive,
                 updatedAt: new Date().toISOString(),
               }
@@ -216,206 +227,137 @@ export default function StoreProductManagement() {
     }
   };
 
-  const handleToggleActive = (product: StoreProduct) => {
-    setProducts(
-      products.map((p) =>
-        p.id === product.id
-          ? { ...p, isActive: !p.isActive, updatedAt: new Date().toISOString() }
-          : p,
-      ),
-    );
-  };
+  const filteredProducts = products.filter((product) => {
+    if (filter === 'all') return true;
+    return product.productType === filter;
+  });
 
   return (
-    <div className="min-h-screen space-y-8">
-      {/* Summary Statistics */}
-      <div className="bg-card rounded-xl border p-6 shadow-sm">
-        <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wide uppercase">
-          Overview
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Total Items */}
-          <div className="flex items-start justify-between rounded-lg border bg-gradient-to-br from-blue-50/50 to-blue-50/0 p-4 dark:from-blue-950/20 dark:to-blue-950/0">
-            <div>
-              <p className="text-muted-foreground text-sm font-medium">Total Items</p>
-              <p className="mt-2 text-3xl font-bold">{products.length}</p>
-              <p className="text-muted-foreground mt-1 text-xs">Purchasable items</p>
-            </div>
-            <Package className="h-8 w-8 opacity-10" />
-          </div>
-
-          {/* Total Purchases */}
-          <div className="flex items-start justify-between rounded-lg border bg-gradient-to-br from-green-50/50 to-green-50/0 p-4 dark:from-green-950/20 dark:to-green-950/0">
-            <div>
-              <p className="text-muted-foreground text-sm font-medium">Total Purchases</p>
-              <p className="mt-2 text-3xl font-bold">
-                {products.reduce((acc, p) => acc + p.totalPurchases, 0).toLocaleString()}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs">All time</p>
-            </div>
-            <ShoppingCart className="h-8 w-8 opacity-10" />
-          </div>
-
-          {/* Total Revenue */}
-          <div className="flex items-start justify-between rounded-lg border bg-gradient-to-br from-purple-50/50 to-purple-50/0 p-4 dark:from-purple-950/20 dark:to-purple-950/0">
-            <div>
-              <p className="text-muted-foreground text-sm font-medium">Total Revenue</p>
-              <p className="mt-2 text-3xl font-bold">
-                $
-                {products
-                  .reduce((acc, p) => acc + p.totalRevenue, 0)
-                  .toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs">All time</p>
-            </div>
-            <DollarSign className="h-8 w-8 opacity-10" />
-          </div>
-
-          {/* Active Items */}
-          <div className="flex items-start justify-between rounded-lg border bg-gradient-to-br from-emerald-50/50 to-emerald-50/0 p-4 dark:from-emerald-950/20 dark:to-emerald-950/0">
-            <div>
-              <p className="text-muted-foreground text-sm font-medium">Active Items</p>
-              <p className="mt-2 text-3xl font-bold text-green-600">
-                {products.filter((p) => p.isActive).length}
-              </p>
-              <p className="text-muted-foreground mt-1 text-xs">Currently visible</p>
-            </div>
-            <GoDotFill className="h-8 w-8 text-green-600 opacity-10" />
-          </div>
-        </div>
-      </div>
-
-      {/* Page Title & Description */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Store Management</h1>
-        <p className="text-muted-foreground max-w-2xl text-lg">
-          Create and manage purchasable items across all categories. Each item can be purchased
-          unlimited times by users.
-        </p>
-      </div>
-
+    <div className="space-y-6">
       {/* Controls Bar */}
-      <div className="bg-card flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" className="gap-2 font-medium">
-            All Items
-            <Badge variant="secondary">{products.length}</Badge>
+      <div className="flex items-center justify-between gap-2">
+        <div className="bg-background/70 flex items-center rounded-lg border p-1">
+          <Button
+            type="button"
+            variant={filter === 'all' ? 'default' : 'ghost'}
+            onClick={() => setFilter('all')}
+          >
+            All
           </Button>
-          <Button variant="outline" size="sm" className="gap-2 font-medium">
-            🔑 Keys
-            <Badge variant="secondary">
-              {products.filter((p) => p.productType === 'key').length}
-            </Badge>
+          <Button
+            type="button"
+            variant={filter === 'key' ? 'default' : 'ghost'}
+            onClick={() => setFilter('key')}
+            className="gap-2"
+          >
+            <Key className="h-4 w-4" />
+            Keys
           </Button>
-          <Button variant="outline" size="sm" className="gap-2 font-medium">
-            ⚡ Boosts
-            <Badge variant="secondary">
-              {products.filter((p) => p.productType === 'boost').length}
-            </Badge>
+          <Button
+            type="button"
+            variant={filter === 'boost' ? 'default' : 'ghost'}
+            onClick={() => setFilter('boost')}
+            className="gap-2"
+          >
+            <Zap className="h-4 w-4" />
+            Boosts
           </Button>
-          <Button variant="outline" size="sm" className="gap-2 font-medium">
-            🔄 Swaps
-            <Badge variant="secondary">
-              {products.filter((p) => p.productType === 'swap').length}
-            </Badge>
+          <Button
+            type="button"
+            variant={filter === 'swap' ? 'default' : 'ghost'}
+            onClick={() => setFilter('swap')}
+            className="gap-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Swaps
           </Button>
         </div>
         <StoreProductForm onCreate={handleCreateProduct} />
       </div>
 
-      {/* Items Grid */}
+      {/* Products Grid - Clean & Beautiful */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {products.map((product) => (
-          <Card
-            key={product.id}
-            className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg"
-          >
-            {/* Card Header */}
-            <CardHeader className="pb-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{typeIcons[product.productType]}</span>
-                    <Badge
-                      variant="outline"
-                      className={cn('capitalize', typeColors[product.productType])}
-                    >
-                      {product.productType}
-                    </Badge>
-                  </div>
-                  <CardTitle className="text-lg">{product.name}</CardTitle>
-                </div>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    'flex-shrink-0 gap-1',
+        {filteredProducts.map((product) => (
+          <Card key={product.id} className="p-0">
+            <CardContent className="space-y-4 p-5 text-sm">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <h3 className="text-foreground leading-tight font-semibold">{product.name}</h3>
+
+                {/* Status */}
+                <p
+                  className={`inline-flex h-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase ${
                     product.isActive
-                      ? 'border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400'
-                      : 'border-gray-500/50 bg-gray-500/10 text-gray-700 dark:text-gray-400',
-                  )}
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                      : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                  }`}
                 >
-                  <GoDotFill className="size-2" />
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${product.isActive ? 'bg-emerald-500' : 'bg-zinc-400'}`}
+                  />
                   {product.isActive ? 'Active' : 'Inactive'}
-                </Badge>
-              </div>
-              <CardDescription className="line-clamp-2">{product.description}</CardDescription>
-            </CardHeader>
-
-            {/* Card Content */}
-            <CardContent className="flex-1 space-y-4">
-              {/* Price */}
-              <div className="bg-muted flex items-center justify-between rounded-lg p-3">
-                <span className="text-muted-foreground text-sm font-medium">Price</span>
-                <span className="text-primary text-xl font-bold">${product.price.toFixed(2)}</span>
+                </p>
               </div>
 
-              {/* Statistics */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-card/50 space-y-1 rounded-lg border p-3">
-                  <div className="text-muted-foreground flex items-center gap-1.5">
-                    <ShoppingCart className="size-3.5" />
-                    <span className="text-xs font-medium">Purchases</span>
-                  </div>
-                  <p className="text-lg font-semibold">{product.totalPurchases.toLocaleString()}</p>
+              {/* Main Info */}
+              <div className="bg-muted/30 grid grid-cols-2 gap-3 rounded-lg border p-3">
+                {/* Price */}
+                <div className="space-y-0.5">
+                  <p className="text-muted-foreground text-xs">Price</p>
+                  <p className="text-foreground font-semibold">${product.price.toFixed(2)}</p>
                 </div>
-                <div className="bg-card/50 space-y-1 rounded-lg border p-3">
-                  <div className="text-muted-foreground flex items-center gap-1.5">
-                    <DollarSign className="size-3.5" />
-                    <span className="text-xs font-medium">Revenue</span>
-                  </div>
-                  <p className="text-lg font-semibold text-green-600">
-                    $
-                    {product.totalRevenue.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </p>
+
+                {/* Stock */}
+                <div className="space-y-0.5 text-right">
+                  <p className="text-muted-foreground text-xs">Stock</p>
+                  <p className="text-foreground font-semibold">{product.quantity} units</p>
+                </div>
+
+                {/* Category */}
+                <div className="space-y-0.5">
+                  <p className="text-muted-foreground text-xs">Category</p>
+
+                  {(() => {
+                    const Icon = typeIcons[product.productType];
+                    const colors = typeColors[product.productType];
+
+                    return (
+                      <div
+                        className={`flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium ${colors.bg} ${colors.border}`}
+                      >
+                        <Icon className={`h-3.5 w-3.5 ${colors.icon}`} />
+
+                        <span className={`${colors.text} capitalize`}>{product.productType}</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Currency */}
+                <div className="space-y-0.5 text-right">
+                  <p className="text-muted-foreground text-xs">Currency</p>
+                  <p className="text-foreground font-medium">{product.currency}</p>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-2 pt-2">
+              <div className="flex justify-end gap-2 pt-1">
                 <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => handleToggleActive(product)}
-                >
-                  {product.isActive ? 'Deactivate' : 'Activate'}
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setEditingProduct(product)}>
-                  <Edit2 className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
+                  size="icon-lg"
+                  variant="destructive"
                   onClick={() => setDeletingProduct(product)}
-                  className="text-destructive hover:bg-destructive/10"
                 >
-                  <Trash2 className="size-4" />
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setEditingProduct(product)}
+                >
+                  <Edit2 className="mr-2 h-4 w-4" />
+                  Edit
                 </Button>
               </div>
             </CardContent>

@@ -137,8 +137,7 @@ export interface StoreProduct {
   productType: StoreProductType;
   price: number;
   currency: string;
-  totalPurchases: number;
-  totalRevenue: number;
+  quantity: number;
   isActive: boolean;
   stripeProductId?: string;
   stripePriceId?: string;

@@ -73,15 +73,15 @@ export function StoreProductForm({
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" variant={product ? 'outline' : 'default'} className="w-full">
+        <Button variant={product ? 'outline' : 'default'}>
           {product ? (
             <>
-              <Edit2 className="mr-2 size-4" />
+              <Edit2 className="size-4" />
               Edit Item
             </>
           ) : (
             <>
-              <Plus className="mr-2 size-4" />
+              <Plus className="size-4" />
               Add New Item
             </>
           )}
@@ -134,9 +134,9 @@ export function StoreProductForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="key">🔑 Key - Unlock Features</SelectItem>
-                  <SelectItem value="boost">⚡ Boost - Enhance Visibility</SelectItem>
-                  <SelectItem value="swap">🔄 Swap - Modify Entries</SelectItem>
+                  <SelectItem value="key">Key </SelectItem>
+                  <SelectItem value="boost">Boost </SelectItem>
+                  <SelectItem value="swap">Swap</SelectItem>
                 </SelectContent>
               </Select>
             </div>
