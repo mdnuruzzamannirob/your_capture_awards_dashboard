@@ -1,14 +1,7 @@
 import Title from '@/components/common/Title';
 import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Wallet as WalletIcon,
-  TrendingUp,
-  TrendingDown,
-  DollarSign,
-  ShoppingCart,
-  Clock,
-} from 'lucide-react';
+import { Wallet as WalletIcon, TrendingUp, TrendingDown, ShoppingCart, Clock } from 'lucide-react';
 
 const Wallet = () => {
   // Mock stats - replace with actual API data
@@ -48,13 +41,6 @@ const Wallet = () => {
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-500/10',
     },
-    {
-      title: 'Platform Commission',
-      value: '$8,760',
-      icon: DollarSign,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-500/10',
-    },
   ];
 
   return (
@@ -65,7 +51,7 @@ const Wallet = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
