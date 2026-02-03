@@ -1,6 +1,6 @@
 import Title from '@/components/common/Title';
 import SupportManagement from '@/components/modules/support/SupportManagement';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { TicketCheck, Clock, CheckCircle2, XCircle } from 'lucide-react';
 
 const Support = () => {
@@ -58,7 +58,7 @@ const Support = () => {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -80,15 +80,7 @@ const Support = () => {
       </div>
 
       {/* Support Tickets Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Support Tickets</CardTitle>
-          <CardDescription>View and manage all support tickets submitted by users</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SupportManagement />
-        </CardContent>
-      </Card>
+      <SupportManagement />
     </section>
   );
 };

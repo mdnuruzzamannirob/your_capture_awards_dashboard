@@ -1,6 +1,6 @@
 import Title from '@/components/common/Title';
 import ReportsManagement from '@/components/modules/reports/ReportsManagement';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { AlertTriangle, Clock, CheckCircle2, XCircle, FileText } from 'lucide-react';
 
 const Reports = () => {
@@ -58,7 +58,7 @@ const Reports = () => {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -80,15 +80,7 @@ const Reports = () => {
       </div>
 
       {/* Reports Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Reports</CardTitle>
-          <CardDescription>View and manage all submitted reports</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ReportsManagement />
-        </CardContent>
-      </Card>
+      <ReportsManagement />
     </section>
   );
 };

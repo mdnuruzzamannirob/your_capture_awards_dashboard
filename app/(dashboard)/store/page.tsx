@@ -17,8 +17,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 9.99,
     currency: 'USD',
     quantity: 150,
-    totalPurchases: 1245,
-    totalRevenue: 12373.55,
     isActive: true,
     stripeProductId: 'prod_1234567890',
     stripePriceId: 'price_1234567890',
@@ -34,8 +32,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 19.99,
     currency: 'USD',
     quantity: 89,
-    totalPurchases: 680,
-    totalRevenue: 13593.2,
     isActive: true,
     stripeProductId: 'prod_0987654321',
     stripePriceId: 'price_0987654321',
@@ -51,8 +47,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 4.99,
     currency: 'USD',
     quantity: 320,
-    totalPurchases: 3450,
-    totalRevenue: 17215.5,
     isActive: true,
     stripeProductId: 'prod_5544332211',
     stripePriceId: 'price_5544332211',
@@ -68,8 +62,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 7.99,
     currency: 'USD',
     quantity: 215,
-    totalPurchases: 2340,
-    totalRevenue: 18696.6,
     isActive: true,
     stripeProductId: 'prod_9988776655',
     stripePriceId: 'price_9988776655',
@@ -85,8 +77,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 14.99,
     currency: 'USD',
     quantity: 75,
-    totalPurchases: 890,
-    totalRevenue: 13341.1,
     isActive: true,
     stripeProductId: 'prod_3344556677',
     stripePriceId: 'price_3344556677',
@@ -102,8 +92,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 2.99,
     currency: 'USD',
     quantity: 500,
-    totalPurchases: 1980,
-    totalRevenue: 5920.2,
     isActive: true,
     stripeProductId: 'prod_2233445566',
     stripePriceId: 'price_2233445566',
@@ -119,8 +107,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 3.99,
     currency: 'USD',
     quantity: 340,
-    totalPurchases: 1560,
-    totalRevenue: 6224.4,
     isActive: true,
     stripeProductId: 'prod_7788990011',
     stripePriceId: 'price_7788990011',
@@ -136,8 +122,6 @@ const mockStoreProducts: StoreProduct[] = [
     price: 5.99,
     currency: 'USD',
     quantity: 0,
-    totalPurchases: 1400,
-    totalRevenue: 8386.0,
     isActive: false,
     stripeProductId: 'prod_5566778899',
     stripePriceId: 'price_5566778899',
@@ -149,12 +133,8 @@ const mockStoreProducts: StoreProduct[] = [
 export default function StorePage() {
   const stats = useMemo(() => {
     const activeProducts = mockStoreProducts.filter((p) => p.isActive);
-    const totalPurchases = mockStoreProducts.reduce((sum, p) => sum + p.totalPurchases, 0);
-    const totalRevenue = mockStoreProducts.reduce((sum, p) => sum + p.totalRevenue, 0);
-    const avgPrice =
-      mockStoreProducts.length > 0
-        ? mockStoreProducts.reduce((sum, p) => sum + p.price, 0) / mockStoreProducts.length
-        : 0;
+    const totalPurchases = 3480;
+    const totalRevenue = 58340.75;
 
     return [
       {
@@ -166,7 +146,7 @@ export default function StorePage() {
       },
       {
         title: 'Total Purchases',
-        value: totalPurchases,
+        value: totalPurchases.toLocaleString(),
         icon: ShoppingCart,
         color: 'text-green-600',
         bgColor: 'bg-green-500/10',
@@ -199,7 +179,7 @@ export default function StorePage() {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
