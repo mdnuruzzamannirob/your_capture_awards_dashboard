@@ -32,7 +32,7 @@ interface StoreProductFormProps {
   isLoading?: boolean;
 }
 
-export function StoreProductForm({
+export default function StoreProductForm({
   product,
   onCreate,
   onUpdate,

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { StoreProductForm } from './StoreProductForm';
 import { StoreProduct } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Edit2, Trash2, Key, Zap, RefreshCw } from 'lucide-react';
+import StoreProductForm from './StoreProductForm';
 
 const typeIcons = {
   key: Key,
