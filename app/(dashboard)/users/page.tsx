@@ -1,30 +1,41 @@
 import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
 import ReduxProvider from '@/providers/ReduxProviders';
 import { userApi } from '@/store/features/user/userApi';
 import { makeStore } from '@/store/makeStore';
-import { UserCheck, Users, UserX } from 'lucide-react';
+import { UserCheck, Users, UserX, ShieldCheck } from 'lucide-react';
 
 const UsersPage = async () => {
-  const usersSummery = [
+  // Mock stats - replace with actual API data
+  const stats = [
     {
       title: 'Total Users',
       value: '751',
-      icon: <Users />,
-      id: 1,
+      icon: Users,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-500/10',
     },
     {
       title: 'Active Users',
       value: '545',
-      icon: <UserCheck />,
-      id: 2,
+      icon: UserCheck,
+      color: 'text-green-600',
+      bgColor: 'bg-green-500/10',
     },
     {
       title: 'Inactive Users',
-      value: '642',
-      icon: <UserX />,
-      id: 3,
+      value: '206',
+      icon: UserX,
+      color: 'text-gray-600',
+      bgColor: 'bg-gray-500/10',
+    },
+    {
+      title: 'Verified',
+      value: '612',
+      icon: ShieldCheck,
+      color: 'text-emerald-600',
+      bgColor: 'bg-emerald-500/10',
     },
   ];
 
@@ -37,31 +48,34 @@ const UsersPage = async () => {
   return (
     <ReduxProvider preloadedState={preloadedState}>
       <section className="space-y-5 p-5">
-        <div className="flex items-center justify-between gap-5">
-          {usersSummery.map((highlight, index) => (
-            <div
-              key={index}
-              className={cn(
-                'flex h-36 w-full items-center gap-3 rounded-xl p-5',
-                highlight.id === 1
-                  ? 'bg-blue-500/80'
-                  : highlight.id === 2
-                    ? 'bg-green-500/80'
-                    : 'bg-yellow-500/80',
-              )}
-            >
-              <span className="flex size-16 items-center justify-center rounded-full bg-white/10 text-3xl">
-                {highlight.icon}
-              </span>
-              <div className="space-y-1">
-                <p className="text-3xl font-semibold">{highlight.value}</p>
-                <p>{highlight.title}</p>
-              </div>
-            </div>
-          ))}
+        <Title
+          title="User Management"
+          description="Monitor and manage all users, activity, and verification status"
+        />
+
+        {/* Stats Grid */}
+        <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={index} className="py-4">
+                <CardContent className="flex items-center gap-4 p-6">
+                  <div
+                    className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
+                  >
+                    <Icon className={`size-6 ${stat.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
+                    <h3 className="text-2xl font-bold">{stat.value}</h3>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        <Title title="Users" description="Manage all users" />
+        {/* Users Table */}
         <UserTable />
       </section>
     </ReduxProvider>
