@@ -48,7 +48,6 @@ const mockTransactions: WalletTransaction[] = [
     productName: 'Lightroom Presets Pack',
     balanceBefore: 300.0,
     balanceAfter: 300.0,
-    platformFee: 4.99,
     createdAt: '2025-02-03T10:15:00Z',
     completedAt: '2025-02-03T10:16:00Z',
   },
@@ -69,7 +68,6 @@ const mockTransactions: WalletTransaction[] = [
     subscriptionPlanName: 'Pro Monthly Plan',
     balanceBefore: 450.0,
     balanceAfter: 450.0,
-    platformFee: 2.99,
     createdAt: '2025-02-03T09:00:00Z',
     completedAt: '2025-02-03T09:01:00Z',
   },
@@ -90,7 +88,6 @@ const mockTransactions: WalletTransaction[] = [
     productName: 'Professional Photo Editing Course',
     balanceBefore: 500.0,
     balanceAfter: 420.01,
-    platformFee: 7.99,
     createdAt: '2025-02-02T14:20:00Z',
     completedAt: '2025-02-02T14:21:00Z',
   },
@@ -111,7 +108,6 @@ const mockTransactions: WalletTransaction[] = [
     subscriptionPlanName: 'Premium Annual Plan',
     balanceBefore: 800.0,
     balanceAfter: 800.0,
-    platformFee: 9.99,
     createdAt: '2025-02-02T11:00:00Z',
     completedAt: '2025-02-02T11:01:00Z',
   },
@@ -132,7 +128,6 @@ const mockTransactions: WalletTransaction[] = [
     productName: 'Premium Photography Templates Bundle',
     balanceBefore: 600.0,
     balanceAfter: 600.0,
-    platformFee: 12.99,
     createdAt: '2025-02-01T16:30:00Z',
     completedAt: '2025-02-01T16:31:00Z',
   },
@@ -173,7 +168,6 @@ const mockTransactions: WalletTransaction[] = [
     subscriptionPlanName: 'Basic Monthly Plan',
     balanceBefore: 200.0,
     balanceAfter: 200.0,
-    platformFee: 1.99,
     createdAt: '2025-01-30T09:30:00Z',
     completedAt: '2025-01-30T09:31:00Z',
   },
@@ -193,7 +187,6 @@ const mockTransactions: WalletTransaction[] = [
     productName: 'Photography eBook Collection',
     balanceBefore: 150.0,
     balanceAfter: 150.0,
-    platformFee: 3.99,
     createdAt: '2025-01-29T13:45:00Z',
     completedAt: '2025-01-29T13:46:00Z',
   },
@@ -214,7 +207,6 @@ const mockTransactions: WalletTransaction[] = [
     subscriptionPlanName: 'Pro Plus Monthly Plan',
     balanceBefore: 350.0,
     balanceAfter: 350.0,
-    platformFee: 4.99,
     createdAt: '2025-01-27T10:00:00Z',
     completedAt: '2025-01-27T10:01:00Z',
   },
@@ -419,18 +411,6 @@ const WalletManagement = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Platform Fee */}
-              {selectedTransaction.platformFee && (
-                <div className="bg-muted/50 rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <p className="text-muted-foreground text-sm">Platform Fee</p>
-                    <p className="text-sm font-medium">
-                      ${selectedTransaction.platformFee.toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {/* Failure Reason */}
               {selectedTransaction.failureReason && (

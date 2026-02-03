@@ -235,7 +235,7 @@ export default function StoreProductManagement({
   return (
     <div className="space-y-6">
       {/* Controls Bar */}
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 max-sm:flex-col-reverse">
         <div className="bg-background/70 flex items-center rounded-lg border p-1">
           <Button
             type="button"

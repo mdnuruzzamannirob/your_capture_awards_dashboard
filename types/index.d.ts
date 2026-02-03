@@ -74,7 +74,6 @@ export interface WalletTransaction {
   subscriptionPlanName?: string;
   balanceBefore: number;
   balanceAfter: number;
-  platformFee?: number;
   createdAt: string;
   completedAt?: string;
   failureReason?: string;
