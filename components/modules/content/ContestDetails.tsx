@@ -66,8 +66,12 @@ const ContestDetails = () => {
     return <ContestDetailsSkeleton tabs={CONTEST_DETAILS_TABS} />;
   }
 
+  if (!contest?.banner) {
+    return <div className="text-muted-foreground p-5 text-sm">Contest not found.</div>;
+  }
+
   if (!isMounted) {
-    return;
+    return null;
   }
   return (
     <section>

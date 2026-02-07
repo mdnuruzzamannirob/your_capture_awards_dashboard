@@ -1,12 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
+import Cookies from 'js-cookie';
 import { baseQuery } from '@/store/baseQuery';
 import { setTempEmail, setTempToken, setUser } from './authSlice';
-import Cookies from 'js-cookie';
 import { AuthUser, SigninData } from './types';
 
 export const authApi = createApi({
   reducerPath: 'authApi',
-  baseQuery: baseQuery(typeof window === 'undefined'),
+  baseQuery,
   tagTypes: ['Auth'],
   endpoints: (builder) => ({
     signin: builder.mutation<{ data: { token: string; user: AuthUser } }, SigninData>({
@@ -49,7 +49,6 @@ export const authApi = createApi({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-
           dispatch(setTempEmail(arg.email));
         } catch {}
       },
@@ -60,12 +59,11 @@ export const authApi = createApi({
       { email: string; code: string }
     >({
       query: (body) => ({ url: '/users/verify-otp', method: 'POST', body }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           const {
             data: { data },
           } = await queryFulfilled;
-
           dispatch(setTempToken(data?.reset_password_token));
         } catch {}
       },

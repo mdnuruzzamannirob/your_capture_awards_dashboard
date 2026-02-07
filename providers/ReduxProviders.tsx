@@ -1,18 +1,16 @@
 'use client';
 
-import { makeStore } from '@/store/makeStore';
 import { Provider } from 'react-redux';
+import AuthBootstrap from '@/components/common/AuthBootstrap';
+import { store } from '@/store/store';
 
-const ReduxProvider = ({
-  children,
-  preloadedState,
-}: {
-  children: React.ReactNode;
-  preloadedState?: any;
-}) => {
-  const store = makeStore(preloadedState);
-
-  return <Provider store={store}>{children}</Provider>;
+const ReduxProvider = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <Provider store={store()}>
+      <AuthBootstrap />
+      {children}
+    </Provider>
+  );
 };
 
 export default ReduxProvider;

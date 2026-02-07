@@ -85,6 +85,7 @@ export function DataTable<TData, TValue>({
   };
 
   const firstFilterableColumn = filterableColumns.length > 0 ? filterableColumns[0] : null;
+  const skeletonRowCount = Math.min(pageSize, 10);
 
   return (
     <div className="w-full">
@@ -119,14 +120,9 @@ export function DataTable<TData, TValue>({
 
           <TableBody>
             {isLoading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-muted-foreground h-24 text-center"
-                >
-                  Loading data...
-                </TableCell>
-              </TableRow>
+              Array.from({ length: skeletonRowCount }).map((_, rowIndex) => (
+                <TableRow key={`skeleton-${rowIndex}`} className="h-[53px]" />
+              ))
             ) : data.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

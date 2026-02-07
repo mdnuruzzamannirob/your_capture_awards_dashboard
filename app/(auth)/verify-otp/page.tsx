@@ -16,7 +16,6 @@ const VerifyOtp = () => {
   const [resendCoolDown, setResendCoolDown] = useState(0);
   const [otpError, setOtpError] = useState('');
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
-
   const [forgotPassword, { isLoading: isForgotLoading }] = useForgotPasswordMutation();
   const [verifyOtp, { isLoading }] = useVerifyOTPMutation();
   const { tempEmail } = useAuth();

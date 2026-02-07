@@ -20,7 +20,7 @@ const ContestTable = () => {
       data={data?.data?.contests ?? []}
       page={page}
       pageSize={limit}
-      total={data?.data?.total ?? 0}
+      total={data?.data?.total ?? data?.data?.count ?? 0}
       filterableColumns={filterColumns}
       onPageChange={setPage}
       onPageSizeChange={(size) => {

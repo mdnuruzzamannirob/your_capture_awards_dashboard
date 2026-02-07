@@ -3,7 +3,7 @@ import { baseQuery } from '@/store/baseQuery';
 
 export const contestApi = createApi({
   reducerPath: 'contestApi',
-  baseQuery: baseQuery(typeof window === 'undefined'),
+  baseQuery,
   tagTypes: ['Contests', 'Contest'],
   endpoints: (builder) => ({
     createContest: builder.mutation<{ data: unknown }, any>({
