@@ -228,7 +228,6 @@ const WalletManagement = () => {
 
   const handleStatusUpdate = () => {
     if (selectedTransaction && newStatus) {
-      console.log('Updating transaction status:', selectedTransaction.id, newStatus);
       // In real app, make API call here
       setIsDialogOpen(false);
       setNewStatus('');

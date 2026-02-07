@@ -130,7 +130,6 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
               className="text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Delete ticket:', ticket.id);
               }}
             >
               <Trash2 className="mr-2 size-4" />

@@ -214,8 +214,6 @@ const ReportsManagement = () => {
   const total = mockReports.length;
 
   const handleStatusUpdate = () => {
-    console.log('Update status to:', newStatus);
-    console.log('Review note:', reviewNote);
     // Add API call here
     setIsDialogOpen(false);
   };

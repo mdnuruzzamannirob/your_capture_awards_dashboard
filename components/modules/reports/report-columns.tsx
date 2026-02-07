@@ -150,7 +150,6 @@ export const reportColumns: ColumnDef<Report>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Resolve report:', report.id);
               }}
             >
               <Check className="mr-2 size-4" />
@@ -159,7 +158,6 @@ export const reportColumns: ColumnDef<Report>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Dismiss report:', report.id);
               }}
             >
               <X className="mr-2 size-4" />
@@ -170,7 +168,6 @@ export const reportColumns: ColumnDef<Report>[] = [
               className="text-destructive"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log('Take action:', report.id);
               }}
             >
               <AlertTriangle className="mr-2 size-4" />

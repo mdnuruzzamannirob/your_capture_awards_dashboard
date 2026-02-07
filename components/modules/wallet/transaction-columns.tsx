@@ -167,7 +167,6 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log('Approve transaction:', transaction.id);
                   }}
                 >
                   <Check className="mr-2 size-4" />
@@ -177,7 +176,6 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
                   className="text-destructive"
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log('Cancel transaction:', transaction.id);
                   }}
                 >
                   <X className="mr-2 size-4" />

@@ -145,7 +145,6 @@ const SupportManagement = () => {
   const total = mockSupportTickets.length;
 
   const handleStatusUpdate = () => {
-    console.log('Update status to:', newStatus);
     // Add API call here
     setIsDialogOpen(false);
   };

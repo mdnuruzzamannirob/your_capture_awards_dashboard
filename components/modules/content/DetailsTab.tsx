@@ -63,7 +63,6 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
   };
 
   const handleSubmit = () => {
-    console.log('Updated Data:', formData);
     setIsDialogOpen(false);
   };
 

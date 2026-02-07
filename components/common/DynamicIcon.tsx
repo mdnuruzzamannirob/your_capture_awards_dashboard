@@ -13,7 +13,6 @@ const DynamicIcon: React.FC<DynamicIconProps> = ({ name, className }) => {
   const IconComponent = (LucideIcons as any)[icon];
 
   if (!IconComponent) {
-    console.warn(`Icon "${name}" does not exist in lucide-react`);
     return null; // fallback: nothing rendered
   }
 

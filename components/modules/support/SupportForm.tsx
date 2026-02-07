@@ -41,12 +41,10 @@ const SupportForm = () => {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      console.log('Support ticket submitted:', data);
       toast.success('Support ticket submitted successfully!');
       reset();
     } catch (error) {
       toast.error('Failed to submit support ticket. Please try again.');
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
