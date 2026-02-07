@@ -8,6 +8,7 @@ import { SigninFormData, signinSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { useSigninMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -19,7 +20,6 @@ import { toast } from 'sonner';
 const Signin = () => {
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
   const [signin, { isLoading }] = useSigninMutation();
 
   const router = useRouter();
@@ -29,7 +29,16 @@ const Signin = () => {
 
   const signInSubmit = async (data: SigninFormData) => {
     try {
-      await signin({ email: data?.email, password: data?.password }).unwrap();
+      const response = await signin({ email: data?.email, password: data?.password }).unwrap();
+
+      if (response?.data?.token) {
+        Cookies.set('token', response.data.token, {
+          expires: rememberMe ? 30 : 7,
+          secure: true,
+          sameSite: 'Strict',
+          path: '/',
+        });
+      }
 
       toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',

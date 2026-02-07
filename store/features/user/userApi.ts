@@ -4,7 +4,7 @@ import { GetUsersResponse, User } from './types';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: baseQuery(typeof window === 'undefined'),
+  baseQuery,
   tagTypes: ['Users', 'User'],
   endpoints: (builder) => ({
     getUsers: builder.query<{ data: GetUsersResponse }, { page?: number; limit?: number }>({

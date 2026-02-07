@@ -18,8 +18,8 @@ import { toast } from 'sonner';
 const ResetPassword = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
-
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
   const { tempEmail, tempToken } = useAuth();
 
   const router = useRouter();
