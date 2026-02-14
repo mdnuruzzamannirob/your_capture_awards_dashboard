@@ -1,11 +1,7 @@
 import { SideMenu } from '@/types';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { TbReportMoney, TbUsers } from 'react-icons/tb';
-import {
-  MdOutlineContactSupport,
-  MdOutlineMonochromePhotos,
-  MdReportGmailerrorred,
-} from 'react-icons/md';
+import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { HiOutlineWallet } from 'react-icons/hi2';
 import { IoStorefrontOutline } from 'react-icons/io5';
 
@@ -41,13 +37,8 @@ export const sideMenus: SideMenu[] = [
     icon: <HiOutlineWallet className="size-full" />,
   },
   {
-    name: 'Reports',
-    href: '/reports',
-    icon: <MdReportGmailerrorred className="size-full" />,
-  },
-  {
-    name: 'Support',
-    href: '/support',
+    name: 'Contact Support',
+    href: '/contact-support',
     icon: <MdOutlineContactSupport className="size-full" />,
   },
 ];

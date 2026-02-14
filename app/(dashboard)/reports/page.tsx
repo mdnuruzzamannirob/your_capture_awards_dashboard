@@ -1,7 +1,7 @@
 import Title from '@/components/common/Title';
 import ReportsManagement from '@/components/modules/reports/ReportsManagement';
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, Clock, CheckCircle2, XCircle, FileText } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle2, FileText } from 'lucide-react';
 
 const Reports = () => {
   // Mock stats - replace with actual API data
@@ -14,39 +14,25 @@ const Reports = () => {
       bgColor: 'bg-blue-500/10',
     },
     {
-      title: 'Pending',
+      title: 'Pending Reports',
       value: '45',
       icon: Clock,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-500/10',
     },
     {
-      title: 'Under Review',
+      title: 'In Progress Reports',
       value: '23',
       icon: AlertTriangle,
       color: 'text-orange-600',
       bgColor: 'bg-orange-500/10',
     },
     {
-      title: 'Resolved',
+      title: 'Resolved Reports',
       value: '145',
       icon: CheckCircle2,
       color: 'text-green-600',
       bgColor: 'bg-green-500/10',
-    },
-    {
-      title: 'Dismissed',
-      value: '21',
-      icon: XCircle,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-500/10',
-    },
-    {
-      title: 'Critical Reports',
-      value: '8',
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-500/10',
     },
   ];
 
@@ -58,7 +44,7 @@ const Reports = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (

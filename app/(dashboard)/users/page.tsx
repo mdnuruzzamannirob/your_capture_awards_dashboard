@@ -1,38 +1,45 @@
 import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
 import { Card, CardContent } from '@/components/ui/card';
-import { UserCheck, Users, UserX, ShieldCheck } from 'lucide-react';
+import { UserCheck, Users, UserX, ShieldCheck, Crown } from 'lucide-react';
 
 const UsersPage = () => {
   // Mock stats - replace with actual API data
   const stats = [
     {
       title: 'Total Users',
-      value: '751',
+      value: '1,248',
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-500/10',
     },
     {
       title: 'Active Users',
-      value: '545',
+      value: '972',
       icon: UserCheck,
       color: 'text-green-600',
       bgColor: 'bg-green-500/10',
     },
     {
       title: 'Inactive Users',
-      value: '206',
+      value: '276',
       icon: UserX,
       color: 'text-gray-600',
       bgColor: 'bg-gray-500/10',
     },
     {
-      title: 'Verified',
-      value: '612',
+      title: 'Premium Users',
+      value: '418',
       icon: ShieldCheck,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-500/10',
+    },
+    {
+      title: 'Pro Users',
+      value: '146',
+      icon: Crown,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-500/10',
     },
   ];
 
@@ -44,7 +51,7 @@ const UsersPage = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (

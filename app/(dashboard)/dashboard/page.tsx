@@ -2,19 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Trophy,
-  Users,
-  DollarSign,
-  TrendingUp,
-  ShoppingCart,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  Image as ImageIcon,
-  Award,
-  Wallet,
-} from 'lucide-react';
+import { Trophy, Users, DollarSign, ShoppingCart, Image as ImageIcon } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -108,46 +96,6 @@ const recentContests = [
   },
 ];
 
-// Top users
-const topUsers = [
-  {
-    id: '1',
-    name: 'Alex Thompson',
-    email: 'alex.t@example.com',
-    avatar: '/images/avatar-placeholder.png',
-    contestsWon: 12,
-    totalEarnings: '$45,200',
-    subscriptionType: 'Premium',
-  },
-  {
-    id: '2',
-    name: 'Emily Chen',
-    email: 'emily.c@example.com',
-    avatar: '/images/avatar-placeholder.png',
-    contestsWon: 10,
-    totalEarnings: '$38,900',
-    subscriptionType: 'Premium',
-  },
-  {
-    id: '3',
-    name: 'David Brown',
-    email: 'david.b@example.com',
-    avatar: '/images/avatar-placeholder.png',
-    contestsWon: 8,
-    totalEarnings: '$29,500',
-    subscriptionType: 'Pro',
-  },
-  {
-    id: '4',
-    name: 'Lisa Anderson',
-    email: 'lisa.a@example.com',
-    avatar: '/images/avatar-placeholder.png',
-    contestsWon: 7,
-    totalEarnings: '$24,800',
-    subscriptionType: 'Pro',
-  },
-];
-
 const Dashboard = () => {
   // Calculate total stats
   const stats = useMemo(
@@ -188,24 +136,6 @@ const Dashboard = () => {
         color: 'text-amber-600',
         bgColor: 'bg-amber-500/10',
       },
-      {
-        title: 'Pending Reports',
-        value: '45',
-        change: '8 critical',
-        changeType: 'negative',
-        icon: AlertCircle,
-        color: 'text-red-600',
-        bgColor: 'bg-red-500/10',
-      },
-      {
-        title: 'Support Tickets',
-        value: '23',
-        change: '12 in progress',
-        changeType: 'neutral',
-        icon: CheckCircle2,
-        color: 'text-indigo-600',
-        bgColor: 'bg-indigo-500/10',
-      },
     ],
     [],
   );
@@ -219,7 +149,7 @@ const Dashboard = () => {
       />
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -312,35 +242,6 @@ const Dashboard = () => {
 
       {/* Contest Distribution and Recent Contests */}
       <div className="grid gap-5 lg:grid-cols-3">
-        {/* Contest Distribution Pie Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Contest Status</CardTitle>
-            <CardDescription>Distribution by status</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={contestDistribution}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={(entry) => `${entry.name}: ${entry.value}`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {contestDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
         {/* Recent Contests */}
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -394,109 +295,33 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Top Users and Quick Stats */}
-      <div className="grid gap-5 lg:grid-cols-3">
-        {/* Top Performers */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Top Performers</CardTitle>
-            <CardDescription>Users with most contest wins</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {topUsers.map((user, index) => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-10 items-center justify-center rounded-full bg-linear-to-br from-blue-500 to-purple-600 font-bold text-white">
-                      #{index + 1}
-                    </div>
-                    <div className="flex size-10 items-center justify-center rounded-full bg-gray-700">
-                      <Users className="size-5" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-semibold">{user.name}</h4>
-                      <p className="text-muted-foreground text-xs">{user.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="flex items-center gap-2">
-                        <Award className="size-4 text-amber-500" />
-                        <span className="font-semibold">{user.contestsWon} wins</span>
-                      </div>
-                      <p className="text-sm font-semibold text-green-600">{user.totalEarnings}</p>
-                    </div>
-                    <Badge variant="outline">{user.subscriptionType}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions & Stats */}
+        {/* Contest Distribution Pie Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Platform Activity</CardTitle>
-            <CardDescription>Real-time metrics</CardDescription>
+            <CardTitle>Contest Status</CardTitle>
+            <CardDescription>Distribution by status</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-blue-500/10">
-                  <ImageIcon className="size-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Total Photos</p>
-                  <p className="text-muted-foreground text-xs">Uploaded</p>
-                </div>
-              </div>
-              <p className="text-xl font-bold">12,450</p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-green-500/10">
-                  <TrendingUp className="size-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Votes Cast</p>
-                  <p className="text-muted-foreground text-xs">This month</p>
-                </div>
-              </div>
-              <p className="text-xl font-bold">45,230</p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-purple-500/10">
-                  <Wallet className="size-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Transactions</p>
-                  <p className="text-muted-foreground text-xs">Completed</p>
-                </div>
-              </div>
-              <p className="text-xl font-bold">1,245</p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-lg border p-3">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-lg bg-amber-500/10">
-                  <Clock className="size-5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Avg Response</p>
-                  <p className="text-muted-foreground text-xs">Support time</p>
-                </div>
-              </div>
-              <p className="text-xl font-bold">2.5h</p>
-            </div>
+          <CardContent className="flex items-center justify-center">
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={contestDistribution}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={(entry) => `${entry.name}: ${entry.value}`}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {contestDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>

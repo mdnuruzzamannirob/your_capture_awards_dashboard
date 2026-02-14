@@ -1,7 +1,7 @@
 import Title from '@/components/common/Title';
 import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wallet as WalletIcon, TrendingUp, TrendingDown, ShoppingCart, Clock } from 'lucide-react';
+import { Wallet as WalletIcon, TrendingUp, ShoppingCart, DollarSign } from 'lucide-react';
 
 const Wallet = () => {
   // Mock stats - replace with actual API data
@@ -12,6 +12,13 @@ const Wallet = () => {
       icon: WalletIcon,
       color: 'text-blue-600',
       bgColor: 'bg-blue-500/10',
+    },
+    {
+      title: 'Monthly Payments',
+      value: '$12,450',
+      icon: DollarSign,
+      color: 'text-yellow-600',
+      bgColor: 'bg-yellow-500/10',
     },
     {
       title: 'Store Revenue',
@@ -27,20 +34,6 @@ const Wallet = () => {
       color: 'text-purple-600',
       bgColor: 'bg-purple-500/10',
     },
-    {
-      title: 'Total Refunds',
-      value: '$1,250',
-      icon: TrendingDown,
-      color: 'text-red-600',
-      bgColor: 'bg-red-500/10',
-    },
-    {
-      title: 'Completed Transactions',
-      value: '1,245',
-      icon: Clock,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-500/10',
-    },
   ];
 
   return (
@@ -51,7 +44,7 @@ const Wallet = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (

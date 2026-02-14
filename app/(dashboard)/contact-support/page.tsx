@@ -1,9 +1,9 @@
 import Title from '@/components/common/Title';
 import SupportManagement from '@/components/modules/support/SupportManagement';
 import { Card, CardContent } from '@/components/ui/card';
-import { TicketCheck, Clock, CheckCircle2, XCircle } from 'lucide-react';
+import { TicketCheck, Clock, CheckCircle2 } from 'lucide-react';
 
-const Support = () => {
+const ContactSupport = () => {
   // Mock stats - replace with actual API data
   const stats = [
     {
@@ -14,7 +14,7 @@ const Support = () => {
       bgColor: 'bg-blue-500/10',
     },
     {
-      title: 'Pending',
+      title: 'Pending ',
       value: '23',
       icon: Clock,
       color: 'text-yellow-600',
@@ -34,20 +34,6 @@ const Support = () => {
       color: 'text-green-600',
       bgColor: 'bg-green-500/10',
     },
-    {
-      title: 'Closed',
-      value: '23',
-      icon: XCircle,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-500/10',
-    },
-    {
-      title: 'Avg Response Time',
-      value: '2.5h',
-      icon: Clock,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
-    },
   ];
 
   return (
@@ -58,7 +44,7 @@ const Support = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -85,4 +71,4 @@ const Support = () => {
   );
 };
 
-export default Support;
+export default ContactSupport;
