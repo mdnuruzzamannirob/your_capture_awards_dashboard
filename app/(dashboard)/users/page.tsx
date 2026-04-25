@@ -1,45 +1,44 @@
+'use client';
+
 import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
 import { Card, CardContent } from '@/components/ui/card';
-import { UserCheck, Users, UserX, ShieldCheck, Crown } from 'lucide-react';
+import { Spinner } from '@/components/ui/spinner';
+import { useGetDashboardUserStatsQuery } from '@/store/features/dashboard/dashboardApi';
+import { ShieldCheck, UserCheck, Users, UserX } from 'lucide-react';
 
 const UsersPage = () => {
-  // Mock stats - replace with actual API data
+  const { data, isLoading, isFetching } = useGetDashboardUserStatsQuery();
+  const statsData = data?.data;
+
   const stats = [
     {
       title: 'Total Users',
-      value: '1,248',
+      value: statsData?.totalUsers ?? 0,
       icon: Users,
       color: 'text-blue-600',
       bgColor: 'bg-blue-500/10',
     },
     {
       title: 'Active Users',
-      value: '972',
+      value: statsData?.active_user_count ?? 0,
       icon: UserCheck,
       color: 'text-green-600',
       bgColor: 'bg-green-500/10',
     },
     {
       title: 'Inactive Users',
-      value: '276',
+      value: statsData?.inactive_user_count ?? 0,
       icon: UserX,
       color: 'text-gray-600',
       bgColor: 'bg-gray-500/10',
     },
     {
-      title: 'Premium Users',
-      value: '418',
+      title: 'Paid Members',
+      value: statsData?.paid_members_count ?? 0,
       icon: ShieldCheck,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-500/10',
-    },
-    {
-      title: 'Pro Users',
-      value: '146',
-      icon: Crown,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
     },
   ];
 
@@ -51,7 +50,7 @@ const UsersPage = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -64,13 +63,19 @@ const UsersPage = () => {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
+                  <h3 className="text-2xl font-bold">{stat.value.toLocaleString()}</h3>
                 </div>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      {(isLoading || isFetching) && (
+        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
+          <Spinner className="size-4" /> Refreshing user stats...
+        </div>
+      )}
 
       {/* Users Table */}
       <UserTable />

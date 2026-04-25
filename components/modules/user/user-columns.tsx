@@ -1,13 +1,17 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { Pen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { User } from '@/store/features/user/types';
 import { cn } from '@/lib/utils';
+import { User } from '@/store/features/user/types';
+import { ColumnDef } from '@tanstack/react-table';
+import { ShieldCheck, ShieldMinus } from 'lucide-react';
 import { GoDotFill } from 'react-icons/go';
 
-export const columns: ColumnDef<User>[] = [
+interface UserColumnsOptions {
+  onToggleBlock: (user: User) => void;
+}
+
+export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef<User>[] => [
   {
     id: 'sl',
     header: 'SL',
@@ -19,7 +23,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'username',
     header: 'USERNAME',
-    cell: ({ row }) => <div>{row.getValue('username')}</div>,
+    cell: ({ row }) => <div>{row.getValue('username') || '--'}</div>,
   },
   {
     id: 'name',
@@ -41,7 +45,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: 'country',
     header: 'COUNTRY',
-    cell: ({ row }) => <div>{row.getValue('country')}</div>,
+    cell: ({ row }) => <div>{row.getValue('country') || '--'}</div>,
   },
   {
     accessorKey: 'role',
@@ -49,7 +53,7 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <div>{row.getValue('role')}</div>,
   },
   {
-    id: 'status',
+    id: 'activeStatus',
     header: 'STATUS',
     cell: ({ row }) => {
       const status = row.original.isActive ? 'ACTIVE' : 'INACTIVE';
@@ -70,11 +74,21 @@ export const columns: ColumnDef<User>[] = [
 
   {
     id: 'actions',
+    header: 'ACTIONS',
     enableHiding: false,
-    cell: () => {
+    cell: ({ row }) => {
+      const isActive = row.original.isActive;
+
       return (
-        <Button variant="outline" onClick={(event) => event.stopPropagation()}>
-          <Pen />
+        <Button
+          variant="outline"
+          onClick={(event) => {
+            event.stopPropagation();
+            onToggleBlock(row.original);
+          }}
+        >
+          {isActive ? <ShieldMinus className="size-4" /> : <ShieldCheck className="size-4" />}{' '}
+          {isActive ? 'Block' : 'Unblock'}
         </Button>
       );
     },

@@ -1,13 +1,16 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '@/store/baseQuery';
-import { GetUsersResponse, User } from './types';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { ApiSuccessResponse, GetUsersResponse, ToggleBlockBody, User } from './types';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery,
   tagTypes: ['Users', 'User'],
   endpoints: (builder) => ({
-    getUsers: builder.query<{ data: GetUsersResponse }, { page?: number; limit?: number }>({
+    getUsers: builder.query<
+      ApiSuccessResponse<GetUsersResponse>,
+      { page?: number; limit?: number }
+    >({
       query: ({ page = 1, limit = 20 }) => `/users?page=${page}&limit=${limit}`,
       providesTags: (result) =>
         result
@@ -22,8 +25,25 @@ export const userApi = createApi({
       query: ({ id }) => `/users/${id}`,
       providesTags: (result, error, { id }) => [{ type: 'User', id }],
     }),
+
+    toggleUserBlock: builder.mutation<ApiSuccessResponse<User>, ToggleBlockBody>({
+      query: (body) => ({
+        url: '/dashboard/toggle-block',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { userId }) => [
+        { type: 'User', id: userId },
+        { type: 'Users', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useLazyGetUsersQuery, useGetUserQuery, useLazyGetUserQuery } =
-  userApi;
+export const {
+  useGetUsersQuery,
+  useLazyGetUsersQuery,
+  useGetUserQuery,
+  useLazyGetUserQuery,
+  useToggleUserBlockMutation,
+} = userApi;

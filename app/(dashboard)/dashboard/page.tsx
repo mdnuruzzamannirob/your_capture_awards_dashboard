@@ -1,159 +1,210 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import Title from '@/components/common/Title';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Users, DollarSign, ShoppingCart, Image as ImageIcon } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { useGetDashboardOverviewQuery } from '@/store/features/dashboard/dashboardApi';
 import {
-  BarChart,
+  CreditCard,
+  DollarSign,
+  Image as ImageIcon,
+  ShoppingCart,
+  Trophy,
+  UserCheck,
+  Users,
+} from 'lucide-react';
+import { useMemo } from 'react';
+import {
   Bar,
-  LineChart,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
   Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
-import { useMemo } from 'react';
-import Title from '@/components/common/Title';
 
-// Monthly revenue data
-const revenueData = [
-  { month: 'Jan', subscription: 12500, store: 8300, contests: 5200 },
-  { month: 'Feb', subscription: 15200, store: 9100, contests: 6800 },
-  { month: 'Mar', subscription: 18900, store: 11200, contests: 8400 },
-  { month: 'Apr', subscription: 22100, store: 13500, contests: 9200 },
-  { month: 'May', subscription: 24800, store: 15800, contests: 10500 },
-  { month: 'Jun', subscription: 28300, store: 17200, contests: 12100 },
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
-// User growth data
-const userGrowthData = [
-  { month: 'Jan', users: 250, active: 185 },
-  { month: 'Feb', users: 320, active: 248 },
-  { month: 'Mar', users: 410, active: 325 },
-  { month: 'Apr', users: 520, active: 420 },
-  { month: 'May', users: 645, active: 531 },
-  { month: 'Jun', users: 751, active: 612 },
-];
+const currency = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
 
-// Contest distribution
-const contestDistribution = [
-  { name: 'Active', value: 35, color: '#22c55e' },
-  { name: 'Completed', value: 70, color: '#3b82f6' },
-  { name: 'Upcoming', value: 15, color: '#f59e0b' },
-];
+const numberFormatter = new Intl.NumberFormat('en-US');
 
-// Recent contests
-const recentContests = [
-  {
-    id: '1',
-    title: 'Summer Landscape Photography',
-    creator: 'John Doe',
-    avatar: '/images/avatar-placeholder.png',
-    participants: 245,
-    entries: 1230,
-    prize: '$5,000',
-    status: 'active',
-    endDate: '2026-02-15',
-  },
-  {
-    id: '2',
-    title: 'Urban Street Photography',
-    creator: 'Jane Smith',
-    avatar: '/images/avatar-placeholder.png',
-    participants: 189,
-    entries: 892,
-    prize: '$3,500',
-    status: 'active',
-    endDate: '2026-02-20',
-  },
-  {
-    id: '3',
-    title: 'Wildlife Close-ups',
-    creator: 'Mike Johnson',
-    avatar: '/images/avatar-placeholder.png',
-    participants: 312,
-    entries: 1567,
-    prize: '$7,000',
-    status: 'completed',
-    endDate: '2026-01-30',
-  },
-  {
-    id: '4',
-    title: 'Black & White Portraits',
-    creator: 'Sarah Wilson',
-    avatar: '/images/avatar-placeholder.png',
-    participants: 156,
-    entries: 624,
-    prize: '$2,500',
-    status: 'upcoming',
-    endDate: '2026-03-01',
-  },
-];
+const getStatusVariant = (status: string) => {
+  if (status === 'RUNNING') return 'default';
+  if (status === 'UPCOMING') return 'outline';
+  return 'secondary';
+};
+
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString('en-US', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+
+const getErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== 'object') return 'Failed to load dashboard overview.';
+
+  if ('data' in error) {
+    const data = (error as { data?: { message?: string; error?: { message?: string } } }).data;
+    if (data?.message) return data.message;
+    if (data?.error?.message) return data.error.message;
+  }
+
+  if ('message' in error && typeof (error as { message?: string }).message === 'string') {
+    return (error as { message: string }).message;
+  }
+
+  return 'Failed to load dashboard overview.';
+};
 
 const Dashboard = () => {
-  // Calculate total stats
+  const { data, isLoading, isFetching, isError, error } = useGetDashboardOverviewQuery();
+
+  const overview = data?.data;
+
   const stats = useMemo(
     () => [
       {
         title: 'Total Revenue',
-        value: '$158,340',
-        change: '+12.5%',
-        changeType: 'positive',
+        value: currency.format(overview?.totalRevenue ?? 0),
         icon: DollarSign,
-        color: 'text-green-600',
-        bgColor: 'bg-green-500/10',
+        color: 'text-emerald-600',
+        bgColor: 'bg-emerald-500/10',
       },
       {
         title: 'Total Users',
-        value: '751',
-        change: '+86 this month',
-        changeType: 'positive',
+        value: numberFormatter.format(overview?.totalUsers ?? 0),
         icon: Users,
         color: 'text-blue-600',
         bgColor: 'bg-blue-500/10',
       },
       {
         title: 'Active Contests',
-        value: '35',
-        change: '5 ending soon',
-        changeType: 'neutral',
+        value: numberFormatter.format(overview?.totalActiveContests ?? 0),
         icon: Trophy,
-        color: 'text-purple-600',
-        bgColor: 'bg-purple-500/10',
-      },
-      {
-        title: 'Store Sales',
-        value: '3,480',
-        change: '+18.2%',
-        changeType: 'positive',
-        icon: ShoppingCart,
         color: 'text-amber-600',
         bgColor: 'bg-amber-500/10',
       },
+      {
+        title: 'Store Revenue',
+        value: currency.format(overview?.totalStoreSalesRevenue ?? 0),
+        icon: ShoppingCart,
+        color: 'text-indigo-600',
+        bgColor: 'bg-indigo-500/10',
+      },
+      {
+        title: 'Paid Members',
+        value: numberFormatter.format(overview?.paid_members_count ?? 0),
+        icon: UserCheck,
+        color: 'text-green-600',
+        bgColor: 'bg-green-500/10',
+      },
+      {
+        title: 'Total Payments',
+        value: numberFormatter.format(overview?.totalPayments ?? 0),
+        icon: CreditCard,
+        color: 'text-cyan-600',
+        bgColor: 'bg-cyan-500/10',
+      },
     ],
-    [],
+    [overview],
+  );
+
+  const revenueData = useMemo(
+    () =>
+      MONTH_LABELS.map((month, index) => ({
+        month,
+        store: overview?.revenueByType?.[index]?.store ?? 0,
+        contest: overview?.revenueByType?.[index]?.contest ?? 0,
+        subscription: overview?.revenueByType?.[index]?.subscription ?? 0,
+        total: overview?.revenueByType?.[index]?.total ?? 0,
+      })),
+    [overview],
+  );
+
+  const growthData = useMemo(
+    () =>
+      MONTH_LABELS.map((month, index) => ({
+        month,
+        users: overview?.userGrowthByMonth?.[index] ?? 0,
+      })),
+    [overview],
+  );
+
+  const memberRatioData = useMemo(
+    () =>
+      MONTH_LABELS.map((month, index) => ({
+        month,
+        premium: overview?.member_ratio?.[index]?.premium ?? 0,
+        pro: overview?.member_ratio?.[index]?.pro ?? 0,
+      })),
+    [overview],
+  );
+
+  const contestDistribution = useMemo(
+    () => [
+      { name: 'Running', value: overview?.totalContests?.running ?? 0, color: '#16a34a' },
+      { name: 'Upcoming', value: overview?.totalContests?.upcoming ?? 0, color: '#f59e0b' },
+      { name: 'Completed', value: overview?.totalContests?.completed ?? 0, color: '#3b82f6' },
+    ],
+    [overview],
   );
 
   return (
     <section className="space-y-5 p-5">
-      {/* Page Header */}
       <Title
         title="Dashboard Overview"
-        description="Welcome back! Here's what's happening with your platform today."
+        description="Live platform metrics, revenue, user growth, and latest contests"
       />
 
+      {isError && (
+        <Card className="border-destructive/40">
+          <CardContent className="text-destructive p-6 text-sm">
+            {getErrorMessage(error)}
+          </CardContent>
+        </Card>
+      )}
+
+      {(isLoading || isFetching) && (
+        <Card>
+          <CardContent className="text-muted-foreground flex items-center gap-2 p-6 text-sm">
+            <Spinner className="size-4" /> Loading dashboard overview...
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {stats.map((stat, index) => {
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="py-4">
+            <Card key={stat.title} className="py-4">
               <CardContent className="flex items-center gap-4 p-6">
                 <div
                   className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
@@ -170,69 +221,47 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Charts Row */}
       <div className="grid gap-5 lg:grid-cols-2">
-        {/* Revenue Chart */}
         <Card>
           <CardHeader>
-            <CardTitle>Revenue Overview</CardTitle>
-            <CardDescription>Monthly revenue from all sources</CardDescription>
+            <CardTitle>Revenue by Type</CardTitle>
+            <CardDescription>Monthly subscription, store, and contest revenue</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="month" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1f2937',
-                    border: '1px solid #374151',
-                    borderRadius: '8px',
-                  }}
-                />
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => currency.format(value)} />
                 <Legend />
-                <Bar dataKey="subscription" fill="#8b5cf6" name="Subscriptions" />
-                <Bar dataKey="store" fill="#3b82f6" name="Store" />
-                <Bar dataKey="contests" fill="#10b981" name="Contests" />
+                <Bar dataKey="subscription" fill="#0ea5e9" name="Subscription" />
+                <Bar dataKey="store" fill="#f59e0b" name="Store" />
+                <Bar dataKey="contest" fill="#8b5cf6" name="Contest" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* User Growth Chart */}
         <Card>
           <CardHeader>
             <CardTitle>User Growth</CardTitle>
-            <CardDescription>Total and active users over time</CardDescription>
+            <CardDescription>Monthly growth from API user history</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={userGrowthData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="month" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1f2937',
-                    border: '1px solid #374151',
-                    borderRadius: '8px',
-                  }}
-                />
+              <LineChart data={growthData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
                 <Legend />
                 <Line
                   type="monotone"
                   dataKey="users"
-                  stroke="#3b82f6"
+                  stroke="#2563eb"
                   strokeWidth={2}
-                  name="Total Users"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="active"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  name="Active Users"
+                  name="Users"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -240,67 +269,31 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Contest Distribution and Recent Contests */}
       <div className="grid gap-5 lg:grid-cols-3">
-        {/* Recent Contests */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Recent Contests</CardTitle>
-            <CardDescription>Latest contest activity</CardDescription>
+            <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
+            <CardDescription>Month-wise membership split</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentContests.map((contest) => (
-                <div
-                  key={contest.id}
-                  className="flex items-center justify-between rounded-lg border p-4"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex size-12 items-center justify-center rounded-lg bg-blue-500/10">
-                      <Trophy className="size-6 text-blue-600" />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-semibold">{contest.title}</h4>
-                      <div className="text-muted-foreground flex items-center gap-4 text-xs">
-                        <span className="flex items-center gap-1">
-                          <Users className="size-3" />
-                          {contest.participants} participants
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ImageIcon className="size-3" />
-                          {contest.entries} entries
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="font-semibold text-green-600">{contest.prize}</p>
-                      <p className="text-muted-foreground text-xs">{contest.endDate}</p>
-                    </div>
-                    <Badge
-                      variant={
-                        contest.status === 'active'
-                          ? 'default'
-                          : contest.status === 'completed'
-                            ? 'secondary'
-                            : 'outline'
-                      }
-                    >
-                      {contest.status}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={memberRatioData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                <Legend />
+                <Bar dataKey="premium" fill="#14b8a6" name="Premium" />
+                <Bar dataKey="pro" fill="#f97316" name="Pro" />
+              </BarChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Contest Distribution Pie Chart */}
         <Card>
           <CardHeader>
             <CardTitle>Contest Status</CardTitle>
-            <CardDescription>Distribution by status</CardDescription>
+            <CardDescription>Running, upcoming, and completed contests</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={250}>
@@ -312,19 +305,59 @@ const Dashboard = () => {
                   labelLine={false}
                   label={(entry) => `${entry.name}: ${entry.value}`}
                   outerRadius={80}
-                  fill="#8884d8"
                   dataKey="value"
                 >
-                  {contestDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {contestDistribution.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Contests</CardTitle>
+          <CardDescription>Latest contests from dashboard overview</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {(overview?.recentContests ?? []).map((contest) => (
+              <div
+                key={contest.id}
+                className="flex items-center justify-between rounded-lg border p-4"
+              >
+                <div className="space-y-1">
+                  <h4 className="font-semibold">{contest.title}</h4>
+                  <div className="text-muted-foreground flex items-center gap-4 text-xs">
+                    <span className="flex items-center gap-1">
+                      <Users className="size-3" />
+                      {numberFormatter.format(contest.participantCount)} participants
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ImageIcon className="size-3" />
+                      {numberFormatter.format(contest.totalPhoto)} photos
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <p className="text-muted-foreground text-xs">{formatDate(contest.createdAt)}</p>
+                  <Badge variant={getStatusVariant(contest.status)}>{contest.status}</Badge>
+                </div>
+              </div>
+            ))}
+
+            {!overview?.recentContests?.length && (
+              <p className="text-muted-foreground py-4 text-center text-sm">
+                No recent contests found.
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 };

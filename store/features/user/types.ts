@@ -2,17 +2,21 @@ export interface User {
   id: string;
   firstName: string | null;
   lastName: string | null;
+  fullName?: string | null;
   username: string | null;
   email: string;
-  phone: string;
+  phone: string | null;
   role: string;
   status?: string;
   avatar: string;
   cover: string;
+  location?: string | null;
+  country?: string | null;
   isActive: boolean;
+  is_blocked?: boolean;
   currentLevel: number;
   voting_power: number;
-  purchased_plan?: any;
+  purchased_plan?: string;
 }
 
 export interface GetUsersResponse {
@@ -20,4 +24,14 @@ export interface GetUsersResponse {
   total: number;
   page: number;
   limit: number;
+}
+
+export interface ApiSuccessResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+export interface ToggleBlockBody {
+  userId: string;
 }
