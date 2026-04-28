@@ -1,10 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { SubscriptionPlan } from '@/types';
-import { subscriptionPlanSchema, SubscriptionPlanFormData } from '@/lib/schemas/subscriptionSchema';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -14,17 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -32,254 +19,282 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  CreateSubscriptionPlanBody,
+  PlanName,
+  PlanRecurring,
+  PlanStatus,
+  SubscriptionPlan,
+} from '@/store/features/subscription/types';
 import { Plus, X } from 'lucide-react';
+import { useState } from 'react';
+
+export interface SubscriptionPlanFormValues {
+  planName: PlanName;
+  features: string[];
+  description: string;
+  amount: number;
+  recurring: PlanRecurring;
+  currency: string;
+  status: PlanStatus;
+  stripe_price_id?: string | null;
+  stripe_product_id?: string | null;
+}
 
 interface SubscriptionPlanFormProps {
-  plan?: SubscriptionPlan;
-  onSubmit: (data: SubscriptionPlanFormData) => void;
+  triggerLabel?: string;
+  title: string;
+  description: string;
+  initialValues?: SubscriptionPlan;
+  onSubmit: (values: SubscriptionPlanFormValues) => Promise<void>;
   isLoading?: boolean;
 }
 
-const SubscriptionPlanForm = ({ plan, onSubmit, isLoading = false }: SubscriptionPlanFormProps) => {
+export const SubscriptionPlanForm = ({
+  triggerLabel,
+  title,
+  description,
+  initialValues,
+  onSubmit,
+  isLoading = false,
+}: SubscriptionPlanFormProps) => {
   const [open, setOpen] = useState(false);
-  const [features, setFeatures] = useState<string[]>(plan?.features || []);
   const [featureInput, setFeatureInput] = useState('');
-
-  const form = useForm<SubscriptionPlanFormData>({
-    resolver: zodResolver(subscriptionPlanSchema),
-    defaultValues: {
-      name: plan?.name || '',
-      description: plan?.description || '',
-      price: plan?.price || 0,
-      billingCycle: plan?.billingCycle || 'monthly',
-      features: plan?.features || [],
-      isActive: plan?.isActive ?? true,
-    },
+  const [formData, setFormData] = useState<SubscriptionPlanFormValues>({
+    planName: initialValues?.planName ?? 'FREE',
+    features: initialValues?.features ?? [],
+    description: initialValues?.description ?? '',
+    amount: initialValues?.amount ?? 0,
+    recurring: initialValues?.recurring ?? 'MONTHLY',
+    currency: initialValues?.currency ?? 'USD',
+    status: initialValues?.status ?? 'ACTIVE',
+    stripe_price_id: initialValues?.stripe_price_id ?? null,
+    stripe_product_id: initialValues?.stripe_product_id ?? null,
   });
 
-  const handleAddFeature = () => {
-    if (featureInput.trim() && !features.includes(featureInput.trim())) {
-      const newFeatures = [...features, featureInput.trim()];
-      setFeatures(newFeatures);
-      form.setValue('features', newFeatures);
-      setFeatureInput('');
-    }
-  };
-
-  const handleRemoveFeature = (index: number) => {
-    const newFeatures = features.filter((_, i) => i !== index);
-    setFeatures(newFeatures);
-    form.setValue('features', newFeatures);
-  };
-
-  const handleSubmit = async (data: SubscriptionPlanFormData) => {
-    data.features = features;
-    onSubmit(data);
-    setOpen(false);
-    setFeatures([]);
+  const addFeature = () => {
+    const value = featureInput.trim();
+    if (!value || formData.features.includes(value)) return;
+    setFormData((prev) => ({ ...prev, features: [...prev.features, value] }));
     setFeatureInput('');
-    form.reset();
+  };
+
+  const removeFeature = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      features: prev.features.filter((_, featureIndex) => featureIndex !== index),
+    }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await onSubmit(formData);
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="h-4 w-4" />
-          Add Plan
+        <Button variant={triggerLabel ? 'outline' : 'default'}>
+          {!triggerLabel && <Plus className="size-4" />} {triggerLabel || 'Add Plan'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card/90 max-h-[90vh] max-w-2xl overflow-y-auto rounded-2xl border p-0 shadow-xl">
-        <div className="border-b px-6 py-5">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">
-              {plan ? 'Edit Subscription Plan' : 'Create New Subscription Plan'}
-            </DialogTitle>
-            <DialogDescription>
-              {plan
-                ? 'Update the subscription plan details below'
-                : 'Fill in the details to create a new subscription plan'}
-            </DialogDescription>
-          </DialogHeader>
-        </div>
-        <div className="px-6 py-6">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-              {/* Plan Name */}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Plan Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="e.g., Pro Plan, Premium Plan"
-                        disabled={isLoading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Plan Name *</Label>
+              <Select
+                value={formData.planName}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, planName: value as PlanName }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FREE">FREE</SelectItem>
+                  <SelectItem value="PRO">PRO</SelectItem>
+                  <SelectItem value="PREMIUM">PREMIUM</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, status: value as PlanStatus }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                  <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Description *</Label>
+            <Textarea
+              value={formData.description}
+              onChange={(event) =>
+                setFormData((prev) => ({ ...prev, description: event.target.value }))
+              }
+              className="min-h-24"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-2">
+              <Label>Amount *</Label>
+              <Input
+                type="number"
+                min={0}
+                step="0.01"
+                value={formData.amount}
+                onChange={(event) =>
+                  setFormData((prev) => ({ ...prev, amount: Number(event.target.value) || 0 }))
+                }
+                required
               />
-
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe what this plan offers..."
-                        disabled={isLoading}
-                        className="resize-none"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Brief description of the plan benefits</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            </div>
+            <div className="space-y-2">
+              <Label>Recurring *</Label>
+              <Select
+                value={formData.recurring}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, recurring: value as PlanRecurring }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ONETIME">ONETIME</SelectItem>
+                  <SelectItem value="MONTHLY">MONTHLY</SelectItem>
+                  <SelectItem value="YEARLY">YEARLY</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Currency *</Label>
+              <Input
+                value={formData.currency}
+                onChange={(event) =>
+                  setFormData((prev) => ({ ...prev, currency: event.target.value.toUpperCase() }))
+                }
+                required
               />
+            </div>
+          </div>
 
-              {/* Price & Billing */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="price"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Price (USD)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="9.99"
-                          disabled={isLoading}
-                          {...field}
-                          onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="billingCycle"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Billing Cycle</FormLabel>
-                      <Select
-                        disabled={isLoading}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="monthly">Monthly</SelectItem>
-                          <SelectItem value="yearly">Yearly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          {initialValues && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Stripe Price ID</Label>
+                <Input
+                  value={formData.stripe_price_id || ''}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      stripe_price_id: event.target.value || null,
+                    }))
+                  }
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Stripe Product ID</Label>
+                <Input
+                  value={formData.stripe_product_id || ''}
+                  onChange={(event) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      stripe_product_id: event.target.value || null,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+          )}
 
-              {/* Features */}
-              <FormItem>
-                <FormLabel>Features</FormLabel>
-                <div className="flex flex-col gap-2 sm:flex-row">
-                  <Input
-                    placeholder="Add a feature..."
-                    value={featureInput}
-                    onChange={(e) => setFeatureInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleAddFeature();
-                      }
-                    }}
-                    disabled={isLoading || features.length >= 10}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAddFeature}
-                    disabled={!featureInput.trim() || isLoading || features.length >= 10}
-                    className="sm:w-24"
-                  >
-                    Add
-                  </Button>
-                </div>
-                {features.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {features.map((feature, index) => (
-                      <Badge key={index} variant="secondary" className="gap-1">
-                        {feature}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveFeature(index)}
-                          className="ml-1 hover:opacity-70"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-                {features.length === 0 && (
-                  <p className="text-muted-foreground text-xs">Add at least one feature</p>
-                )}
-                {features.length >= 10 && (
-                  <p className="text-destructive text-xs">Maximum 10 features reached</p>
-                )}
-              </FormItem>
-
-              {/* Active Status */}
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="bg-muted/60 flex flex-row items-center justify-between rounded-xl border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">Active Plan</FormLabel>
-                      <FormDescription>Enable this plan for users to subscribe</FormDescription>
-                    </div>
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
+          <div className="space-y-2">
+            <Label>Features</Label>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Input
+                value={featureInput}
+                onChange={(event) => setFeatureInput(event.target.value)}
+                placeholder="Add feature"
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    addFeature();
+                  }
+                }}
               />
-
-              {/* Submit Button */}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Saving...' : plan ? 'Update Plan' : 'Create Plan'}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addFeature}
+                disabled={!featureInput.trim()}
+              >
+                Add
               </Button>
-            </form>
-          </Form>
-        </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {formData.features.map((feature, index) => (
+                <Badge key={`${feature}-${index}`} variant="secondary" className="gap-1">
+                  {feature}
+                  <button type="button" onClick={() => removeFeature(index)}>
+                    <X className="size-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-3">
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading ? 'Saving...' : initialValues ? 'Update Plan' : 'Create Plan'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
 };
 
+export const toCreatePlanBody = (
+  values: SubscriptionPlanFormValues,
+): CreateSubscriptionPlanBody => ({
+  planName: values.planName,
+  features: values.features,
+  description: values.description,
+  amount: values.amount,
+  recurring: values.recurring,
+  currency: values.currency,
+  status: values.status,
+});
+
 export default SubscriptionPlanForm;
-export { SubscriptionPlanForm };

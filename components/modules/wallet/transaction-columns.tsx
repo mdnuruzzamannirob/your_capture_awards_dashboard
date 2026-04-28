@@ -1,23 +1,11 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { WalletTransaction } from '@/types';
 import { cn } from '@/lib/utils';
+import { PaymentTransaction } from '@/store/features/wallet/types';
+import { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
-import { Eye, Download, X, Check } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 
-export const transactionColumns: ColumnDef<WalletTransaction>[] = [
+export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
   {
     id: 'sl',
     header: 'SL',
@@ -27,59 +15,33 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
     },
   },
   {
-    accessorKey: 'transactionNumber',
-    header: 'TRANSACTION #',
-    cell: ({ row }) => (
-      <div className="font-mono text-xs font-semibold">{row.getValue('transactionNumber')}</div>
-    ),
+    accessorKey: 'id',
+    header: 'TRANSACTION ID',
+    cell: ({ row }) => <div className="font-mono text-xs font-semibold">{row.getValue('id')}</div>,
   },
   {
-    accessorKey: 'userName',
+    id: 'user',
     header: 'USER',
     cell: ({ row }) => (
       <div>
-        <div className="font-medium">{row.getValue('userName')}</div>
-        <div className="text-muted-foreground text-xs">{row.original.userEmail}</div>
+        <div className="font-medium">{row.original.user.fullName || 'Unknown User'}</div>
+        <div className="text-muted-foreground text-xs">{row.original.user.email}</div>
       </div>
     ),
   },
   {
     accessorKey: 'type',
     header: 'TYPE',
-    cell: ({ row }) => {
-      const type = row.getValue('type') as string;
-      const isIncoming = ['refund'].includes(type);
-      return (
-        <Badge
-          variant="outline"
-          className={cn(
-            'capitalize',
-            type === 'withdrawal' && 'border-red-500/50 bg-red-500/10 text-red-600',
-            type === 'store_purchase' && 'border-blue-500/50 bg-blue-500/10 text-blue-600',
-            type === 'subscription_payment' && 'border-green-500/50 bg-green-500/10 text-green-600',
-            type === 'refund' && 'border-cyan-500/50 bg-cyan-500/10 text-cyan-600',
-          )}
-        >
-          {isIncoming ? (
-            <ArrowDownLeft className="mr-1 size-3" />
-          ) : (
-            <ArrowUpRight className="mr-1 size-3" />
-          )}
-          {type.replace('_', ' ')}
-        </Badge>
-      );
-    },
+    cell: ({ row }) => <div className="text-xs font-medium">{row.getValue('type')}</div>,
   },
   {
     accessorKey: 'amount',
     header: 'AMOUNT',
     cell: ({ row }) => {
       const amount = row.getValue('amount') as number;
-      const type = row.original.type;
-      const isIncoming = ['refund'].includes(type);
       return (
-        <div className={cn('font-semibold', isIncoming ? 'text-green-600' : 'text-red-600')}>
-          {isIncoming ? '+' : '-'}${amount.toFixed(2)}
+        <div className="font-semibold">
+          {row.original.currency} {amount.toFixed(2)}
         </div>
       );
     },
@@ -92,11 +54,11 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
       return (
         <button
           className={cn(
-            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'completed' && 'bg-green-500/20 text-green-600',
-            status === 'pending' && 'bg-yellow-500/20 text-yellow-600',
-            status === 'failed' && 'bg-red-500/20 text-red-600',
-            status === 'cancelled' && 'bg-gray-500/20 text-gray-600',
+            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium',
+            status === 'SUCCEEDED' && 'bg-green-500/20 text-green-600',
+            status === 'PENDING' && 'bg-yellow-500/20 text-yellow-600',
+            status === 'FAILED' && 'bg-red-500/20 text-red-600',
+            status === 'EXPIRED' && 'bg-zinc-500/20 text-zinc-600',
           )}
         >
           <GoDotFill /> {status}
@@ -105,22 +67,9 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
     },
   },
   {
-    accessorKey: 'paymentGateway',
-    header: 'GATEWAY',
-    cell: ({ row }) => {
-      const gateway = row.getValue('paymentGateway') as string;
-      return gateway ? (
-        <div className="flex items-center gap-1 text-sm capitalize">
-          {gateway === 'stripe' && '💳'}
-          {gateway === 'wallet' && '💰'}
-          {gateway === 'paypal' && '🅿️'}
-          {gateway === 'bank_transfer' && '🏦'}
-          <span>{gateway.replace('_', ' ')}</span>
-        </div>
-      ) : (
-        <span className="text-muted-foreground text-xs">N/A</span>
-      );
-    },
+    accessorKey: 'method',
+    header: 'METHOD',
+    cell: ({ row }) => <div className="text-sm capitalize">{row.getValue('method')}</div>,
   },
   {
     accessorKey: 'createdAt',
@@ -134,57 +83,6 @@ export const transactionColumns: ColumnDef<WalletTransaction>[] = [
             {date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
-      );
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const transaction = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" className="size-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              <Eye className="mr-2 size-4" />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              <Download className="mr-2 size-4" />
-              Download Receipt
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {transaction.status === 'pending' && (
-              <>
-                <DropdownMenuItem
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <Check className="mr-2 size-4" />
-                  Approve Transaction
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <X className="mr-2 size-4" />
-                  Cancel Transaction
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
       );
     },
   },

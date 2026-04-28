@@ -1,17 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -20,178 +9,178 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { StoreProduct, StoreProductType } from '@/types';
-import { Plus, Edit2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  CreateStoreProductBody,
+  StoreProductStatus,
+  StoreProductType,
+} from '@/store/features/store/types';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
 
 interface StoreProductFormProps {
-  product?: StoreProduct;
-  onCreate?: (data: Partial<StoreProduct>) => void;
-  onUpdate?: (data: Partial<StoreProduct>) => void;
-  onClose?: () => void;
-  defaultType?: StoreProductType;
+  onCreate: (data: CreateStoreProductBody) => Promise<void>;
   isLoading?: boolean;
 }
 
-export default function StoreProductForm({
-  product,
-  onCreate,
-  onUpdate,
-  onClose,
-  defaultType = 'key',
-  isLoading = false,
-}: StoreProductFormProps) {
-  const [open, setOpen] = useState(!!product);
-  const [formData, setFormData] = useState({
-    name: product?.name || '',
-    description: product?.description || '',
-    productType: product?.productType || (defaultType as StoreProductType),
-    price: product?.price || 0,
-    isActive: product?.isActive ?? true,
-  });
+const defaultValues: CreateStoreProductBody = {
+  title: '',
+  description: '',
+  type: 'KEY',
+  quantity: 1,
+  amount: 0,
+  currency: 'USD',
+  status: 'ACTIVE',
+};
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (product && onUpdate) {
-      onUpdate(formData);
-    } else if (!product && onCreate) {
-      onCreate(formData);
-    }
-    setOpen(false);
-  };
+export default function StoreProductForm({ onCreate, isLoading = false }: StoreProductFormProps) {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState<CreateStoreProductBody>(defaultValues);
 
   const handleClose = () => {
     setOpen(false);
-    onClose?.();
+    setFormData(defaultValues);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await onCreate(formData);
+    handleClose();
   };
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(newOpen) => {
-        setOpen(newOpen);
-        if (!newOpen) handleClose();
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={product ? 'outline' : 'default'} className="max-sm:w-full">
-          {product ? (
-            <>
-              <Edit2 className="size-4" />
-              Edit Item
-            </>
-          ) : (
-            <>
-              <Plus className="size-4" />
-              Add New Item
-            </>
-          )}
+        <Button className="max-sm:w-full">
+          <Plus className="size-4" /> Add New Item
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {product ? 'Edit Purchasable Item' : 'Add New Purchasable Item'}
-          </DialogTitle>
-          <DialogDescription>
-            {product ? 'Update item details' : 'Create a new store item for users to purchase'}
-          </DialogDescription>
+          <DialogTitle>Create Store Product</DialogTitle>
+          <DialogDescription>Create a new purchasable store item.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Item Name *</Label>
+            <Label htmlFor="title">Title *</Label>
             <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Gold Key, Vote Boost, Category Swap"
+              id="title"
+              value={formData.title}
+              onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
+              placeholder="e.g. Bucket of Keys"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Describe what this item does for users..."
+              onChange={(event) =>
+                setFormData((prev) => ({ ...prev, description: event.target.value }))
+              }
+              placeholder="Write product description"
               className="min-h-24"
-              required
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="type">Item Type *</Label>
+              <Label htmlFor="type">Type *</Label>
               <Select
-                value={formData.productType}
+                value={formData.type}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, productType: value as StoreProductType })
+                  setFormData((prev) => ({ ...prev, type: value as StoreProductType }))
                 }
               >
                 <SelectTrigger id="type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="key">Key </SelectItem>
-                  <SelectItem value="boost">Boost </SelectItem>
-                  <SelectItem value="swap">Swap</SelectItem>
+                  <SelectItem value="KEY">KEY</SelectItem>
+                  <SelectItem value="BOOST">BOOST</SelectItem>
+                  <SelectItem value="SWAP">SWAP</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="price">Price (USD) *</Label>
-              <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-sm">$</span>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.price}
-                  onChange={(e) =>
-                    setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
-                  }
-                  placeholder="9.99"
-                  required
-                />
-              </div>
+              <Label htmlFor="status">Status *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, status: value as StoreProductStatus }))
+                }
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                  <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+                  <SelectItem value="DISCONTINUED">DISCONTINUED</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
-            <div className="flex items-start gap-3">
-              <div className="text-2xl text-blue-600 dark:text-blue-400">ℹ️</div>
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                  Unlimited Purchase Item
-                </p>
-                <p className="text-xs text-blue-700 dark:text-blue-300">
-                  This item has no quantity limit. Users can purchase it as many times as they want.
-                </p>
-              </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="space-y-2">
+              <Label htmlFor="quantity">Quantity *</Label>
+              <Input
+                id="quantity"
+                type="number"
+                min={0}
+                value={formData.quantity}
+                onChange={(event) =>
+                  setFormData((prev) => ({ ...prev, quantity: Number(event.target.value) || 0 }))
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="amount">Amount *</Label>
+              <Input
+                id="amount"
+                type="number"
+                step="0.01"
+                min={0}
+                value={formData.amount}
+                onChange={(event) =>
+                  setFormData((prev) => ({ ...prev, amount: Number(event.target.value) || 0 }))
+                }
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency *</Label>
+              <Input
+                id="currency"
+                value={formData.currency}
+                onChange={(event) =>
+                  setFormData((prev) => ({ ...prev, currency: event.target.value.toUpperCase() }))
+                }
+                required
+              />
             </div>
           </div>
 
-          <div className="bg-muted flex items-center gap-2 rounded-lg p-3">
-            <input
-              type="checkbox"
-              id="active"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="border-input rounded border"
-            />
-            <Label htmlFor="active" className="flex-1 cursor-pointer">
-              Active Item (visible to users)
-            </Label>
-          </div>
-
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-3">
             <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Saving...' : product ? 'Update Item' : 'Create Item'}
+              {isLoading ? 'Saving...' : 'Create Product'}
             </Button>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Cancel
             </Button>
           </div>

@@ -1,131 +1,100 @@
 'use client';
 
-import { useMemo } from 'react';
 import Title from '@/components/common/Title';
 import SubscriptionManagement from '@/components/modules/subscription/SubscriptionManagement';
-import { SubscriptionPlan } from '@/types';
-import { Users, DollarSign, Package, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
+import { useGetSubscriptionStatsQuery } from '@/store/features/subscription/subscriptionApi';
+import { DollarSign, Package, TrendingUp, Users } from 'lucide-react';
 
-const mockSubscriptionPlans: SubscriptionPlan[] = [
-  {
-    id: '1',
-    planId: 'plan_001',
-    name: 'Free',
-    description: 'Perfect for getting started with photography sharing',
-    price: 0,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: ['50 GB Storage', 'Up to 1000 Photos', 'Basic Editing Tools', 'Community Access'],
-    subscribers: 2450,
-    isActive: true,
-    stripePriceId: 'price_1234567890',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2025-02-03T10:30:00Z',
-  },
-  {
-    id: '2',
-    planId: 'plan_002',
-    name: 'Pro',
-    description: 'For serious photographers and content creators',
-    price: 9.99,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: [
-      '500 GB Storage',
-      'Unlimited Photos',
-      'Advanced Editing',
-      'Priority Support',
-      'Portfolio Tools',
-    ],
-    subscribers: 1850,
-    isActive: true,
-    stripePriceId: 'price_0987654321',
-    createdAt: '2024-02-20T14:00:00Z',
-    updatedAt: '2025-02-02T14:00:00Z',
-  },
-  {
-    id: '3',
-    planId: 'plan_003',
-    name: 'Premium',
-    description: 'Ultimate plan for professional photographers',
-    price: 19.99,
-    currency: 'USD',
-    billingCycle: 'monthly',
-    features: [
-      '2 TB Storage',
-      'Unlimited Photos',
-      'Professional Tools',
-      '24/7 Support',
-      'Analytics Dashboard',
-      'Team Collaboration',
-    ],
-    subscribers: 890,
-    isActive: true,
-    stripePriceId: 'price_5544332211',
-    createdAt: '2024-03-10T09:15:00Z',
-    updatedAt: '2025-02-01T09:15:00Z',
-  },
-];
+const currency = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 2,
+});
+
+const getErrorMessage = (error: unknown) => {
+  if (!error || typeof error !== 'object') return 'Failed to load subscription stats.';
+
+  if ('data' in error) {
+    const data = (error as { data?: { message?: string; error?: { message?: string } } }).data;
+    if (data?.message) return data.message;
+    if (data?.error?.message) return data.error.message;
+  }
+
+  if ('message' in error && typeof (error as { message?: string }).message === 'string') {
+    return (error as { message: string }).message;
+  }
+
+  return 'Failed to load subscription stats.';
+};
 
 export default function SubscriptionPlanPage() {
-  const stats = useMemo(() => {
-    const activePlans = mockSubscriptionPlans.filter((p) => p.isActive);
-    const totalSubscribers = mockSubscriptionPlans.reduce((sum, p) => sum + p.subscribers, 0);
-    const monthlyRevenue = mockSubscriptionPlans
-      .filter((p) => p.billingCycle === 'monthly')
-      .reduce((sum, p) => sum + p.price * p.subscribers, 0);
-    const yearlyRevenue = mockSubscriptionPlans
-      .filter((p) => p.billingCycle === 'yearly')
-      .reduce((sum, p) => sum + p.price * p.subscribers, 0);
-    const totalRevenue = monthlyRevenue + yearlyRevenue;
+  const { data, isLoading, isFetching, isError, error, refetch } = useGetSubscriptionStatsQuery();
 
-    return [
-      {
-        title: 'Total Plans',
-        value: activePlans.length,
-        icon: Package,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-500/10',
-      },
-      {
-        title: 'Active Subscribers',
-        value: totalSubscribers,
-        icon: Users,
-        color: 'text-green-600',
-        bgColor: 'bg-green-500/10',
-      },
-      {
-        title: 'Monthly Revenue',
-        value: `$${monthlyRevenue.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`,
-        icon: DollarSign,
-        color: 'text-purple-600',
-        bgColor: 'bg-purple-500/10',
-      },
-      {
-        title: 'Total Revenue',
-        value: `$${totalRevenue.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        })}`,
-        icon: TrendingUp,
-        color: 'text-amber-600',
-        bgColor: 'bg-amber-500/10',
-      },
-    ];
-  }, []);
+  const statsData = data?.data;
+  const monthlyRevenue =
+    Object.values(statsData?.monthlySubscriptionRevenue ?? {}).reduce(
+      (sum, item) => sum + item,
+      0,
+    ) / 12;
+
+  const stats = [
+    {
+      title: 'Total Plans',
+      value: statsData?.totalPlans ?? 0,
+      icon: Package,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-500/10',
+    },
+    {
+      title: 'Active Subscribers',
+      value: statsData?.totalActiveSubscribers ?? 0,
+      icon: Users,
+      color: 'text-green-600',
+      bgColor: 'bg-green-500/10',
+    },
+    {
+      title: 'Monthly Revenue (Avg)',
+      value: currency.format(monthlyRevenue),
+      icon: DollarSign,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-500/10',
+    },
+    {
+      title: 'Total Subscription Revenue',
+      value: currency.format(statsData?.totalSubscriptionRevenue ?? 0),
+      icon: TrendingUp,
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-500/10',
+    },
+  ];
 
   return (
     <section className="space-y-5 p-5">
       <Title
         title="Subscription Plan"
-        description="Manage your subscription plans and view key metrics."
+        description="Manage subscription plans with live revenue and subscriber stats."
       />
 
-      {/* Stats Grid */}
+      {(isLoading || isFetching) && (
+        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
+          <Spinner className="size-4" /> Loading subscription stats...
+        </div>
+      )}
+
+      {isError && (
+        <Card>
+          <CardContent className="flex items-center justify-between gap-3 p-4">
+            <p className="text-destructive text-sm">{getErrorMessage(error)}</p>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
@@ -139,7 +108,9 @@ export default function SubscriptionPlanPage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
+                  <h3 className="text-2xl font-bold">
+                    {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+                  </h3>
                 </div>
               </CardContent>
             </Card>
@@ -147,7 +118,7 @@ export default function SubscriptionPlanPage() {
         })}
       </div>
 
-      <SubscriptionManagement mockSubscriptionPlans={mockSubscriptionPlans} />
+      <SubscriptionManagement />
     </section>
   );
 }
