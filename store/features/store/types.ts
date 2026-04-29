@@ -44,6 +44,10 @@ export interface CreateStoreProductBody {
   status: StoreProductStatus;
 }
 
+export interface UpdateStoreProductBody extends CreateStoreProductBody {
+  productId: string;
+}
+
 export interface ApiSuccessResponse<T> {
   success: boolean;
   message: string;
