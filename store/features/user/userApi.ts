@@ -28,8 +28,8 @@ export const userApi = createApi({
 
     toggleUserBlock: builder.mutation<ApiSuccessResponse<User>, ToggleBlockBody>({
       query: (body) => ({
-        url: '/dashboard/toggle-block',
-        method: 'POST',
+        url: '/dashboard/toggole-block',
+        method: 'PATCH',
         body,
       }),
       invalidatesTags: (result, error, { userId }) => [
