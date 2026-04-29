@@ -1,14 +1,29 @@
 'use client';
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import {
   useCreateStoreProductMutation,
+  useDeleteStoreProductMutation,
   useGetStoreProductsQuery,
+  useUpdateStoreProductMutation,
 } from '@/store/features/store/storeApi';
-import { CreateStoreProductBody, StoreProductType } from '@/store/features/store/types';
-import { Key, RefreshCw, Zap } from 'lucide-react';
+import {
+  CreateStoreProductBody,
+  StoreProduct,
+  StoreProductType,
+} from '@/store/features/store/types';
+import { Key, RefreshCw, Trash2, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import StoreProductForm from './StoreProductForm';
@@ -62,6 +77,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 const StoreProductManagement = () => {
   const [filter, setFilter] = useState<StoreProductType>('KEY');
   const [page, setPage] = useState(1);
+  const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(null);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useGetStoreProductsQuery({
     type: filter,
@@ -70,6 +86,8 @@ const StoreProductManagement = () => {
   });
 
   const [createStoreProduct, { isLoading: isCreating }] = useCreateStoreProductMutation();
+  const [updateStoreProduct, { isLoading: isUpdating }] = useUpdateStoreProductMutation();
+  const [deleteStoreProduct, { isLoading: isDeleting }] = useDeleteStoreProductMutation();
 
   const products = data?.data?.data ?? [];
   const meta = data?.data?.meta;
@@ -83,6 +101,33 @@ const StoreProductManagement = () => {
     } catch (mutationError) {
       toast.error(getErrorMessage(mutationError, 'Failed to create product.'));
       throw mutationError;
+    }
+  };
+
+  const handleUpdateProduct = async (productId: string, payload: CreateStoreProductBody) => {
+    try {
+      const response = await updateStoreProduct({ productId, ...payload }).unwrap();
+      toast.success(response.message || 'Product updated successfully.');
+      refetch();
+    } catch (mutationError) {
+      toast.error(getErrorMessage(mutationError, 'Failed to update product.'));
+      throw mutationError;
+    }
+  };
+
+  const handleDeleteProduct = async () => {
+    if (!deletingProduct) return;
+
+    try {
+      const response = await deleteStoreProduct({ productId: deletingProduct.id }).unwrap();
+      toast.success(response.message || 'Product deleted successfully.');
+      setDeletingProduct(null);
+      if (products.length === 1 && page > 1) {
+        setPage((prev) => Math.max(1, prev - 1));
+      }
+      refetch();
+    } catch (mutationError) {
+      toast.error(getErrorMessage(mutationError, 'Failed to delete product.'));
     }
   };
 
@@ -127,7 +172,7 @@ const StoreProductManagement = () => {
             Swaps
           </Button>
         </div>
-        <StoreProductForm onCreate={handleCreateProduct} isLoading={isCreating} />
+        <StoreProductForm onSubmit={handleCreateProduct} isLoading={isCreating} />
       </div>
 
       {(isLoading || isFetching) && (
@@ -225,6 +270,24 @@ const StoreProductManagement = () => {
                     <p className="text-muted-foreground line-clamp-2 text-xs">
                       {product.description || 'No description available.'}
                     </p>
+
+                    <div className="flex items-center gap-2">
+                      <StoreProductForm
+                        triggerLabel="Edit"
+                        title="Update Store Product"
+                        description="Update selected product details."
+                        initialValues={product}
+                        onSubmit={(payload) => handleUpdateProduct(product.id, payload)}
+                        isLoading={isUpdating}
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => setDeletingProduct(product)}
+                      >
+                        <Trash2 className="size-4" /> Delete
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               );
@@ -264,6 +327,29 @@ const StoreProductManagement = () => {
           </div>
         </>
       )}
+
+      <AlertDialog open={Boolean(deletingProduct)} onOpenChange={() => setDeletingProduct(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete{' '}
+              <span className="font-semibold">{deletingProduct?.title}</span>? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex items-center gap-2">
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteProduct}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

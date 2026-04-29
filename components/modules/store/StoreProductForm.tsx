@@ -21,6 +21,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   CreateStoreProductBody,
+  StoreProduct,
   StoreProductStatus,
   StoreProductType,
 } from '@/store/features/store/types';
@@ -28,7 +29,11 @@ import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
 interface StoreProductFormProps {
-  onCreate: (data: CreateStoreProductBody) => Promise<void>;
+  onSubmit: (data: CreateStoreProductBody) => Promise<void>;
+  triggerLabel?: string;
+  title?: string;
+  description?: string;
+  initialValues?: StoreProduct;
   isLoading?: boolean;
 }
 
@@ -42,32 +47,57 @@ const defaultValues: CreateStoreProductBody = {
   status: 'ACTIVE',
 };
 
-export default function StoreProductForm({ onCreate, isLoading = false }: StoreProductFormProps) {
+const mapInitialValues = (product?: StoreProduct): CreateStoreProductBody => ({
+  title: product?.title ?? defaultValues.title,
+  description: product?.description ?? defaultValues.description,
+  type: product?.productType ?? defaultValues.type,
+  quantity: product?.quantity ?? defaultValues.quantity,
+  amount: product?.amount ?? defaultValues.amount,
+  currency: product?.currency ?? defaultValues.currency,
+  status: product?.status ?? defaultValues.status,
+});
+
+export default function StoreProductForm({
+  onSubmit,
+  triggerLabel,
+  title,
+  description,
+  initialValues,
+  isLoading = false,
+}: StoreProductFormProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<CreateStoreProductBody>(defaultValues);
+  const [formData, setFormData] = useState<CreateStoreProductBody>(mapInitialValues(initialValues));
 
   const handleClose = () => {
     setOpen(false);
-    setFormData(defaultValues);
+    setFormData(mapInitialValues(initialValues));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await onCreate(formData);
+    await onSubmit(formData);
     handleClose();
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (nextOpen) setFormData(mapInitialValues(initialValues));
+      }}
+    >
       <DialogTrigger asChild>
-        <Button className="max-sm:w-full">
-          <Plus className="size-4" /> Add New Item
+        <Button variant={triggerLabel ? 'outline' : 'default'} className="max-sm:w-full">
+          {!triggerLabel && <Plus className="size-4" />} {triggerLabel || 'Add New Item'}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Create Store Product</DialogTitle>
-          <DialogDescription>Create a new purchasable store item.</DialogDescription>
+          <DialogTitle>{title || 'Create Store Product'}</DialogTitle>
+          <DialogDescription>
+            {description || 'Create a new purchasable store item.'}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -178,7 +208,7 @@ export default function StoreProductForm({ onCreate, isLoading = false }: StoreP
 
           <div className="flex gap-2 pt-3">
             <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Saving...' : 'Create Product'}
+              {isLoading ? 'Saving...' : initialValues ? 'Update Product' : 'Create Product'}
             </Button>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Cancel

@@ -35,3 +35,15 @@ export interface ApiSuccessResponse<T> {
 export interface ToggleBlockBody {
   userId: string;
 }
+
+export interface UpdateProfileBody {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  location: string;
+}
+
+export interface ChangePasswordBody {
+  oldPassword: string;
+  newPassword: string;
+}

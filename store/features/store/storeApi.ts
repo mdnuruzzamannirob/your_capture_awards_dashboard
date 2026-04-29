@@ -7,6 +7,7 @@ import {
   StoreProductsListData,
   StoreProductType,
   StoreStats,
+  UpdateStoreProductBody,
 } from './types';
 
 export const storeApi = createApi({
@@ -38,8 +39,36 @@ export const storeApi = createApi({
         { type: 'StoreStats', id: 'SINGLE' },
       ],
     }),
+
+    updateStoreProduct: builder.mutation<ApiSuccessResponse<StoreProduct>, UpdateStoreProductBody>({
+      query: ({ productId, ...body }) => ({
+        url: `/stores/${productId}`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: [
+        { type: 'StoreProducts', id: 'LIST' },
+        { type: 'StoreStats', id: 'SINGLE' },
+      ],
+    }),
+
+    deleteStoreProduct: builder.mutation<ApiSuccessResponse<StoreProduct>, { productId: string }>({
+      query: ({ productId }) => ({
+        url: `/stores/${productId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: [
+        { type: 'StoreProducts', id: 'LIST' },
+        { type: 'StoreStats', id: 'SINGLE' },
+      ],
+    }),
   }),
 });
 
-export const { useGetStoreStatsQuery, useGetStoreProductsQuery, useCreateStoreProductMutation } =
-  storeApi;
+export const {
+  useGetStoreStatsQuery,
+  useGetStoreProductsQuery,
+  useCreateStoreProductMutation,
+  useUpdateStoreProductMutation,
+  useDeleteStoreProductMutation,
+} = storeApi;

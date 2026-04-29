@@ -1,11 +1,16 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from '@/store/baseQuery';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import { ApiSuccessResponse, ContestStats } from './types';
 
 export const contestApi = createApi({
   reducerPath: 'contestApi',
   baseQuery,
   tagTypes: ['Contests', 'Contest'],
   endpoints: (builder) => ({
+    getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
+      query: () => '/dashboard/contest/stats',
+    }),
+
     createContest: builder.mutation<{ data: unknown }, any>({
       query: (credentials) => ({
         url: '/contests',
@@ -36,6 +41,7 @@ export const contestApi = createApi({
 });
 
 export const {
+  useGetContestStatsQuery,
   useCreateContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
