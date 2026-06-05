@@ -1,12 +1,7 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { SupportTicket } from '@/types';
-import { cn } from '@/lib/utils';
-import { GoDotFill } from 'react-icons/go';
-import { Eye, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { SupportTicket } from '@/types';
+import { ColumnDef } from '@tanstack/react-table';
+import { Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import { GoDotFill } from 'react-icons/go';
 
 export const supportColumns: ColumnDef<SupportTicket>[] = [
   {
@@ -100,44 +99,38 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const ticket = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" className="size-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              <Eye className="mr-2 size-4" />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              Mark as In Progress
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              Mark as Resolved
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Mark as Closed</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <Trash2 className="mr-2 size-4" />
-              Delete Ticket
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <Button variant="ghost" className="size-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+            <Eye className="mr-2 size-4" />
+            View Details
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+            Mark as In Progress
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Mark as Resolved</DropdownMenuItem>
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Mark as Closed</DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Trash2 className="mr-2 size-4" />
+            Delete Ticket
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
   },
 ];

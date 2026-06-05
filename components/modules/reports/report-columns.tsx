@@ -1,12 +1,7 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Report } from '@/types';
-import { cn } from '@/lib/utils';
-import { GoDotFill } from 'react-icons/go';
-import { Eye, Check, X, AlertTriangle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Report } from '@/types';
+import { ColumnDef } from '@tanstack/react-table';
+import { AlertTriangle, Check, Eye, MoreHorizontal, X } from 'lucide-react';
+import { GoDotFill } from 'react-icons/go';
 
 export const reportColumns: ColumnDef<Report>[] = [
   {
@@ -126,56 +125,52 @@ export const reportColumns: ColumnDef<Report>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: ({ row }) => {
-      const report = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" className="size-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              <Eye className="mr-2 size-4" />
-              View Details
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-              Mark as Under Review
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <Check className="mr-2 size-4" />
-              Mark as Resolved
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <X className="mr-2 size-4" />
-              Dismiss Report
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <AlertTriangle className="mr-2 size-4" />
-              Take Action
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <Button variant="ghost" className="size-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+            <Eye className="mr-2 size-4" />
+            View Details
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+            Mark as Under Review
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <Check className="mr-2 size-4" />
+            Mark as Resolved
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <X className="mr-2 size-4" />
+            Dismiss Report
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <AlertTriangle className="mr-2 size-4" />
+            Take Action
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
   },
 ];

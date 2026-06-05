@@ -1,14 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { supportSchema, type SupportFormData } from '@/lib/schemas/supportSchema';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -16,7 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { supportSchema, type SupportFormData } from '@/lib/schemas/supportSchema';
 import { cn } from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const SupportForm = () => {
@@ -43,7 +44,7 @@ const SupportForm = () => {
 
       toast.success('Support ticket submitted successfully!');
       reset();
-    } catch (error) {
+    } catch {
       toast.error('Failed to submit support ticket. Please try again.');
     } finally {
       setIsSubmitting(false);

@@ -78,7 +78,10 @@ const SideBar = () => {
         onMouseLeave={() => !isPinned && !isMobile && setIsHovered(false)}
       >
         {/* Logo */}
-        <Link href="/dashboard" className="flex h-[57px] items-center justify-center border-b px-4 max-lg:justify-center">
+        <Link
+          href="/dashboard"
+          className="flex h-[57px] items-center justify-center border-b px-4 max-lg:justify-center"
+        >
           {showLogo ? (
             <Image
               src="/images/logo.png"
