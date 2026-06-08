@@ -1,9 +1,9 @@
 import { SideMenu } from '@/types';
-import { LuLayoutDashboard } from 'react-icons/lu';
-import { TbReportMoney, TbUsers } from 'react-icons/tb';
-import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { HiOutlineWallet } from 'react-icons/hi2';
 import { IoStorefrontOutline } from 'react-icons/io5';
+import { LuLayoutDashboard } from 'react-icons/lu';
+import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
+import { TbUsers } from 'react-icons/tb';
 
 export const sideMenus: SideMenu[] = [
   {
@@ -25,11 +25,6 @@ export const sideMenus: SideMenu[] = [
     name: 'Store',
     href: '/store',
     icon: <IoStorefrontOutline className="size-full" />,
-  },
-  {
-    name: 'Subscription Plan',
-    href: '/subscription-plan',
-    icon: <TbReportMoney className="size-full" />,
   },
   {
     name: 'Wallet',

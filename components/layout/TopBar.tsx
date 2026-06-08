@@ -1,13 +1,12 @@
 'use client';
 
+import useDashboard from '@/hooks/useDashboard';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import UserMenu from './UserMenu';
-import Notification from './Notification';
-import useDashboard from '@/hooks/useDashboard';
-import Link from 'next/link';
-import Image from 'next/image';
 
 const TopBar = () => {
   const { isSidebarVisible } = useDashboard();
@@ -62,7 +61,7 @@ const TopBar = () => {
 
       {/* 4. Right Section: Notification & UserMenu */}
       <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
-        <Notification />
+        {/* <Notification /> */}
         <UserMenu />
       </div>
     </header>
