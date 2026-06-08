@@ -32,8 +32,8 @@ export const sideMenus: SideMenu[] = [
     icon: <HiOutlineWallet className="size-full" />,
   },
   {
-    name: 'Contact Support',
-    href: '/contact-support',
+    name: 'Support',
+    href: '/support',
     icon: <MdOutlineContactSupport className="size-full" />,
   },
 ];
