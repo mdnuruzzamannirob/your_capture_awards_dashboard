@@ -1,41 +1,22 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { CalendarIcon, Info, Pencil } from 'lucide-react';
-import { format } from 'date-fns';
 import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
+import { Info, Pencil } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 
 const DetailsTab = ({
   contest: data,
   canEdit = true,
+  onEditClick,
 }: {
   contest: any;
   canEdit?: boolean;
+  onEditClick?: () => void;
 }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [contest] = useState(data);
-  const [formData, setFormData] = useState({
-    title: contest?.title ?? '',
-    description: contest?.description ?? '',
-    isMoneyContest: Boolean(contest?.isMoneyContest),
-    minPrize: contest?.minPrize ?? 0,
-    maxPrize: contest?.maxPrize ?? 0,
-    coin_requirement: Boolean(contest?.coin_requirement),
-    coin_required: contest?.coin_required ?? 0,
-    status: contest?.status ?? 'ACTIVE',
-    maxUploads: contest?.maxUploads ?? 4,
-    startDate: contest?.startDate ? new Date(contest.startDate) : new Date(),
-    endDate: contest?.endDate ? new Date(contest.endDate) : new Date(),
-  });
 
   const {
     day: startDay,
@@ -54,10 +35,6 @@ const DetailsTab = ({
     year: endYear,
   } = formatDateWithTime(contest?.endDate);
 
-  const handleChange = (key: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-5">
@@ -66,7 +43,7 @@ const DetailsTab = ({
         </h1>
 
         {canEdit && (
-          <Button onClick={() => setIsDialogOpen(true)} className="text-white">
+          <Button onClick={onEditClick} className="text-white">
             <Pencil /> Edit
           </Button>
         )}
@@ -174,137 +151,6 @@ const DetailsTab = ({
           </div>
         </div>
       </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 sm:max-h-[80vh] sm:max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Edit Details</DialogTitle>
-          </DialogHeader>
-          <form className="size-full overflow-y-auto">
-            <div className="flex flex-col gap-2">
-              <Label>Title</Label>
-              <Input value={formData.title} onChange={(e) => handleChange('title', e.target.value)} />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label>Description</Label>
-              <Input
-                value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-5 space-y-5">
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={formData.isMoneyContest}
-                  onCheckedChange={(val) => handleChange('isMoneyContest', val)}
-                />
-                <Label>Is money contest</Label>
-              </div>
-
-              {formData.isMoneyContest && (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <Label>Min Prize</Label>
-                    <Input
-                      type="number"
-                      value={formData.minPrize}
-                      onChange={(e) => handleChange('minPrize', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label>Max Prize</Label>
-                    <Input
-                      type="number"
-                      value={formData.maxPrize}
-                      onChange={(e) => handleChange('maxPrize', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                </>
-              )}
-
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={formData.coin_requirement}
-                  onCheckedChange={(val) => handleChange('coin_requirement', val)}
-                />
-                <Label>Coin requirement</Label>
-              </div>
-
-              {formData.coin_requirement && (
-                <div className="flex flex-col gap-2">
-                  <Label>Required coins</Label>
-                  <Input
-                    type="number"
-                    value={formData.coin_required}
-                    onChange={(e) => handleChange('coin_required', parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2">
-                <Label>Status</Label>
-                <Input value={formData.status} onChange={(e) => handleChange('status', e.target.value)} />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Max Upload</Label>
-                <Input
-                  type="number"
-                  value={formData.maxUploads}
-                  onChange={(e) => handleChange('maxUploads', parseInt(e.target.value) || 0)}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>Start Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between">
-                      {format(formData.startDate, 'PPP')}
-                      <CalendarIcon className="ml-2 size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Calendar
-                      mode="single"
-                      selected={formData.startDate}
-                      onSelect={(date) => date && handleChange('startDate', date)}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <Label>End Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="justify-between">
-                      {format(formData.endDate, 'PPP')}
-                      <CalendarIcon className="ml-2 size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0">
-                    <Calendar
-                      mode="single"
-                      selected={formData.endDate}
-                      onSelect={(date) => date && handleChange('endDate', date)}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            <div className="mt-4 flex justify-end gap-3">
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setIsDialogOpen(false)}>Save</Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

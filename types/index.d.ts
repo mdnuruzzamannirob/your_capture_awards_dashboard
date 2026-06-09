@@ -11,7 +11,7 @@ export interface SideMenu {
 
 export type ContestDetailsTabKey = 'details' | 'prizes' | 'rules' | 'rank' | 'winners';
 
-export type SupportTicketStatus = 'pending' | 'in-progress' | 'resolved' | 'closed';
+export type SupportTicketStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 export type SupportTicketPriority = 'low' | 'medium' | 'high';
 
 export interface SupportTicket {

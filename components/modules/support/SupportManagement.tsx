@@ -26,14 +26,14 @@ import { createSupportColumns } from './support-columns';
 
 const statusLabels: Record<SupportTicketStatus, string> = {
   pending: 'Pending',
-  'in-progress': 'In Progress',
+  'in_progress': 'In Progress',
   resolved: 'Resolved',
   closed: 'Closed',
 };
 
 const statusStyles: Record<SupportTicketStatus, string> = {
   pending: 'bg-yellow-500/20 text-yellow-600',
-  'in-progress': 'bg-blue-500/20 text-blue-600',
+  'in_progress': 'bg-blue-500/20 text-blue-600',
   resolved: 'bg-green-500/20 text-green-600',
   closed: 'bg-gray-500/20 text-gray-600',
 };
@@ -222,7 +222,7 @@ const SupportManagement = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
                       <SelectItem value="resolved">Resolved</SelectItem>
                       <SelectItem value="closed">Closed</SelectItem>
                     </SelectContent>
