@@ -9,7 +9,7 @@ export interface SideMenu {
   }[];
 }
 
-export type ContestDetailsTabKey = 'details' | 'winners' | 'rules' | 'prizes' | 'rank';
+export type ContestDetailsTabKey = 'details' | 'prizes' | 'rules' | 'rank' | 'winners';
 
 export type SupportTicketStatus = 'pending' | 'in-progress' | 'resolved' | 'closed';
 export type SupportTicketPriority = 'low' | 'medium' | 'high';

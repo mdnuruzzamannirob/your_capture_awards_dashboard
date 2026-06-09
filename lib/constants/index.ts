@@ -6,10 +6,10 @@ export const DEFAULT_ERROR = {
 };
 export const CONTEST_DETAILS_TABS: { key: ContestDetailsTabKey; label: string }[] = [
   { key: 'details', label: 'Details' },
-  { key: 'rules', label: 'Rules' },
   { key: 'prizes', label: 'Prizes' },
+  { key: 'rules', label: 'Rules' },
   { key: 'rank', label: 'Rank' },
-  { key: 'winners', label: 'Winner' },
+  { key: 'winners', label: 'Winners' },
 ];
 export const CREATE_CONTEST_STEPS = [
   {

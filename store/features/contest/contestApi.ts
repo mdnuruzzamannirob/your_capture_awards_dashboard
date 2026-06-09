@@ -19,6 +19,14 @@ export const contestApi = createApi({
       }),
     }),
 
+    updateContest: builder.mutation<{ data: unknown }, { id: string; body: any }>({
+      query: ({ id, body }) => ({
+        url: `/contests/${id}`,
+        method: 'PATCH',
+        body,
+      }),
+    }),
+
     getContests: builder.query<{ data: any }, { page?: number; limit?: number }>({
       query: ({ page = 1, limit = 20 }) => `/contests/all?page=${page}&limit=${limit}`,
       providesTags: (result) =>
@@ -43,6 +51,7 @@ export const contestApi = createApi({
 export const {
   useGetContestStatsQuery,
   useCreateContestMutation,
+  useUpdateContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
   useGetContestQuery,

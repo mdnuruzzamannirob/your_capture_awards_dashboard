@@ -14,7 +14,13 @@ import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
 import Image from 'next/image';
 import { GoDotFill } from 'react-icons/go';
 
-const DetailsTab = ({ contest: data }: { contest: any }) => {
+const DetailsTab = ({
+  contest: data,
+  canEdit = true,
+}: {
+  contest: any;
+  canEdit?: boolean;
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [contest] = useState(data);
   const [formData, setFormData] = useState({
@@ -59,9 +65,11 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
           <Info className="size-5" /> Details
         </h1>
 
-        <Button onClick={() => setIsDialogOpen(true)} className="text-white">
-          <Pencil /> Edit
-        </Button>
+        {canEdit && (
+          <Button onClick={() => setIsDialogOpen(true)} className="text-white">
+            <Pencil /> Edit
+          </Button>
+        )}
       </div>
 
       <div className="space-y-5 rounded-xl border p-5">
