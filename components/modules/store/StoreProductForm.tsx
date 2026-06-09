@@ -11,7 +11,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   CreateStoreProductBody,
@@ -49,7 +55,20 @@ type FormState = {
   items: BundleItemDraft[];
 };
 
-type FormErrors = Partial<Record<'title' | 'category' | 'description' | 'status' | 'quantity' | 'amount' | 'currency' | 'items', string>>;
+type FormErrors = Partial<
+  Record<
+    | 'title'
+    | 'category'
+    | 'description'
+    | 'status'
+    | 'quantity'
+    | 'amount'
+    | 'currency'
+    | 'items'
+    | 'image',
+    string
+  >
+>;
 
 const bundleTypes: StoreBundleItemType[] = ['KEY', 'BOOST', 'SWAP'];
 const emptyItem = (type: StoreBundleItemType = 'KEY'): BundleItemDraft => ({ type, quantity: 1 });
@@ -70,7 +89,7 @@ const mapInitialValues = (
     title: product?.title ?? '',
     description: product?.description ?? '',
     category,
-    quantity: category === 'BUNDLES' ? 1 : product?.quantity ?? 1,
+    quantity: category === 'BUNDLES' ? 1 : (product?.quantity ?? 1),
     amount: product?.amount ?? 0,
     currency: product?.currency ?? (category === 'BUNDLES' ? 'COINS' : 'USD'),
     status: product?.status ?? 'ACTIVE',
@@ -89,15 +108,17 @@ const schema = z.object({
   title: z.string().trim().min(1, 'Title is required.'),
   description: z.string().trim().optional(),
   category: z.enum(['COINS', 'BUNDLES']),
-  quantity: z.number().min(0, 'Quantity is required.').optional(),
-  amount: z.number().min(0, 'Amount is required.'),
+  quantity: z.number().gt(0, 'Quantity is required.').optional(),
+  amount: z.number().gt(0, 'Amount is required.'),
   currency: z.string().trim().min(1, 'Currency is required.'),
   status: z.enum(['ACTIVE', 'INACTIVE']),
-  image: z.any().nullable().optional(),
+  image: z
+    .any()
+    .refine((v) => !!v || (typeof v === 'string' && v.length > 0), 'Image is required.'),
   items: z.array(
     z.object({
       type: z.enum(['KEY', 'BOOST', 'SWAP']),
-      quantity: z.number().min(1, 'Qty is required.'),
+      quantity: z.number().gt(0, 'Qty is required.'),
     }),
   ),
 });
@@ -112,7 +133,9 @@ export default function StoreProductForm({
   isLoading = false,
 }: StoreProductFormProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<FormState>(() => mapInitialValues(initialValues, defaultCategory));
+  const [formData, setFormData] = useState<FormState>(() =>
+    mapInitialValues(initialValues, defaultCategory),
+  );
   const [errors, setErrors] = useState<FormErrors>({});
 
   const isEditMode = Boolean(initialValues);
@@ -139,7 +162,12 @@ export default function StoreProductForm({
       category: nextCategory,
       quantity: nextCategory === 'BUNDLES' ? 1 : prev.quantity || 1,
       currency: nextCategory === 'COINS' ? 'USD' : 'COINS',
-      items: nextCategory === 'BUNDLES' ? (prev.items.length ? prev.items.slice(0, 3) : [emptyItem()]) : [],
+      items:
+        nextCategory === 'BUNDLES'
+          ? prev.items.length
+            ? prev.items.slice(0, 3)
+            : [emptyItem()]
+          : [],
     }));
     setErrors((prev) => ({ ...prev, category: undefined }));
   };
@@ -150,9 +178,10 @@ export default function StoreProductForm({
       return {
         ...prev,
         image: file ?? null,
-        imagePreview: file ? URL.createObjectURL(file) : initialValues?.image ?? '',
+        imagePreview: file ? URL.createObjectURL(file) : (initialValues?.image ?? ''),
       };
     });
+    setErrors((prev) => ({ ...prev, image: undefined }));
   };
 
   useEffect(() => {
@@ -161,7 +190,9 @@ export default function StoreProductForm({
     };
   }, [formData.imagePreview]);
 
-  const availableTypes = bundleTypes.filter((type) => !formData.items.some((item) => item.type === type));
+  const availableTypes = bundleTypes.filter(
+    (type) => !formData.items.some((item) => item.type === type),
+  );
 
   const handleAddBundleItem = () => {
     if (formData.items.length >= 3 || availableTypes.length === 0) return;
@@ -274,7 +305,9 @@ export default function StoreProductForm({
                   placeholder="Write product description"
                   className="min-h-20 resize-none"
                 />
-                {errors.description && <p className="text-destructive text-xs">{errors.description}</p>}
+                {errors.description && (
+                  <p className="text-destructive text-xs">{errors.description}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -335,7 +368,9 @@ export default function StoreProductForm({
                       }}
                       required
                     />
-                    {errors.quantity && <p className="text-destructive text-xs">{errors.quantity}</p>}
+                    {errors.quantity && (
+                      <p className="text-destructive text-xs">{errors.quantity}</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="amount">Amount *</Label>
@@ -364,7 +399,9 @@ export default function StoreProductForm({
                       }}
                       required
                     />
-                    {errors.currency && <p className="text-destructive text-xs">{errors.currency}</p>}
+                    {errors.currency && (
+                      <p className="text-destructive text-xs">{errors.currency}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -529,6 +566,7 @@ export default function StoreProductForm({
                     />
                   </div>
                 </div>
+                {errors.image && <p className="text-destructive text-xs">{errors.image}</p>}
               </div>
             </div>
           </div>

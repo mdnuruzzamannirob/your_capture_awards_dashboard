@@ -18,11 +18,11 @@ import {
   useGetSupportTicketsQuery,
   useUpdateSupportTicketStatusMutation,
 } from '@/store/features/support/supportApi';
-import { createSupportColumns } from './support-columns';
 import type { SupportTicket, SupportTicketStatus } from '@/types';
 import { Calendar, Clock, Mail, Ticket, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { createSupportColumns } from './support-columns';
 
 const statusLabels: Record<SupportTicketStatus, string> = {
   pending: 'Pending',
@@ -99,21 +99,13 @@ const SupportManagement = () => {
     }
   };
 
-  const currentTicket = selectedTicket ?? tickets.find((ticket) => ticket.id === selectedTicketId) ?? null;
+  const currentTicket =
+    selectedTicket ?? tickets.find((ticket) => ticket.id === selectedTicketId) ?? null;
   const columns = createSupportColumns(handleViewTicket);
 
   return (
     <>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-end">
-          <div>
-            <p className="text-sm font-semibold">All Tickets</p>
-            <p className="text-muted-foreground text-xs">
-              Page {meta?.page ?? page} of {meta?.totalPage ?? 1} · Total {meta?.total ?? 0}
-            </p>
-          </div>
-        </div>
-
         {ticketsQuery.isError && (
           <div className="rounded-lg border p-4">
             <div className="flex items-center justify-between gap-3">
@@ -240,7 +232,9 @@ const SupportManagement = () => {
 
               <div className="rounded-lg border p-4">
                 <h4 className="mb-3 font-semibold">Message</h4>
-                <p className="text-muted-foreground whitespace-pre-wrap text-sm">{currentTicket.message}</p>
+                <p className="text-muted-foreground text-sm whitespace-pre-wrap">
+                  {currentTicket.message}
+                </p>
               </div>
 
               {currentTicket.assignedTo && (
