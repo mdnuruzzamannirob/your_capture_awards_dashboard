@@ -4,7 +4,7 @@ import { z } from 'zod';
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-/* STEP 1 — DETAILS */
+/* STEP 1 - DETAILS */
 export const contestDetailsSchema = z
   .object({
     title: z
@@ -61,15 +61,14 @@ export const contestDetailsSchema = z
     }
   });
 
-/* STEP 2 — PRIZES (Contest Meta + Money Logic) */
+/* STEP 2 - PRIZES (Coin / Money Logic) */
 export const contestPrizesSchema = z
   .object({
-    type: z.enum(['OPEN', 'PREMIUM', 'PRO']),
-
     isMoneyContest: z.coerce.boolean().default(false),
-
     minPrize: z.coerce.number().min(0).default(0),
     maxPrize: z.coerce.number().min(0).default(0),
+    coin_requirement: z.coerce.boolean().default(false),
+    coin_required: z.coerce.number().int().min(0).default(0),
   })
   .superRefine((data, ctx) => {
     if (data.isMoneyContest && data.maxPrize <= 0) {
@@ -80,16 +79,24 @@ export const contestPrizesSchema = z
       });
     }
 
-    if (data.minPrize > data.maxPrize) {
+    if (data.isMoneyContest && data.minPrize > data.maxPrize) {
       ctx.addIssue({
         path: ['minPrize'],
         code: 'custom',
         message: 'Min prize cannot exceed max prize',
       });
     }
+
+    if (data.coin_requirement && data.coin_required <= 0) {
+      ctx.addIssue({
+        path: ['coin_required'],
+        code: 'custom',
+        message: 'Coin requirement must be greater than 0',
+      });
+    }
   });
 
-/* STEP 3 — RULES */
+/* STEP 3 - RULES */
 export const contestRulesSchema = z
   .array(
     z.object({
@@ -100,7 +107,7 @@ export const contestRulesSchema = z
   )
   .min(1, 'At least one rule is required');
 
-/* STEP 4 — REWARDS (Leaderboard / Boost / Keys etc.) */
+/* STEP 4 - REWARDS (Leaderboard / Boost / Keys etc.) */
 export const contestRewardsSchema = z
   .array(
     z.object({
@@ -114,7 +121,7 @@ export const contestRewardsSchema = z
   )
   .min(1, 'At least one reward is required');
 
-/* STEP 5 — FINAL PREVIEW / SUBMIT SCHEMA */
+/* STEP 5 - FINAL PREVIEW / SUBMIT SCHEMA */
 export const contestFinalSchema = z.object({
   details: contestDetailsSchema,
   prizes: contestPrizesSchema,

@@ -36,10 +36,11 @@ const CreateContest: React.FC = () => {
         endDate: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
       prizes: {
-        type: 'OPEN',
         isMoneyContest: false,
         minPrize: 0,
         maxPrize: 0,
+        coin_requirement: false,
+        coin_required: 0,
       },
       rules: [{ name: 'General Rule', description: 'General Rule', icon: 'Info' }],
       rewards: [
@@ -57,13 +58,13 @@ const CreateContest: React.FC = () => {
 
   const { watch, setValue, getValues, trigger } = form;
   const watchRecurring = watch('details.recurring');
-  const watchType = watch('prizes.type');
   const watchIsMoney = watch('prizes.isMoneyContest');
 
   useEffect(() => {
     if (!watchRecurring) {
-      setValue('details.recurringType', undefined);
-      void trigger('details.recurringType');
+      if (getValues('details.recurringType') !== undefined) {
+        setValue('details.recurringType', undefined);
+      }
     } else {
       const val = getValues('details.recurringType');
       if (!val) setValue('details.recurringType', 'DAILY');
@@ -71,19 +72,18 @@ const CreateContest: React.FC = () => {
   }, [watchRecurring, getValues, setValue, trigger]);
 
   useEffect(() => {
-    if (watchType === 'OPEN' && watchIsMoney) {
-      setValue('prizes.isMoneyContest', false);
-    }
-    if ((watchType === 'PRO' || watchType === 'PREMIUM') && !watchIsMoney) {
-      setValue('prizes.isMoneyContest', true);
-    }
-
     if (!watchIsMoney) {
-      setValue('prizes.minPrize', 0);
-      setValue('prizes.maxPrize', 0);
-      void trigger(['prizes.minPrize', 'prizes.maxPrize']);
+      const currentMinPrize = getValues('prizes.minPrize');
+      const currentMaxPrize = getValues('prizes.maxPrize');
+      const currentCoinRequirement = getValues('prizes.coin_requirement');
+      const currentCoinRequired = getValues('prizes.coin_required');
+
+      if (currentMinPrize !== 0) setValue('prizes.minPrize', 0);
+      if (currentMaxPrize !== 0) setValue('prizes.maxPrize', 0);
+      if (currentCoinRequirement !== false) setValue('prizes.coin_requirement', false);
+      if (currentCoinRequired !== 0) setValue('prizes.coin_required', 0);
     }
-  }, [watchType, watchIsMoney, setValue, trigger]);
+  }, [watchIsMoney, getValues, setValue]);
 
   const goToStep = async (targetIndex: number) => {
     if (targetIndex === currentStep) return;
@@ -104,7 +104,7 @@ const CreateContest: React.FC = () => {
         'details.startDate',
         'details.endDate',
       ],
-      1: ['prizes.type', 'prizes.isMoneyContest', 'prizes.minPrize', 'prizes.maxPrize'],
+      1: ['prizes.isMoneyContest', 'prizes.minPrize', 'prizes.maxPrize', 'prizes.coin_requirement', 'prizes.coin_required'],
       2: ['rules'],
       3: ['rewards'],
       4: [],
@@ -159,10 +159,11 @@ const CreateContest: React.FC = () => {
     formData.append('maxUploads', String(details.maxUploads));
     if (details.banner) formData.append('banner', details.banner);
 
-    formData.append('type', prizes.type);
     formData.append('isMoneyContest', String(prizes.isMoneyContest));
     formData.append('minPrize', String(prizes.minPrize));
     formData.append('maxPrize', String(prizes.maxPrize));
+    formData.append('coin_requirement', String(prizes.coin_requirement));
+    formData.append('coin_required', String(prizes.coin_required));
 
     rules.forEach((rule, idx) => {
       formData.append(`rules[${idx}][name]`, rule.name);

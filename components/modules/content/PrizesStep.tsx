@@ -1,81 +1,122 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { DollarSign } from 'lucide-react';
+import { Coins } from 'lucide-react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 
 const PrizesStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const watchType = form.watch('prizes.type');
   const watchIsMoney = form.watch('prizes.isMoneyContest');
-
-  useEffect(() => {
-    if (watchType === 'OPEN' && watchIsMoney) {
-      form.setValue('prizes.isMoneyContest', false);
-    }
-    if ((watchType === 'PRO' || watchType === 'PREMIUM') && !watchIsMoney) {
-      form.setValue('prizes.isMoneyContest', true);
-    }
-  }, [watchType, watchIsMoney, form]);
+  const watchCoinRequirement = form.watch('prizes.coin_requirement');
 
   return (
     <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
-      <h2 className="flex items-center gap-2 border-b border-gray-700 pb-4 text-lg font-semibold">
-        <DollarSign className="size-5 text-amber-400" /> Prizes
+      <h2 className="flex items-center gap-2 border-b border-gray-800 pb-4 text-lg font-semibold">
+        <Coins className="size-5 text-amber-400" /> Money & Coins
       </h2>
 
-      <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
+      <div className="space-y-4">
         <FormField
           control={form.control}
-          name="prizes.type"
+          name="prizes.isMoneyContest"
           render={({ field }) => (
-            <FormItem className="col-span-1">
-              <FormLabel>Contest type</FormLabel>
+            <FormItem className="flex items-center gap-2 space-y-0 rounded-lg border border-gray-800 p-4">
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="h-11! w-full">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="OPEN">Open</SelectItem>
-                    <SelectItem value="PRO">Pro</SelectItem>
-                    <SelectItem value="PREMIUM">Premium</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
+              <div className="space-y-1">
+                <FormLabel className="mt-0!">Is money contest</FormLabel>
+                <p className="text-xs text-gray-400">Enable this when the contest uses money.</p>
+              </div>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* <div className="col-span-full rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-100">
-          {watchType === 'OPEN'
-            ? 'Open contests cannot offer money prizes; min/max prize disabled.'
-            : 'Money contest enabled; set the min and max prize amounts.'}
-        </div> */}
+        {watchIsMoney && (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="prizes.minPrize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Min prize</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="Enter minimum prize"
+                      name={field.name}
+                      ref={field.ref}
+                      value={field.value ?? ''}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <div className="col-span-full grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="prizes.maxPrize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max prize</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      placeholder="Enter maximum prize"
+                      name={field.name}
+                      ref={field.ref}
+                      value={field.value ?? ''}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        <FormField
+          control={form.control}
+          name="prizes.coin_requirement"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2 space-y-0 rounded-lg border border-gray-800 p-4">
+              <FormControl>
+                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+              <div className="space-y-1">
+                <FormLabel className="mt-0!">Coin requirement</FormLabel>
+                <p className="text-xs text-gray-400">Show coin input only if this is enabled.</p>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {watchCoinRequirement && (
           <FormField
             control={form.control}
-            name="prizes.minPrize"
+            name="prizes.coin_required"
             render={({ field }) => (
-              <FormItem className="col-span-1">
-                <FormLabel>Min prize (₹)</FormLabel>
+              <FormItem>
+                <FormLabel>Required coins</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min={0}
-                    disabled={!watchIsMoney}
+                    placeholder="Enter required coins"
                     name={field.name}
                     ref={field.ref}
                     value={field.value ?? ''}
@@ -88,36 +129,7 @@ const PrizesStep = () => {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="prizes.maxPrize"
-            render={({ field }) => (
-              <FormItem className="col-span-1">
-                <FormLabel>Max prize (₹)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    disabled={!watchIsMoney}
-                    name={field.name}
-                    ref={field.ref}
-                    value={field.value ?? ''}
-                    onChange={(e) =>
-                      field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* <div className="flex items-center gap-2 text-sm text-gray-400">
-          <Award className="size-4 text-emerald-400" />
-          isMoneyContest is derived from type (OPEN = false, PRO/PREMIUM = true).
-        </div> */}
+        )}
       </div>
     </div>
   );

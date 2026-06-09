@@ -8,7 +8,6 @@ import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 const ReviewStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const values = form.getValues();
-  const isMoney = values.prizes.isMoneyContest;
 
   return (
     <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
@@ -32,14 +31,15 @@ const ReviewStep = () => {
         </div>
 
         <div className="rounded-lg border border-gray-800 p-4">
-          <p className="font-semibold">Prizes</p>
-          <p>Type: {values.prizes.type}</p>
-          <p>Money contest: {isMoney ? 'Yes' : 'No'}</p>
-          {isMoney && (
+          <p className="font-semibold">Coins</p>
+          <p>Money contest: {values.prizes.isMoneyContest ? 'Yes' : 'No'}</p>
+          {values.prizes.isMoneyContest && (
             <p>
-              Prize Range: ₹{values.prizes.minPrize} - ₹{values.prizes.maxPrize}
+              Prize Range: {values.prizes.minPrize} - {values.prizes.maxPrize}
             </p>
           )}
+          <p>Coin requirement: {values.prizes.coin_requirement ? 'Yes' : 'No'}</p>
+          {values.prizes.coin_requirement && <p>Required coins: {values.prizes.coin_required}</p>}
         </div>
 
         <div className="rounded-lg border border-gray-800 p-4">
@@ -47,7 +47,7 @@ const ReviewStep = () => {
           <ul className="list-disc space-y-1 pl-5 text-gray-300">
             {values.rules.map((rule, idx) => (
               <li key={idx}>
-                {rule.name} — {rule.description}
+                {rule.name} - {rule.description}
               </li>
             ))}
           </ul>

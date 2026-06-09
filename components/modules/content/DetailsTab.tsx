@@ -5,14 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { CalendarIcon, Info, Pencil } from 'lucide-react';
@@ -25,20 +18,17 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [contest] = useState(data);
   const [formData, setFormData] = useState({
-    title: contest?.title,
-    description: 'Lorem, ipsum dolor sit ',
-    moneyContest: true,
-    vote: 7500,
-    participant: 55,
-    status: 'ACTIVE',
-    mode: 'Solo',
-    maxUpload: 4,
-    minPrize: 200,
-    maxPrize: 4000,
-    startDate: '2025-01-16',
-    startTime: '10:00',
-    endDate: '2025-01-20',
-    endTime: '18:00',
+    title: contest?.title ?? '',
+    description: contest?.description ?? '',
+    isMoneyContest: Boolean(contest?.isMoneyContest),
+    minPrize: contest?.minPrize ?? 0,
+    maxPrize: contest?.maxPrize ?? 0,
+    coin_requirement: Boolean(contest?.coin_requirement),
+    coin_required: contest?.coin_required ?? 0,
+    status: contest?.status ?? 'ACTIVE',
+    maxUploads: contest?.maxUploads ?? 4,
+    startDate: contest?.startDate ? new Date(contest.startDate) : new Date(),
+    endDate: contest?.endDate ? new Date(contest.endDate) : new Date(),
   });
 
   const {
@@ -48,7 +38,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
     month: startMonth,
     timeZone: startTimeZone,
     year: startYear,
-  } = formatDateWithTime(contest.startDate);
+  } = formatDateWithTime(contest?.startDate);
   const {
     day: endDay,
     hours: endHours,
@@ -56,14 +46,10 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
     month: endMonth,
     timeZone: endTimeZone,
     year: endYear,
-  } = formatDateWithTime(contest.endDate);
+  } = formatDateWithTime(contest?.endDate);
 
   const handleChange = (key: string, value: any) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleSubmit = () => {
-    setIsDialogOpen(false);
   };
 
   return (
@@ -89,7 +75,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
               height={40}
               className="size-10 min-w-10 overflow-hidden rounded-full bg-gray-900 object-cover"
             />
-            <div className="">
+            <div>
               <h3 className="font-medium">{contest?.creator?.fullName}</h3>
               <p className="text-muted-foreground text-sm">{contest?.creator?.email}</p>
             </div>
@@ -106,10 +92,30 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
           <p className="text-base">{contest?.description}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-5 text-sm">
+        <div className="grid grid-cols-2 gap-5 text-sm md:grid-cols-3">
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Money Contest</h1>
             <p className="text-base font-semibold">{contest?.isMoneyContest ? 'Yes' : 'No'}</p>
+          </div>
+          {contest?.isMoneyContest && (
+            <>
+              <div className="space-y-1">
+                <h1 className="text-muted-foreground font-medium">Min Prize</h1>
+                <p className="text-base font-semibold">{contest?.minPrize ?? 0}</p>
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-muted-foreground font-medium">Max Prize</h1>
+                <p className="text-base font-semibold">{contest?.maxPrize ?? 0}</p>
+              </div>
+            </>
+          )}
+          <div className="space-y-1">
+            <h1 className="text-muted-foreground font-medium">Coin Requirement</h1>
+            <p className="text-base font-semibold">{contest?.coin_requirement ? 'Yes' : 'No'}</p>
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-muted-foreground font-medium">Required Coins</h1>
+            <p className="text-base font-semibold">{contest?.coin_required ?? 0}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Vote</h1>
@@ -120,7 +126,7 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
             <p className="text-base font-semibold">N/A</p>
           </div>
           <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Status</h1>{' '}
+            <h1 className="text-muted-foreground font-medium">Status</h1>
             <button
               className={cn(
                 'text-foreground flex cursor-default items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
@@ -133,25 +139,12 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
             </button>
           </div>
           <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Mode</h1>
-            <p className="text-base font-semibold">{contest?.mode}</p>
-          </div>
-          <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Max Upload</h1>
-            <p className="text-base font-semibold">{contest.maxUploads}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Min Prize</h1>
-            <p className="text-base font-semibold">${contest.minPrize ?? 0}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Max Prize</h1>
-            <p className="text-base font-semibold">${contest.maxPrize ?? 0}</p>
+            <p className="text-base font-semibold">{contest?.maxUploads}</p>
           </div>
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">Start Date</h1>
             <p className="text-base font-semibold">
-              {' '}
               {startDay} {startMonth} {startYear}, {startHours}:{startMinutes}{' '}
               <span className="text-muted-foreground text-xs font-medium">{startTimeZone}</span>
             </p>
@@ -159,7 +152,6 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
           <div className="space-y-1">
             <h1 className="text-muted-foreground font-medium">End Date</h1>
             <p className="text-base font-semibold">
-              {' '}
               {endDay} {endMonth} {endYear}, {endHours}:{endMinutes}{' '}
               <span className="text-muted-foreground text-xs font-medium">{endTimeZone}</span>
             </p>
@@ -181,16 +173,11 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
             <DialogTitle>Edit Details</DialogTitle>
           </DialogHeader>
           <form className="size-full overflow-y-auto">
-            {/* Title */}
             <div className="flex flex-col gap-2">
               <Label>Title</Label>
-              <Input
-                value={formData.title}
-                onChange={(e) => handleChange('title', e.target.value)}
-              />
+              <Input value={formData.title} onChange={(e) => handleChange('title', e.target.value)} />
             </div>
 
-            {/* Description */}
             <div className="flex flex-col gap-2">
               <Label>Description</Label>
               <Input
@@ -200,60 +187,68 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-5 space-y-5">
-              {/* Money Contest */}
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={formData.isMoneyContest}
+                  onCheckedChange={(val) => handleChange('isMoneyContest', val)}
+                />
+                <Label>Is money contest</Label>
+              </div>
+
+              {formData.isMoneyContest && (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <Label>Min Prize</Label>
+                    <Input
+                      type="number"
+                      value={formData.minPrize}
+                      onChange={(e) => handleChange('minPrize', parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label>Max Prize</Label>
+                    <Input
+                      type="number"
+                      value={formData.maxPrize}
+                      onChange={(e) => handleChange('maxPrize', parseInt(e.target.value) || 0)}
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={formData.coin_requirement}
+                  onCheckedChange={(val) => handleChange('coin_requirement', val)}
+                />
+                <Label>Coin requirement</Label>
+              </div>
+
+              {formData.coin_requirement && (
+                <div className="flex flex-col gap-2">
+                  <Label>Required coins</Label>
+                  <Input
+                    type="number"
+                    value={formData.coin_required}
+                    onChange={(e) => handleChange('coin_required', parseInt(e.target.value) || 0)}
+                  />
+                </div>
+              )}
+
               <div className="flex flex-col gap-2">
-                <Label>Money Contest</Label>
-                <Switch
-                  checked={formData.moneyContest}
-                  onCheckedChange={(val) => handleChange('moneyContest', val)}
+                <Label>Status</Label>
+                <Input value={formData.status} onChange={(e) => handleChange('status', e.target.value)} />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Label>Max Upload</Label>
+                <Input
+                  type="number"
+                  value={formData.maxUploads}
+                  onChange={(e) => handleChange('maxUploads', parseInt(e.target.value) || 0)}
                 />
               </div>
 
-              {/* Status */}
-              <div className="flex flex-col gap-2">
-                <Label>Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(val) => handleChange('status', val)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                    <SelectItem value="INACTIVE">INACTIVE</SelectItem>
-                    <SelectItem value="CLOSED">CLOSED</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Mode */}
-              <div className="flex flex-col gap-2">
-                <Label>Mode</Label>
-                <Select value={formData.mode} onValueChange={(val) => handleChange('mode', val)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select mode" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Solo">Solo</SelectItem>
-                    <SelectItem value="Team">Team</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Numbers */}
-              {['maxUpload', 'participant', 'minPrize', 'maxPrize'].map((key) => (
-                <div key={key} className="flex flex-col gap-2">
-                  <Label>{key}</Label>
-                  <Input
-                    type="number"
-                    value={formData[key as keyof typeof formData] as number}
-                    onChange={(e) => handleChange(key, parseInt(e.target.value) || 0)}
-                  />
-                </div>
-              ))}
-
-              {/* Dates */}
               <div className="flex flex-col gap-2">
                 <Label>Start Date</Label>
                 <Popover>
@@ -266,19 +261,11 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
                   <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
-                      selected={contest.startDate}
-                      onSelect={(date) => handleChange('startDate', date)}
+                      selected={formData.startDate}
+                      onSelect={(date) => date && handleChange('startDate', date)}
                     />
                   </PopoverContent>
                 </Popover>
-              </div>
-              <div className="flex flex-col gap-2">
-                <Label>Start Time</Label>
-                <Input
-                  type="time"
-                  value={formData.startTime}
-                  onChange={(e) => handleChange('startTime', e.target.value)}
-                />
               </div>
 
               <div className="flex flex-col gap-2">
@@ -290,31 +277,22 @@ const DetailsTab = ({ contest: data }: { contest: any }) => {
                       <CalendarIcon className="ml-2 size-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-fit p-0">
+                  <PopoverContent className="p-0">
                     <Calendar
                       mode="single"
-                      selected={contest.endDate}
-                      onSelect={(date) => handleChange('endDate', date)}
+                      selected={formData.endDate}
+                      onSelect={(date) => date && handleChange('endDate', date)}
                     />
                   </PopoverContent>
                 </Popover>
               </div>
-              <div className="flex flex-col gap-2">
-                <Label>End Time</Label>
-                <Input
-                  type="time"
-                  value={formData.endTime}
-                  onChange={(e) => handleChange('endTime', e.target.value)}
-                />
-              </div>
             </div>
 
-            {/* Actions */}
             <div className="mt-4 flex justify-end gap-3">
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmit}>Save</Button>
+              <Button onClick={() => setIsDialogOpen(false)}>Save</Button>
             </div>
           </form>
         </DialogContent>

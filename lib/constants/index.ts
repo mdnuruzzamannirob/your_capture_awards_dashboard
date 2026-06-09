@@ -18,7 +18,7 @@ export const CREATE_CONTEST_STEPS = [
     icon: 'FileText',
     fields: [],
   },
-  { id: 1, title: 'Prizes', icon: 'DollarSign', fields: [] },
+  { id: 1, title: 'Money & Coins', icon: 'Coins', fields: [] },
   { id: 2, title: 'Rules', icon: 'Scale', fields: [] },
   { id: 3, title: 'Rewards', icon: 'Gift', fields: [] },
   { id: 4, title: 'Review', icon: 'ClipboardCheck', fields: [] },
