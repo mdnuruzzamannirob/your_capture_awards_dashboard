@@ -20,11 +20,7 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
       return pageIndex * pageSize + row.index + 1;
     },
   },
-  {
-    accessorKey: 'username',
-    header: 'USERNAME',
-    cell: ({ row }) => <div>{row.getValue('username') || '--'}</div>,
-  },
+
   {
     id: 'name',
     header: 'NAME',
@@ -42,11 +38,6 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
     cell: ({ row }) => <div>{row.getValue('email')}</div>,
   },
 
-  {
-    accessorKey: 'country',
-    header: 'COUNTRY',
-    cell: ({ row }) => <div>{row.getValue('country') || '--'}</div>,
-  },
   {
     accessorKey: 'role',
     header: 'ROLE',

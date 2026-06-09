@@ -3,7 +3,6 @@
 import Title from '@/components/common/Title';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetDashboardOverviewQuery } from '@/store/features/dashboard/dashboardApi';
 import {
   CreditCard,
@@ -18,7 +17,6 @@ import { useMemo } from 'react';
 import {
   Bar,
   BarChart,
-  CartesianGrid,
   Cell,
   Legend,
   Line,
@@ -82,6 +80,94 @@ const getErrorMessage = (error: unknown) => {
 
   return 'Failed to load dashboard overview.';
 };
+
+/* ─────────────────────────── Skeleton ─────────────────────────── */
+
+const DashboardSkeleton = () => (
+  <div className="space-y-5">
+    {/* Stats Grid */}
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <Card key={i} className="py-4">
+          <CardContent className="flex items-center gap-4 p-6">
+            <div className="bg-muted size-12 animate-pulse rounded-lg" />
+            <div className="space-y-2">
+              <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+              <div className="bg-muted h-7 w-32 animate-pulse rounded" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
+    {/* Revenue + User Growth */}
+    <div className="grid gap-5 lg:grid-cols-2">
+      {Array.from({ length: 2 }).map((_, i) => (
+        <Card key={i}>
+          <CardHeader>
+            <div className="bg-muted h-5 w-40 animate-pulse rounded" />
+            <div className="bg-muted h-3 w-56 animate-pulse rounded" />
+          </CardHeader>
+          <CardContent>
+            <div className="bg-muted h-[300px] w-full animate-pulse rounded-lg" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
+    {/* Member Ratio + Contest Status */}
+    <div className="grid gap-5 lg:grid-cols-3">
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <div className="bg-muted h-5 w-48 animate-pulse rounded" />
+          <div className="bg-muted h-3 w-40 animate-pulse rounded" />
+        </CardHeader>
+        <CardContent>
+          <div className="bg-muted h-[300px] w-full animate-pulse rounded-lg" />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="bg-muted h-5 w-36 animate-pulse rounded" />
+          <div className="bg-muted h-3 w-44 animate-pulse rounded" />
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <div className="bg-muted size-[200px] animate-pulse rounded-full" />
+        </CardContent>
+      </Card>
+    </div>
+
+    {/* Recent Contests */}
+    <Card>
+      <CardHeader>
+        <div className="bg-muted h-5 w-36 animate-pulse rounded" />
+        <div className="bg-muted h-3 w-52 animate-pulse rounded" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex items-center justify-between rounded-lg border p-4">
+              <div className="space-y-2">
+                <div className="bg-muted h-4 w-48 animate-pulse rounded" />
+                <div className="flex items-center gap-4">
+                  <div className="bg-muted h-3 w-28 animate-pulse rounded" />
+                  <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="bg-muted h-3 w-24 animate-pulse rounded" />
+                <div className="bg-muted h-5 w-16 animate-pulse rounded-full" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
+
+/* ─────────────────────────── Dashboard ─────────────────────────── */
 
 const Dashboard = () => {
   const { data, isLoading, isFetching, isError, error } = useGetDashboardOverviewQuery();
@@ -191,173 +277,170 @@ const Dashboard = () => {
         </Card>
       )}
 
-      {(isLoading || isFetching) && (
-        <Card>
-          <CardContent className="text-muted-foreground flex items-center gap-2 p-6 text-sm">
-            <Spinner className="size-4" /> Loading dashboard overview...
-          </CardContent>
-        </Card>
-      )}
+      {isLoading || isFetching ? (
+        <DashboardSkeleton />
+      ) : (
+        <>
+          {/* Stats Grid */}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <Card key={stat.title} className="py-4">
+                  <CardContent className="flex items-center gap-4 p-6">
+                    <div
+                      className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
+                    >
+                      <Icon className={`size-6 ${stat.color}`} />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
+                      <h3 className="text-2xl font-bold">{stat.value}</h3>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {stats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.title} className="py-4">
-              <CardContent className="flex items-center gap-4 p-6">
-                <div
-                  className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
-                >
-                  <Icon className={`size-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
-                </div>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue by Type</CardTitle>
+                <CardDescription>Monthly subscription, store, and contest revenue</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={revenueData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => currency.format(value)} />
+                    <Legend />
+                    <Bar dataKey="subscription" fill="#0ea5e9" name="Subscription" />
+                    <Bar dataKey="store" fill="#f59e0b" name="Store" />
+                    <Bar dataKey="contest" fill="#8b5cf6" name="Contest" />
+                  </BarChart>
+                </ResponsiveContainer>
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue by Type</CardTitle>
-            <CardDescription>Monthly subscription, store, and contest revenue</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => currency.format(value)} />
-                <Legend />
-                <Bar dataKey="subscription" fill="#0ea5e9" name="Subscription" />
-                <Bar dataKey="store" fill="#f59e0b" name="Store" />
-                <Bar dataKey="contest" fill="#8b5cf6" name="Contest" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Growth</CardTitle>
-            <CardDescription>Monthly growth from API user history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={growthData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="users"
-                  stroke="#2563eb"
-                  strokeWidth={2}
-                  name="Users"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
-            <CardDescription>Month-wise membership split</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={memberRatioData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
-                <Legend />
-                <Bar dataKey="premium" fill="#14b8a6" name="Premium" />
-                <Bar dataKey="pro" fill="#f97316" name="Pro" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Contest Status</CardTitle>
-            <CardDescription>Running, upcoming, and completed contests</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={contestDistribution}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={(entry) => `${entry.name}: ${entry.value}`}
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {contestDistribution.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Contests</CardTitle>
-          <CardDescription>Latest contests from dashboard overview</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {(overview?.recentContests ?? []).map((contest) => (
-              <div
-                key={contest.id}
-                className="flex items-center justify-between rounded-lg border p-4"
-              >
-                <div className="space-y-1">
-                  <h4 className="font-semibold">{contest.title}</h4>
-                  <div className="text-muted-foreground flex items-center gap-4 text-xs">
-                    <span className="flex items-center gap-1">
-                      <Users className="size-3" />
-                      {numberFormatter.format(contest.participantCount)} participants
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ImageIcon className="size-3" />
-                      {numberFormatter.format(contest.totalPhoto)} photos
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <p className="text-muted-foreground text-xs">{formatDate(contest.createdAt)}</p>
-                  <Badge variant={getStatusVariant(contest.status)}>{contest.status}</Badge>
-                </div>
-              </div>
-            ))}
-
-            {!overview?.recentContests?.length && (
-              <p className="text-muted-foreground py-4 text-center text-sm">
-                No recent contests found.
-              </p>
-            )}
+            <Card>
+              <CardHeader>
+                <CardTitle>User Growth</CardTitle>
+                <CardDescription>Monthly growth from API user history</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={growthData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="users"
+                      stroke="#2563eb"
+                      strokeWidth={2}
+                      name="Users"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="grid gap-5 lg:grid-cols-3">
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
+                <CardDescription>Month-wise membership split</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={memberRatioData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                    <Legend />
+                    <Bar dataKey="premium" fill="#14b8a6" name="Premium" />
+                    <Bar dataKey="pro" fill="#f97316" name="Pro" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Contest Status</CardTitle>
+                <CardDescription>Running, upcoming, and completed contests</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-center justify-center">
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={contestDistribution}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(entry) => `${entry.name}: ${entry.value}`}
+                      outerRadius={80}
+                      dataKey="value"
+                    >
+                      {contestDistribution.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Contests</CardTitle>
+              <CardDescription>Latest contests from dashboard overview</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {(overview?.recentContests ?? []).map((contest) => (
+                  <div
+                    key={contest.id}
+                    className="flex items-center justify-between rounded-lg border p-4"
+                  >
+                    <div className="space-y-1">
+                      <h4 className="font-semibold">{contest.title}</h4>
+                      <div className="text-muted-foreground flex items-center gap-4 text-xs">
+                        <span className="flex items-center gap-1">
+                          <Users className="size-3" />
+                          {numberFormatter.format(contest.participantCount)} participants
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <ImageIcon className="size-3" />
+                          {numberFormatter.format(contest.totalPhoto)} photos
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <p className="text-muted-foreground text-xs">
+                        {formatDate(contest.createdAt)}
+                      </p>
+                      <Badge variant={getStatusVariant(contest.status)}>{contest.status}</Badge>
+                    </div>
+                  </div>
+                ))}
+
+                {!overview?.recentContests?.length && (
+                  <p className="text-muted-foreground py-4 text-center text-sm">
+                    No recent contests found.
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </section>
   );
 };

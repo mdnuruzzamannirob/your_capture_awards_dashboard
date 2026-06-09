@@ -127,7 +127,7 @@ const UserTable = () => {
                 </div>
                 <div className="">
                   <h1 className="text-lg font-semibold">{formatDisplayName(selectedRow)}</h1>
-                  <p className="text-sm"> {selectedRow?.username && '@' + selectedRow?.username}</p>
+                  {/* username removed per request */}
                 </div>
               </div>
               <h1 className="my-3 flex items-center gap-2 font-semibold">
@@ -139,11 +139,9 @@ const UserTable = () => {
                   { title: 'Email', value: selectedRow?.email },
                   { title: 'Phone', value: selectedRow?.phone },
                   { title: 'Location', value: selectedRow?.location },
-                  { title: 'Country', value: selectedRow?.country },
                   { title: 'Role', value: selectedRow?.role },
                   { title: 'Level', value: selectedRow?.currentLevel },
                   { title: 'Voting Power', value: selectedRow?.voting_power },
-                  { title: 'Subscription Plan', value: selectedRow?.purchased_plan || 'FREE' },
                   { title: 'Status', value: selectedRow?.isActive ? 'ACTIVE' : 'INACTIVE' },
                 ].map((item, index) => (
                   <div key={index} className={cn('flex items-center', index !== 0 && 'border-t')}>

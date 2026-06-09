@@ -19,6 +19,21 @@ export const userApi = createApi({
       { page?: number; limit?: number }
     >({
       query: ({ page = 1, limit = 20 }) => `/users?page=${page}&limit=${limit}`,
+      transformResponse: (response: any) => {
+        // Transform the API response to match GetUsersResponse structure
+        return {
+          ...response,
+          data: {
+            users: response.data,
+            total: response.meta?.total || 0,
+            page: response.meta?.page || 1,
+            limit: response.meta?.limit || 20,
+            totalPage: response.meta?.totalPage,
+            hasNextPage: response.meta?.hasNextPage,
+            hasPreviousPage: response.meta?.hasPreviousPage,
+          },
+        };
+      },
       providesTags: (result) =>
         result
           ? [

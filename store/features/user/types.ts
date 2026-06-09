@@ -13,10 +13,15 @@ export interface User {
   location?: string | null;
   country?: string | null;
   isActive: boolean;
+  isBlocked?: boolean;
+  isDeleted?: boolean;
   is_blocked?: boolean;
+  socialId?: string | null;
+  socialProvider?: string | null;
+  customerId?: string | null;
   currentLevel: number;
   voting_power: number;
-  purchased_plan?: string;
+  purchased_plan?: string | null;
 }
 
 export interface GetUsersResponse {
@@ -24,6 +29,20 @@ export interface GetUsersResponse {
   total: number;
   page: number;
   limit: number;
+  totalPage?: number;
+  hasNextPage?: boolean;
+  hasPreviousPage?: boolean;
+}
+
+export interface GetUsersApiResponse {
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 }
 
 export interface ApiSuccessResponse<T> {
