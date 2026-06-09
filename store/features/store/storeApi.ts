@@ -4,11 +4,33 @@ import {
   ApiSuccessResponse,
   CreateStoreProductBody,
   StoreProduct,
-  StoreProductsListData,
-  StoreProductType,
   StoreStats,
+  StoreProductsResponse,
   UpdateStoreProductBody,
 } from './types';
+
+const toFormData = (body: CreateStoreProductBody) => {
+  const formData = new FormData();
+
+  formData.append('title', body.title);
+  formData.append('category', body.category);
+  formData.append('quantity', String(body.quantity));
+  formData.append('amount', String(body.amount));
+  formData.append('currency', body.currency);
+  formData.append('status', body.status);
+  formData.append('description', body.description ?? '');
+
+  if (body.image instanceof File) {
+    formData.append('image', body.image);
+  }
+
+  body.items.forEach((item, index) => {
+    formData.append(`items[${index}][type]`, item.type);
+    formData.append(`items[${index}][quantity]`, String(item.quantity));
+  });
+
+  return formData;
+};
 
 export const storeApi = createApi({
   reducerPath: 'storeApi',
@@ -21,10 +43,13 @@ export const storeApi = createApi({
     }),
 
     getStoreProducts: builder.query<
-      ApiSuccessResponse<StoreProductsListData>,
-      { type: StoreProductType; page?: number; limit?: number }
+      StoreProductsResponse,
+      { category?: 'COINS' | 'BUNDLES'; page?: number; limit?: number }
     >({
-      query: ({ type, page = 1, limit = 10 }) => `/stores?type=${type}&page=${page}&limit=${limit}`,
+      query: ({ category, page = 1, limit = 10 }) => ({
+        url: `/stores?page=${page}&limit=${limit}${category ? `&category=${category}` : ''}`,
+        method: 'GET',
+      }),
       providesTags: [{ type: 'StoreProducts', id: 'LIST' }],
     }),
 
@@ -32,7 +57,7 @@ export const storeApi = createApi({
       query: (body) => ({
         url: '/stores',
         method: 'POST',
-        body,
+        body: toFormData(body),
       }),
       invalidatesTags: [
         { type: 'StoreProducts', id: 'LIST' },
@@ -44,7 +69,7 @@ export const storeApi = createApi({
       query: ({ productId, ...body }) => ({
         url: `/stores/${productId}`,
         method: 'PATCH',
-        body,
+        body: toFormData(body),
       }),
       invalidatesTags: [
         { type: 'StoreProducts', id: 'LIST' },

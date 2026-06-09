@@ -1,4 +1,5 @@
-export type StoreProductType = 'KEY' | 'BOOST' | 'SWAP';
+export type StoreProductCategory = 'COINS' | 'BUNDLES';
+export type StoreBundleItemType = 'KEY' | 'BOOST' | 'SWAP';
 export type StoreProductStatus = 'ACTIVE' | 'INACTIVE' | 'DISCONTINUED';
 
 export interface StoreStats {
@@ -9,9 +10,14 @@ export interface StoreStats {
   totalActiveProducts: number;
 }
 
+export interface StoreBundleItem {
+  type: StoreBundleItemType;
+  quantity: number;
+}
+
 export interface StoreProduct {
   id: string;
-  productType: StoreProductType;
+  category: StoreProductCategory;
   title: string;
   quantity: number;
   amount: number;
@@ -20,6 +26,9 @@ export interface StoreProduct {
   description: string | null;
   image: string | null;
   status: StoreProductStatus;
+  items: StoreBundleItem[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface StoreListMeta {
@@ -29,19 +38,21 @@ export interface StoreListMeta {
   totalPages: number;
 }
 
-export interface StoreProductsListData {
-  meta: StoreListMeta;
-  data: StoreProduct[];
+export interface StoreProductFormItem {
+  type: StoreBundleItemType;
+  quantity: number;
 }
 
 export interface CreateStoreProductBody {
   title: string;
   description: string;
-  type: StoreProductType;
+  category: StoreProductCategory;
   quantity: number;
   amount: number;
   currency: string;
   status: StoreProductStatus;
+  image?: File | string | null;
+  items: StoreProductFormItem[];
 }
 
 export interface UpdateStoreProductBody extends CreateStoreProductBody {
@@ -52,4 +63,11 @@ export interface ApiSuccessResponse<T> {
   success: boolean;
   message: string;
   data: T;
+}
+
+export interface StoreProductsResponse {
+  success: boolean;
+  message: string;
+  meta: StoreListMeta;
+  data: StoreProduct[];
 }

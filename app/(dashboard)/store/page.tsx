@@ -4,7 +4,6 @@ import Title from '@/components/common/Title';
 import StoreProductManagement from '@/components/modules/store/StoreProductManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetStoreStatsQuery } from '@/store/features/store/storeApi';
 import { DollarSign, Package, ShoppingCart, TrendingUp } from 'lucide-react';
 
@@ -31,7 +30,7 @@ const currency = new Intl.NumberFormat('en-US', {
 });
 
 export default function StorePage() {
-  const { data, isLoading, isFetching, isError, error, refetch } = useGetStoreStatsQuery();
+  const { data, isError, error, refetch } = useGetStoreStatsQuery();
   const statsData = data?.data;
 
   const stats = [
@@ -71,12 +70,6 @@ export default function StorePage() {
         title="Store Management"
         description="Create and manage store items with live product and revenue stats."
       />
-
-      {(isLoading || isFetching) && (
-        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
-          <Spinner className="size-4" /> Loading store stats...
-        </div>
-      )}
 
       {isError && (
         <Card>

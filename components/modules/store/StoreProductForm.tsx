@@ -21,12 +21,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import {
   CreateStoreProductBody,
+  StoreBundleItemType,
   StoreProduct,
+  StoreProductCategory,
   StoreProductStatus,
-  StoreProductType,
 } from '@/store/features/store/types';
-import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { Check, ImageIcon, Plus, Trash2, Upload } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface StoreProductFormProps {
   onSubmit: (data: CreateStoreProductBody) => Promise<void>;
@@ -34,28 +35,57 @@ interface StoreProductFormProps {
   title?: string;
   description?: string;
   initialValues?: StoreProduct;
+  defaultCategory?: StoreProductCategory;
   isLoading?: boolean;
 }
 
-const defaultValues: CreateStoreProductBody = {
-  title: '',
-  description: '',
-  type: 'KEY',
-  quantity: 1,
-  amount: 0,
-  currency: 'USD',
-  status: 'ACTIVE',
+type BundleItemDraft = { type: StoreBundleItemType; quantity: number };
+
+type FormState = {
+  title: string;
+  description: string;
+  category: StoreProductCategory;
+  quantity: number;
+  amount: number;
+  currency: string;
+  status: StoreProductStatus;
+  image: File | null;
+  imagePreview: string;
+  items: BundleItemDraft[];
 };
 
-const mapInitialValues = (product?: StoreProduct): CreateStoreProductBody => ({
-  title: product?.title ?? defaultValues.title,
-  description: product?.description ?? defaultValues.description,
-  type: product?.productType ?? defaultValues.type,
-  quantity: product?.quantity ?? defaultValues.quantity,
-  amount: product?.amount ?? defaultValues.amount,
-  currency: product?.currency ?? defaultValues.currency,
-  status: product?.status ?? defaultValues.status,
-});
+const bundleTypes: StoreBundleItemType[] = ['KEY', 'BOOST', 'SWAP'];
+const emptyItem = (type: StoreBundleItemType = 'KEY'): BundleItemDraft => ({ type, quantity: 1 });
+
+const normalizeItems = (items?: StoreProduct['items']) => {
+  const existing = items ?? [];
+  if (!existing.length) return [emptyItem()];
+  return existing.slice(0, 3).map((i) => ({ type: i.type, quantity: i.quantity }));
+};
+
+const mapInitialValues = (
+  product?: StoreProduct,
+  fallbackCategory: StoreProductCategory = 'COINS',
+): FormState => {
+  const category = product?.category ?? fallbackCategory;
+  return {
+    title: product?.title ?? '',
+    description: product?.description ?? '',
+    category,
+    quantity: category === 'BUNDLES' ? 1 : (product?.quantity ?? 1),
+    amount: product?.amount ?? 0,
+    currency: product?.currency ?? (category === 'BUNDLES' ? 'COINS' : 'USD'),
+    status: product?.status ?? 'ACTIVE',
+    image: null,
+    imagePreview: product?.image ?? '',
+    items: category === 'BUNDLES' ? normalizeItems(product?.items) : [],
+  };
+};
+
+const statusOptions: Array<{ value: StoreProductStatus; label: string }> = [
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'INACTIVE', label: 'Inactive' },
+];
 
 export default function StoreProductForm({
   onSubmit,
@@ -63,28 +93,92 @@ export default function StoreProductForm({
   title,
   description,
   initialValues,
+  defaultCategory = 'COINS',
   isLoading = false,
 }: StoreProductFormProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<CreateStoreProductBody>(mapInitialValues(initialValues));
+  const [formData, setFormData] = useState<FormState>(() =>
+    mapInitialValues(initialValues, defaultCategory),
+  );
+
+  const isEditMode = Boolean(initialValues);
+  const isBundle = formData.category === 'BUNDLES';
+
+  const formTitle = useMemo(
+    () => title || (isEditMode ? 'Update Store Product' : 'Create Store Product'),
+    [isEditMode, title],
+  );
+
+  const resetForm = (nextCategory = defaultCategory) =>
+    setFormData(mapInitialValues(initialValues, nextCategory));
 
   const handleClose = () => {
     setOpen(false);
-    setFormData(mapInitialValues(initialValues));
+    resetForm();
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await onSubmit(formData);
+  const handleCategoryChange = (next: StoreProductCategory) => {
+    setFormData((prev) => {
+      if (prev.category === next) return prev;
+      return {
+        ...prev,
+        category: next,
+        quantity: next === 'BUNDLES' ? 1 : prev.quantity || 1,
+        currency: next === 'COINS' ? 'USD' : 'COINS',
+        items:
+          next === 'BUNDLES' ? (prev.items.length ? prev.items.slice(0, 3) : [emptyItem()]) : [],
+      };
+    });
+  };
+
+  const handleImageChange = (file?: File | null) => {
+    setFormData((prev) => {
+      if (prev.imagePreview.startsWith('blob:')) URL.revokeObjectURL(prev.imagePreview);
+      return {
+        ...prev,
+        image: file ?? null,
+        imagePreview: file ? URL.createObjectURL(file) : (initialValues?.image ?? ''),
+      };
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      if (formData.imagePreview.startsWith('blob:')) URL.revokeObjectURL(formData.imagePreview);
+    };
+  }, [formData.imagePreview]);
+
+  const availableTypes = bundleTypes.filter(
+    (type) => !formData.items.some((item) => item.type === type),
+  );
+
+  const handleAddBundleItem = () => {
+    if (formData.items.length >= 3 || availableTypes.length === 0) return;
+    setFormData((prev) => ({ ...prev, items: [...prev.items, emptyItem(availableTypes[0])] }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await onSubmit({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      quantity: isBundle ? 1 : formData.quantity,
+      amount: formData.amount,
+      currency: formData.currency,
+      status: formData.status,
+      image: formData.image,
+      items: isBundle ? formData.items : [],
+    });
     handleClose();
   };
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-        if (nextOpen) setFormData(mapInitialValues(initialValues));
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (next) resetForm(initialValues?.category ?? defaultCategory);
       }}
     >
       <DialogTrigger asChild>
@@ -92,126 +186,323 @@ export default function StoreProductForm({
           {!triggerLabel && <Plus className="size-4" />} {triggerLabel || 'Add New Item'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{title || 'Create Store Product'}</DialogTitle>
+
+      <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 max-sm:p-3 sm:max-h-[85vh] sm:max-w-[500px]">
+        {/* Fixed header */}
+        <DialogHeader className="shrink-0">
+          <DialogTitle>{formTitle}</DialogTitle>
           <DialogDescription>
-            {description || 'Create a new purchasable store item.'}
+            {description || 'Create or update a coin pack or bundle offer.'}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(event) => setFormData((prev) => ({ ...prev, title: event.target.value }))}
-              placeholder="e.g. Bucket of Keys"
-              required
-            />
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          {/* Scrollable body */}
+          <div className="min-h-0 flex-1 overflow-y-auto pb-3">
+            <div className="space-y-4 py-1 pr-1">
+              {/* ── Row 1: Title + Category ── */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="title">Title *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                    placeholder="e.g. Yc Max Pro"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="category">Category *</Label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(v) => handleCategoryChange(v as StoreProductCategory)}
+                    disabled={isEditMode}
+                  >
+                    <SelectTrigger id="category" className="h-11! w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="COINS">COINS</SelectItem>
+                      <SelectItem value="BUNDLES">BUNDLES</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* ── Row 2: Description ── */}
+              <div className="space-y-1.5">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
+                  placeholder="Write product description"
+                  className="min-h-20 resize-none"
+                />
+              </div>
+
+              {/* ── Row 3: Status ── */}
+              <div className="space-y-1.5">
+                <Label>Status *</Label>
+                <div className="inline-flex w-full rounded-lg border p-1">
+                  {statusOptions.map((opt) => {
+                    const active = formData.status === opt.value;
+                    return (
+                      <Button
+                        key={opt.value}
+                        type="button"
+                        variant={active ? 'default' : 'ghost'}
+                        size="sm"
+                        className="flex-1 gap-1.5"
+                        onClick={() => setFormData((p) => ({ ...p, status: opt.value }))}
+                      >
+                        {active && <Check className="size-3.5" />}
+                        {opt.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* ── Row 4: Pricing — adapts to category ── */}
+              {isBundle ? (
+                /* BUNDLES: single Coin field only */
+                <div className="space-y-1.5">
+                  <Label htmlFor="amount">Coin *</Label>
+                  <Input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={formData.amount}
+                    onChange={(e) =>
+                      setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }))
+                    }
+                    required
+                  />
+                </div>
+              ) : (
+                /* COINS: Quantity + Amount + Currency */
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="quantity">Quantity *</Label>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min={0}
+                      value={formData.quantity}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, quantity: Number(e.target.value) || 0 }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="amount">Amount *</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      value={formData.amount}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="currency">Currency *</Label>
+                    <Input
+                      id="currency"
+                      value={formData.currency}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, currency: e.target.value.toUpperCase() }))
+                      }
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* ── Row 5: Bundle Items (BUNDLES only) ── */}
+              {isBundle && (
+                <div className="space-y-3 rounded-xl border p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium">Bundle Items</p>
+                      <p className="text-muted-foreground text-xs">
+                        Up to 3 — KEY, BOOST, and SWAP can each appear once.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddBundleItem}
+                      disabled={formData.items.length >= 3 || availableTypes.length === 0}
+                    >
+                      <Plus className="mr-1 size-3.5" />
+                      Add item
+                    </Button>
+                  </div>
+
+                  {/* Column headers */}
+                  <div className="grid grid-cols-[1fr_100px_36px] gap-3 px-1">
+                    <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Type
+                    </span>
+                    <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                      Qty
+                    </span>
+                    <span />
+                  </div>
+
+                  {/* Items */}
+                  <div className="space-y-2">
+                    {formData.items.map((item, index) => {
+                      const options: StoreBundleItemType[] = [
+                        item.type,
+                        ...availableTypes.filter((t) => t !== item.type),
+                      ];
+                      return (
+                        <div
+                          key={`${item.type}-${index}`}
+                          className="grid grid-cols-[1fr_100px_36px] items-center gap-3"
+                        >
+                          <Select
+                            value={item.type}
+                            onValueChange={(v) =>
+                              setFormData((prev) => {
+                                const next = [...prev.items];
+                                next[index] = { ...next[index], type: v as StoreBundleItemType };
+                                return { ...prev, items: next };
+                              })
+                            }
+                          >
+                            <SelectTrigger className="h-11! w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.map((opt) => (
+                                <SelectItem key={opt} value={opt}>
+                                  {opt}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          <Input
+                            type="number"
+                            min={1}
+                            value={item.quantity}
+                            onChange={(e) =>
+                              setFormData((prev) => {
+                                const next = [...prev.items];
+                                next[index] = {
+                                  ...next[index],
+                                  quantity: Number(e.target.value) || 1,
+                                };
+                                return { ...prev, items: next };
+                              })
+                            }
+                            placeholder="Qty"
+                            required
+                          />
+
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive size-9 shrink-0"
+                            onClick={() =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                items: prev.items.filter((_, i) => i !== index),
+                              }))
+                            }
+                            disabled={formData.items.length <= 1}
+                          >
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ── Row 6: Image (compact horizontal bar) ── */}
+              <div className="space-y-1.5">
+                <Label>Image</Label>
+                <div className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
+                  {/* Thumbnail / placeholder icon */}
+                  <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-md border">
+                    {formData.imagePreview ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={formData.imagePreview}
+                        alt="Product"
+                        className="size-10 rounded-md object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="text-muted-foreground size-5" />
+                    )}
+                  </div>
+
+                  {/* Text */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm leading-tight font-medium">
+                      {formData.imagePreview ? 'Image selected' : 'No image selected'}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      JPG, PNG or WEBP — displayed on the product card.
+                    </p>
+                  </div>
+
+                  {/* Upload / Remove */}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {formData.imagePreview && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="text-muted-foreground hover:text-destructive text-xs"
+                        onClick={() => handleImageChange(null)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                    <label htmlFor="image-upload" className="cursor-pointer">
+                      <Button type="button" variant="outline" size="sm" asChild>
+                        <span>
+                          <Upload className="mr-1.5 size-3.5" />
+                          Upload
+                        </span>
+                      </Button>
+                    </label>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(event) =>
-                setFormData((prev) => ({ ...prev, description: event.target.value }))
-              }
-              placeholder="Write product description"
-              className="min-h-24"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type *</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, type: value as StoreProductType }))
-                }
-              >
-                <SelectTrigger id="type">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="KEY">KEY</SelectItem>
-                  <SelectItem value="BOOST">BOOST</SelectItem>
-                  <SelectItem value="SWAP">SWAP</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status *</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, status: value as StoreProductStatus }))
-                }
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ACTIVE">ACTIVE</SelectItem>
-                  <SelectItem value="INACTIVE">INACTIVE</SelectItem>
-                  <SelectItem value="DISCONTINUED">DISCONTINUED</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity *</Label>
-              <Input
-                id="quantity"
-                type="number"
-                min={0}
-                value={formData.quantity}
-                onChange={(event) =>
-                  setFormData((prev) => ({ ...prev, quantity: Number(event.target.value) || 0 }))
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="amount">Amount *</Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.01"
-                min={0}
-                value={formData.amount}
-                onChange={(event) =>
-                  setFormData((prev) => ({ ...prev, amount: Number(event.target.value) || 0 }))
-                }
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="currency">Currency *</Label>
-              <Input
-                id="currency"
-                value={formData.currency}
-                onChange={(event) =>
-                  setFormData((prev) => ({ ...prev, currency: event.target.value.toUpperCase() }))
-                }
-                required
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2 pt-3">
-            <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Saving...' : initialValues ? 'Update Product' : 'Create Product'}
-            </Button>
+          {/* Sticky footer */}
+          <div className="flex shrink-0 gap-2 border-t pt-4">
+            {' '}
             <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading} className="flex-1">
+              {isLoading ? 'Saving…' : isEditMode ? 'Update Product' : 'Create Product'}
             </Button>
           </div>
         </form>

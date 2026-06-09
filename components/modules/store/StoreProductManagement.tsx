@@ -21,42 +21,12 @@ import {
 import {
   CreateStoreProductBody,
   StoreProduct,
-  StoreProductType,
+  StoreProductCategory,
 } from '@/store/features/store/types';
-import { Key, RefreshCw, Trash2, Zap } from 'lucide-react';
+import { Coins, Package, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import StoreProductForm from './StoreProductForm';
-
-const typeIcons: Record<StoreProductType, React.ComponentType<{ className?: string }>> = {
-  KEY: Key,
-  BOOST: Zap,
-  SWAP: RefreshCw,
-};
-
-const typeColors: Record<
-  StoreProductType,
-  { bg: string; border: string; icon: string; text: string }
-> = {
-  KEY: {
-    bg: 'bg-amber-50 dark:bg-amber-950/20',
-    border: 'border-amber-200 dark:border-amber-800/30',
-    icon: 'text-amber-600 dark:text-amber-400',
-    text: 'text-amber-700 dark:text-amber-300',
-  },
-  BOOST: {
-    bg: 'bg-purple-50 dark:bg-purple-950/20',
-    border: 'border-purple-200 dark:border-purple-800/30',
-    icon: 'text-purple-600 dark:text-purple-400',
-    text: 'text-purple-700 dark:text-purple-300',
-  },
-  SWAP: {
-    bg: 'bg-cyan-50 dark:bg-cyan-950/20',
-    border: 'border-cyan-200 dark:border-cyan-800/30',
-    icon: 'text-cyan-600 dark:text-cyan-400',
-    text: 'text-cyan-700 dark:text-cyan-300',
-  },
-};
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
@@ -74,13 +44,32 @@ const getErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const categoryMeta: Record<StoreProductCategory, { label: string; icon: typeof Coins }> = {
+  COINS: { label: 'Coin packs', icon: Coins },
+  BUNDLES: { label: 'Bundles', icon: Package },
+};
+
+const categoryStyles: Record<
+  StoreProductCategory,
+  { tab: string; badge: string }
+> = {
+  COINS: {
+    tab: 'data-[state=active]:bg-orange-500 data-[state=active]:text-white',
+    badge: 'bg-orange-500/15 text-orange-300 border-orange-500/20',
+  },
+  BUNDLES: {
+    tab: 'data-[state=active]:bg-slate-100 data-[state=active]:text-slate-950',
+    badge: 'bg-slate-100/10 text-slate-100 border-white/10',
+  },
+};
+
 const StoreProductManagement = () => {
-  const [filter, setFilter] = useState<StoreProductType>('KEY');
+  const [category, setCategory] = useState<StoreProductCategory>('COINS');
   const [page, setPage] = useState(1);
   const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(null);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useGetStoreProductsQuery({
-    type: filter,
+    category,
     page,
     limit: 10,
   });
@@ -89,15 +78,16 @@ const StoreProductManagement = () => {
   const [updateStoreProduct, { isLoading: isUpdating }] = useUpdateStoreProductMutation();
   const [deleteStoreProduct, { isLoading: isDeleting }] = useDeleteStoreProductMutation();
 
-  const products = data?.data?.data ?? [];
-  const meta = data?.data?.meta;
+  const products = data?.data ?? [];
+  const meta = data?.meta;
+  const categoryLabel = categoryMeta[category].label;
+  const totalCount = meta?.total ?? 0;
 
   const handleCreateProduct = async (payload: CreateStoreProductBody) => {
     try {
       const response = await createStoreProduct(payload).unwrap();
       toast.success(response.message || 'Product created successfully.');
       setPage(1);
-      refetch();
     } catch (mutationError) {
       toast.error(getErrorMessage(mutationError, 'Failed to create product.'));
       throw mutationError;
@@ -108,7 +98,6 @@ const StoreProductManagement = () => {
     try {
       const response = await updateStoreProduct({ productId, ...payload }).unwrap();
       toast.success(response.message || 'Product updated successfully.');
-      refetch();
     } catch (mutationError) {
       toast.error(getErrorMessage(mutationError, 'Failed to update product.'));
       throw mutationError;
@@ -125,72 +114,99 @@ const StoreProductManagement = () => {
       if (products.length === 1 && page > 1) {
         setPage((prev) => Math.max(1, prev - 1));
       }
-      refetch();
     } catch (mutationError) {
       toast.error(getErrorMessage(mutationError, 'Failed to delete product.'));
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-2 max-sm:flex-col-reverse">
-        <div className="bg-background/70 flex items-center rounded-lg border p-1">
-          <Button
-            type="button"
-            variant={filter === 'KEY' ? 'default' : 'ghost'}
-            onClick={() => {
-              setFilter('KEY');
-              setPage(1);
-            }}
-            className="gap-2"
-          >
-            <Key className="size-4" />
-            Keys
-          </Button>
-          <Button
-            type="button"
-            variant={filter === 'BOOST' ? 'default' : 'ghost'}
-            onClick={() => {
-              setFilter('BOOST');
-              setPage(1);
-            }}
-            className="gap-2"
-          >
-            <Zap className="size-4" />
-            Boosts
-          </Button>
-          <Button
-            type="button"
-            variant={filter === 'SWAP' ? 'default' : 'ghost'}
-            onClick={() => {
-              setFilter('SWAP');
-              setPage(1);
-            }}
-            className="gap-2"
-          >
-            <RefreshCw className="size-4" />
-            Swaps
-          </Button>
-        </div>
-        <StoreProductForm onSubmit={handleCreateProduct} isLoading={isCreating} />
+  const renderSkeleton = () => (
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Card key={index} className="overflow-hidden border-white/10 bg-slate-900/90 p-0">
+            <CardContent className="space-y-4 p-5 text-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-2">
+                  <div className="bg-white/10 h-4 w-32 animate-pulse rounded" />
+                  <div className="bg-white/10 h-5 w-18 animate-pulse rounded-full" />
+                </div>
+                <div className="bg-white/10 h-5 w-16 animate-pulse rounded-full" />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                <div className="space-y-2">
+                  <div className="bg-white/10 h-3 w-10 animate-pulse rounded" />
+                  <div className="bg-white/10 h-4 w-20 animate-pulse rounded" />
+                </div>
+                <div className="space-y-2 text-right">
+                  <div className="bg-white/10 ml-auto h-3 w-10 animate-pulse rounded" />
+                  <div className="bg-white/10 ml-auto h-4 w-12 animate-pulse rounded" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="bg-white/10 h-3 w-16 animate-pulse rounded" />
+                <div className="bg-white/10 h-9 w-full animate-pulse rounded-md" />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <div className="bg-white/10 h-9 flex-1 animate-pulse rounded-md" />
+                <div className="bg-white/10 h-9 w-24 animate-pulse rounded-md" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {(isLoading || isFetching) && (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <Card key={index} className="p-0">
-              <CardContent className="space-y-4 p-5">
-                <div className="bg-muted h-5 w-1/2 animate-pulse rounded" />
-                <div className="bg-muted h-20 animate-pulse rounded" />
-                <div className="bg-muted h-9 animate-pulse rounded" />
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex items-center justify-between gap-3">
+        <div className="bg-white/10 h-4 w-40 animate-pulse rounded" />
+        <div className="flex items-center gap-2">
+          <div className="bg-white/10 h-9 w-24 animate-pulse rounded" />
+          <div className="bg-white/10 h-9 w-20 animate-pulse rounded" />
         </div>
-      )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-end">
+        <div className="inline-flex rounded-lg border border-white/10 bg-slate-950 p-1">
+          {Object.entries(categoryMeta).map(([value, meta]) => {
+            const Icon = meta.icon;
+            const isActive = category === value;
+            const styles = categoryStyles[value as StoreProductCategory];
+
+            return (
+              <Button
+                key={value}
+                type="button"
+                variant="ghost"
+                data-state={isActive ? 'active' : 'inactive'}
+                onClick={() => {
+                  setCategory(value as StoreProductCategory);
+                  setPage(1);
+                }}
+                className={`gap-2 ${styles.tab}`}
+              >
+                <Icon className="size-4" />
+                {meta.label}
+              </Button>
+            );
+          })}
+        </div>
+
+        <StoreProductForm
+          onSubmit={handleCreateProduct}
+          isLoading={isCreating}
+          defaultCategory={category}
+        />
+      </div>
+
+      {(isLoading || isFetching) && renderSkeleton()}
 
       {isError && (
-        <Card>
+        <Card className="border-white/10 bg-slate-900/90">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <p className="text-destructive text-sm">
               {getErrorMessage(error, 'Failed to load store products.')}
@@ -204,68 +220,67 @@ const StoreProductManagement = () => {
 
       {!isLoading && !isFetching && !isError && (
         <>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-start">
+            <div>
+              <p className="text-sm font-semibold">{categoryLabel}</p>
+              <p className="text-muted-foreground text-xs">
+                Page {meta?.page ?? page} of {meta?.totalPages ?? 1} · Total {totalCount}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => {
-              const Icon = typeIcons[product.productType];
-              const colors = typeColors[product.productType];
+              const styles = categoryStyles[product.category];
 
               return (
-                <Card key={product.id} className="p-0">
+                <Card key={product.id} className="overflow-hidden p-0">
                   <CardContent className="space-y-4 p-5 text-sm">
-                    <div className="flex items-start justify-between">
-                      <h3 className="text-foreground leading-tight font-semibold">
-                        {product.title}
-                      </h3>
-                      <p
-                        className={`inline-flex h-fit items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase ${
-                          product.status === 'ACTIVE'
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                            : product.status === 'INACTIVE'
-                              ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
-                              : 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400'
-                        }`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            product.status === 'ACTIVE'
-                              ? 'bg-emerald-500'
-                              : product.status === 'INACTIVE'
-                                ? 'bg-zinc-400'
-                                : 'bg-red-500'
-                          }`}
-                        />
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <h3 className="text-foreground leading-tight font-semibold">{product.title}</h3>
+                      </div>
+                      <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
                         {product.status}
-                      </p>
+                      </span>
                     </div>
 
-                    <div className="bg-muted/30 grid grid-cols-2 gap-3 rounded-lg border p-3">
+                    <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/30 p-3">
                       <div className="space-y-0.5">
                         <p className="text-muted-foreground text-xs">Price</p>
-                        <p className="text-foreground font-semibold">
-                          {product.currency} {product.amount.toFixed(2)}
+                        <p className="font-semibold">
+                          {product.category === 'COINS'
+                            ? `${product.amount} ${product.currency}`
+                            : `${product.amount} coins`}
                         </p>
                       </div>
-
                       <div className="space-y-0.5 text-right">
                         <p className="text-muted-foreground text-xs">Stock</p>
-                        <p className="text-foreground font-semibold">{product.quantity} units</p>
-                      </div>
-
-                      <div className="space-y-0.5">
-                        <p className="text-muted-foreground text-xs">Category</p>
-                        <div
-                          className={`flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium ${colors.bg} ${colors.border}`}
-                        >
-                          <Icon className={`size-3.5 ${colors.icon}`} />
-                          <span className={colors.text}>{product.productType}</span>
-                        </div>
-                      </div>
-
-                      <div className="space-y-0.5 text-right">
-                        <p className="text-muted-foreground text-xs">Type</p>
-                        <p className="text-foreground font-medium">{product.productType}</p>
+                        <p className="font-semibold">{product.quantity}</p>
                       </div>
                     </div>
+
+                    {product.category === 'BUNDLES' ? (
+                      <div className="space-y-2">
+                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                          Bundle items
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {product.items?.length ? (
+                            product.items.map((item) => (
+                              <span
+                                key={`${product.id}-${item.type}`}
+                                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs"
+                              >
+                                {item.type} x {item.quantity}
+                              </span>
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground text-xs">No items configured.</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
 
                     <p className="text-muted-foreground line-clamp-2 text-xs">
                       {product.description || 'No description available.'}
@@ -275,16 +290,12 @@ const StoreProductManagement = () => {
                       <StoreProductForm
                         triggerLabel="Edit"
                         title="Update Store Product"
-                        description="Update selected product details."
+                        description="Update this store offer."
                         initialValues={product}
                         onSubmit={(payload) => handleUpdateProduct(product.id, payload)}
                         isLoading={isUpdating}
                       />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={() => setDeletingProduct(product)}
-                      >
+                      <Button type="button" variant="destructive" onClick={() => setDeletingProduct(product)}>
                         <Trash2 className="size-4" /> Delete
                       </Button>
                     </div>
@@ -295,16 +306,16 @@ const StoreProductManagement = () => {
           </div>
 
           {!products.length && (
-            <Card>
-              <CardContent className="text-muted-foreground py-10 text-center text-sm">
-                No products found for {filter}.
+            <Card className="border-white/10 bg-slate-900/90">
+              <CardContent className="py-10 text-center text-sm text-muted-foreground">
+                No products found for {categoryLabel}.
               </CardContent>
             </Card>
           )}
 
           <div className="flex items-center justify-between gap-3">
             <p className="text-muted-foreground text-sm">
-              Page {meta?.page ?? page} of {meta?.totalPages ?? 1} • Total {meta?.total ?? 0}
+              Page {meta?.page ?? page} of {meta?.totalPages ?? 1} · Total {totalCount}
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -333,9 +344,8 @@ const StoreProductManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Product</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete{' '}
-              <span className="font-semibold">{deletingProduct?.title}</span>? This action cannot be
-              undone.
+              Are you sure you want to delete <span className="font-semibold">{deletingProduct?.title}</span>?
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex items-center gap-2">
