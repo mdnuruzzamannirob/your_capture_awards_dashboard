@@ -3,6 +3,7 @@
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 import { Table } from '@tanstack/react-table';
 import { Settings2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +15,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function DataTableViewOptions<TData>({ table }: { table: Table<TData> }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  // Render nothing on the server to avoid Radix-generated id hydration mismatches
+  if (!mounted) return null;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

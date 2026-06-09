@@ -1,4 +1,5 @@
 import { baseQuery } from '@/store/baseQuery';
+import { dashboardApi } from '@/store/features/dashboard/dashboardApi';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import {
   ApiSuccessResponse,
@@ -12,7 +13,7 @@ import {
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery,
-  tagTypes: ['Users', 'User'],
+  tagTypes: ['Users', 'User', 'DashboardUserStats'],
   endpoints: (builder) => ({
     getUsers: builder.query<
       ApiSuccessResponse<GetUsersResponse>,
@@ -57,7 +58,20 @@ export const userApi = createApi({
       invalidatesTags: (result, error, { userId }) => [
         { type: 'User', id: userId },
         { type: 'Users', id: 'LIST' },
+        // Ensure dashboard user stats are invalidated so counts refresh
+        { type: 'DashboardUserStats', id: 'SINGLE' },
       ],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Explicitly invalidate dashboard stats from the dashboardApi instance
+          dispatch(
+            dashboardApi.util.invalidateTags([{ type: 'DashboardUserStats', id: 'SINGLE' }]),
+          );
+        } catch {
+          // ignore
+        }
+      },
     }),
 
     updateUserProfile: builder.mutation<ApiSuccessResponse<User>, UpdateProfileBody>({

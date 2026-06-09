@@ -3,12 +3,11 @@
 import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
 import { Card, CardContent } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetDashboardUserStatsQuery } from '@/store/features/dashboard/dashboardApi';
 import { ShieldCheck, UserCheck, Users, UserX } from 'lucide-react';
 
 const UsersPage = () => {
-  const { data, isLoading, isFetching } = useGetDashboardUserStatsQuery();
+  const { data } = useGetDashboardUserStatsQuery();
   const statsData = data?.data;
 
   const stats = [
@@ -70,12 +69,6 @@ const UsersPage = () => {
           );
         })}
       </div>
-
-      {(isLoading || isFetching) && (
-        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
-          <Spinner className="size-4" /> Refreshing user stats...
-        </div>
-      )}
 
       {/* Users Table */}
       <UserTable />
