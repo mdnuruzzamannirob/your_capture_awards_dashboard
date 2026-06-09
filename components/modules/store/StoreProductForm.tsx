@@ -11,13 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   CreateStoreProductBody,
@@ -28,6 +22,7 @@ import {
 } from '@/store/features/store/types';
 import { Check, ImageIcon, Plus, Trash2, Upload } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { z } from 'zod';
 
 interface StoreProductFormProps {
   onSubmit: (data: CreateStoreProductBody) => Promise<void>;
@@ -54,6 +49,8 @@ type FormState = {
   items: BundleItemDraft[];
 };
 
+type FormErrors = Partial<Record<'title' | 'category' | 'description' | 'status' | 'quantity' | 'amount' | 'currency' | 'items', string>>;
+
 const bundleTypes: StoreBundleItemType[] = ['KEY', 'BOOST', 'SWAP'];
 const emptyItem = (type: StoreBundleItemType = 'KEY'): BundleItemDraft => ({ type, quantity: 1 });
 
@@ -68,11 +65,12 @@ const mapInitialValues = (
   fallbackCategory: StoreProductCategory = 'COINS',
 ): FormState => {
   const category = product?.category ?? fallbackCategory;
+
   return {
     title: product?.title ?? '',
     description: product?.description ?? '',
     category,
-    quantity: category === 'BUNDLES' ? 1 : (product?.quantity ?? 1),
+    quantity: category === 'BUNDLES' ? 1 : product?.quantity ?? 1,
     amount: product?.amount ?? 0,
     currency: product?.currency ?? (category === 'BUNDLES' ? 'COINS' : 'USD'),
     status: product?.status ?? 'ACTIVE',
@@ -87,6 +85,23 @@ const statusOptions: Array<{ value: StoreProductStatus; label: string }> = [
   { value: 'INACTIVE', label: 'Inactive' },
 ];
 
+const schema = z.object({
+  title: z.string().trim().min(1, 'Title is required.'),
+  description: z.string().trim().optional(),
+  category: z.enum(['COINS', 'BUNDLES']),
+  quantity: z.number().min(0, 'Quantity is required.').optional(),
+  amount: z.number().min(0, 'Amount is required.'),
+  currency: z.string().trim().min(1, 'Currency is required.'),
+  status: z.enum(['ACTIVE', 'INACTIVE']),
+  image: z.any().nullable().optional(),
+  items: z.array(
+    z.object({
+      type: z.enum(['KEY', 'BOOST', 'SWAP']),
+      quantity: z.number().min(1, 'Qty is required.'),
+    }),
+  ),
+});
+
 export default function StoreProductForm({
   onSubmit,
   triggerLabel,
@@ -97,9 +112,8 @@ export default function StoreProductForm({
   isLoading = false,
 }: StoreProductFormProps) {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<FormState>(() =>
-    mapInitialValues(initialValues, defaultCategory),
-  );
+  const [formData, setFormData] = useState<FormState>(() => mapInitialValues(initialValues, defaultCategory));
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const isEditMode = Boolean(initialValues);
   const isBundle = formData.category === 'BUNDLES';
@@ -109,26 +123,25 @@ export default function StoreProductForm({
     [isEditMode, title],
   );
 
-  const resetForm = (nextCategory = defaultCategory) =>
+  const resetForm = (nextCategory = defaultCategory) => {
     setFormData(mapInitialValues(initialValues, nextCategory));
+    setErrors({});
+  };
 
   const handleClose = () => {
     setOpen(false);
     resetForm();
   };
 
-  const handleCategoryChange = (next: StoreProductCategory) => {
-    setFormData((prev) => {
-      if (prev.category === next) return prev;
-      return {
-        ...prev,
-        category: next,
-        quantity: next === 'BUNDLES' ? 1 : prev.quantity || 1,
-        currency: next === 'COINS' ? 'USD' : 'COINS',
-        items:
-          next === 'BUNDLES' ? (prev.items.length ? prev.items.slice(0, 3) : [emptyItem()]) : [],
-      };
-    });
+  const handleCategoryChange = (nextCategory: StoreProductCategory) => {
+    setFormData((prev) => ({
+      ...prev,
+      category: nextCategory,
+      quantity: nextCategory === 'BUNDLES' ? 1 : prev.quantity || 1,
+      currency: nextCategory === 'COINS' ? 'USD' : 'COINS',
+      items: nextCategory === 'BUNDLES' ? (prev.items.length ? prev.items.slice(0, 3) : [emptyItem()]) : [],
+    }));
+    setErrors((prev) => ({ ...prev, category: undefined }));
   };
 
   const handleImageChange = (file?: File | null) => {
@@ -137,7 +150,7 @@ export default function StoreProductForm({
       return {
         ...prev,
         image: file ?? null,
-        imagePreview: file ? URL.createObjectURL(file) : (initialValues?.image ?? ''),
+        imagePreview: file ? URL.createObjectURL(file) : initialValues?.image ?? '',
       };
     });
   };
@@ -148,9 +161,7 @@ export default function StoreProductForm({
     };
   }, [formData.imagePreview]);
 
-  const availableTypes = bundleTypes.filter(
-    (type) => !formData.items.some((item) => item.type === type),
-  );
+  const availableTypes = bundleTypes.filter((type) => !formData.items.some((item) => item.type === type));
 
   const handleAddBundleItem = () => {
     if (formData.items.length >= 3 || availableTypes.length === 0) return;
@@ -159,7 +170,8 @@ export default function StoreProductForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await onSubmit({
+
+    const payload = {
       title: formData.title,
       description: formData.description,
       category: formData.category,
@@ -169,6 +181,24 @@ export default function StoreProductForm({
       status: formData.status,
       image: formData.image,
       items: isBundle ? formData.items : [],
+    };
+
+    const parsed = schema.safeParse(payload);
+    if (!parsed.success) {
+      const nextErrors: FormErrors = {};
+      parsed.error.issues.forEach((issue) => {
+        const key = issue.path[0] as keyof FormErrors | undefined;
+        if (key && !nextErrors[key]) nextErrors[key] = issue.message;
+      });
+      if (isBundle && formData.items.length < 1) nextErrors.items = 'Add at least one bundle item.';
+      setErrors(nextErrors);
+      return;
+    }
+
+    await onSubmit({
+      ...payload,
+      quantity: isBundle ? 1 : payload.quantity,
+      items: isBundle ? payload.items : [],
     });
     handleClose();
   };
@@ -188,7 +218,6 @@ export default function StoreProductForm({
       </DialogTrigger>
 
       <DialogContent className="flex max-h-[95vh] max-w-[95vw] flex-col overflow-hidden border-2 max-sm:p-3 sm:max-h-[85vh] sm:max-w-[500px]">
-        {/* Fixed header */}
         <DialogHeader className="shrink-0">
           <DialogTitle>{formTitle}</DialogTitle>
           <DialogDescription>
@@ -197,20 +226,22 @@ export default function StoreProductForm({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          {/* Scrollable body */}
           <div className="min-h-0 flex-1 overflow-y-auto pb-3">
             <div className="space-y-4 py-1 pr-1">
-              {/* ── Row 1: Title + Category ── */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="title">Title *</Label>
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                    onChange={(e) => {
+                      setFormData((p) => ({ ...p, title: e.target.value }));
+                      setErrors((prev) => ({ ...prev, title: undefined }));
+                    }}
                     placeholder="e.g. Yc Max Pro"
                     required
                   />
+                  {errors.title && <p className="text-destructive text-xs">{errors.title}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="category">Category *</Label>
@@ -227,22 +258,25 @@ export default function StoreProductForm({
                       <SelectItem value="BUNDLES">BUNDLES</SelectItem>
                     </SelectContent>
                   </Select>
+                  {errors.category && <p className="text-destructive text-xs">{errors.category}</p>}
                 </div>
               </div>
 
-              {/* ── Row 2: Description ── */}
               <div className="space-y-1.5">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData((p) => ({ ...p, description: e.target.value }))}
+                  onChange={(e) => {
+                    setFormData((p) => ({ ...p, description: e.target.value }));
+                    setErrors((prev) => ({ ...prev, description: undefined }));
+                  }}
                   placeholder="Write product description"
                   className="min-h-20 resize-none"
                 />
+                {errors.description && <p className="text-destructive text-xs">{errors.description}</p>}
               </div>
 
-              {/* ── Row 3: Status ── */}
               <div className="space-y-1.5">
                 <Label>Status *</Label>
                 <div className="inline-flex w-full rounded-lg border p-1">
@@ -255,7 +289,10 @@ export default function StoreProductForm({
                         variant={active ? 'default' : 'ghost'}
                         size="sm"
                         className="flex-1 gap-1.5"
-                        onClick={() => setFormData((p) => ({ ...p, status: opt.value }))}
+                        onClick={() => {
+                          setFormData((p) => ({ ...p, status: opt.value }));
+                          setErrors((prev) => ({ ...prev, status: undefined }));
+                        }}
                       >
                         {active && <Check className="size-3.5" />}
                         {opt.label}
@@ -263,11 +300,10 @@ export default function StoreProductForm({
                     );
                   })}
                 </div>
+                {errors.status && <p className="text-destructive text-xs">{errors.status}</p>}
               </div>
 
-              {/* ── Row 4: Pricing — adapts to category ── */}
               {isBundle ? (
-                /* BUNDLES: single Coin field only */
                 <div className="space-y-1.5">
                   <Label htmlFor="amount">Coin *</Label>
                   <Input
@@ -276,14 +312,15 @@ export default function StoreProductForm({
                     step="0.01"
                     min={0}
                     value={formData.amount}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }))
-                    }
+                    onChange={(e) => {
+                      setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }));
+                      setErrors((prev) => ({ ...prev, amount: undefined }));
+                    }}
                     required
                   />
+                  {errors.amount && <p className="text-destructive text-xs">{errors.amount}</p>}
                 </div>
               ) : (
-                /* COINS: Quantity + Amount + Currency */
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="quantity">Quantity *</Label>
@@ -292,11 +329,13 @@ export default function StoreProductForm({
                       type="number"
                       min={0}
                       value={formData.quantity}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, quantity: Number(e.target.value) || 0 }))
-                      }
+                      onChange={(e) => {
+                        setFormData((p) => ({ ...p, quantity: Number(e.target.value) || 0 }));
+                        setErrors((prev) => ({ ...prev, quantity: undefined }));
+                      }}
                       required
                     />
+                    {errors.quantity && <p className="text-destructive text-xs">{errors.quantity}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="amount">Amount *</Label>
@@ -306,34 +345,37 @@ export default function StoreProductForm({
                       step="0.01"
                       min={0}
                       value={formData.amount}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }))
-                      }
+                      onChange={(e) => {
+                        setFormData((p) => ({ ...p, amount: Number(e.target.value) || 0 }));
+                        setErrors((prev) => ({ ...prev, amount: undefined }));
+                      }}
                       required
                     />
+                    {errors.amount && <p className="text-destructive text-xs">{errors.amount}</p>}
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="currency">Currency *</Label>
                     <Input
                       id="currency"
                       value={formData.currency}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, currency: e.target.value.toUpperCase() }))
-                      }
+                      onChange={(e) => {
+                        setFormData((p) => ({ ...p, currency: e.target.value.toUpperCase() }));
+                        setErrors((prev) => ({ ...prev, currency: undefined }));
+                      }}
                       required
                     />
+                    {errors.currency && <p className="text-destructive text-xs">{errors.currency}</p>}
                   </div>
                 </div>
               )}
 
-              {/* ── Row 5: Bundle Items (BUNDLES only) ── */}
               {isBundle && (
                 <div className="space-y-3 rounded-xl border p-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium">Bundle Items</p>
                       <p className="text-muted-foreground text-xs">
-                        Up to 3 — KEY, BOOST, and SWAP can each appear once.
+                        Up to 3 - KEY, BOOST, and SWAP can each appear once.
                       </p>
                     </div>
                     <Button
@@ -348,7 +390,6 @@ export default function StoreProductForm({
                     </Button>
                   </div>
 
-                  {/* Column headers */}
                   <div className="grid grid-cols-[1fr_100px_36px] gap-3 px-1">
                     <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                       Type
@@ -359,13 +400,13 @@ export default function StoreProductForm({
                     <span />
                   </div>
 
-                  {/* Items */}
                   <div className="space-y-2">
                     {formData.items.map((item, index) => {
                       const options: StoreBundleItemType[] = [
                         item.type,
                         ...availableTypes.filter((t) => t !== item.type),
                       ];
+
                       return (
                         <div
                           key={`${item.type}-${index}`}
@@ -430,14 +471,13 @@ export default function StoreProductForm({
                       );
                     })}
                   </div>
+                  {errors.items && <p className="text-destructive text-xs">{errors.items}</p>}
                 </div>
               )}
 
-              {/* ── Row 6: Image (compact horizontal bar) ── */}
               <div className="space-y-1.5">
                 <Label>Image</Label>
                 <div className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
-                  {/* Thumbnail / placeholder icon */}
                   <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-md border">
                     {formData.imagePreview ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -451,17 +491,15 @@ export default function StoreProductForm({
                     )}
                   </div>
 
-                  {/* Text */}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm leading-tight font-medium">
                       {formData.imagePreview ? 'Image selected' : 'No image selected'}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      JPG, PNG or WEBP — displayed on the product card.
+                      JPG, PNG or WEBP - displayed on the product card.
                     </p>
                   </div>
 
-                  {/* Upload / Remove */}
                   <div className="flex shrink-0 items-center gap-2">
                     {formData.imagePreview && (
                       <Button
@@ -495,14 +533,12 @@ export default function StoreProductForm({
             </div>
           </div>
 
-          {/* Sticky footer */}
           <div className="flex shrink-0 gap-2 border-t pt-4">
-            {' '}
             <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Saving…' : isEditMode ? 'Update Product' : 'Create Product'}
+              {isLoading ? 'Saving...' : isEditMode ? 'Update Product' : 'Create Product'}
             </Button>
           </div>
         </form>

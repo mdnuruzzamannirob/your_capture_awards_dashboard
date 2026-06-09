@@ -13,10 +13,25 @@ import {
 import { cn } from '@/lib/utils';
 import { SupportTicket } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Eye, MoreHorizontal } from 'lucide-react';
 import { GoDotFill } from 'react-icons/go';
 
-export const supportColumns: ColumnDef<SupportTicket>[] = [
+const statusStyles: Record<SupportTicket['status'], string> = {
+  pending: 'bg-yellow-500/20 text-yellow-600',
+  'in-progress': 'bg-blue-500/20 text-blue-600',
+  resolved: 'bg-green-500/20 text-green-600',
+  closed: 'bg-gray-500/20 text-gray-600',
+};
+
+const priorityStyles: Record<SupportTicket['priority'], string> = {
+  high: 'bg-red-500/20 text-red-600 hover:bg-red-500/30',
+  medium: 'bg-orange-500/20 text-orange-600 hover:bg-orange-500/30',
+  low: 'bg-blue-500/20 text-blue-600 hover:bg-blue-500/30',
+};
+
+export const createSupportColumns = (
+  onViewTicket: (ticket: SupportTicket) => void,
+): ColumnDef<SupportTicket>[] => [
   {
     id: 'sl',
     header: 'SL',
@@ -40,11 +55,6 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
     ),
   },
   {
-    accessorKey: 'userName',
-    header: 'USER',
-    cell: ({ row }) => <div>{row.getValue('userName') || 'N/A'}</div>,
-  },
-  {
     accessorKey: 'email',
     header: 'EMAIL',
     cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
@@ -53,18 +63,9 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
     accessorKey: 'priority',
     header: 'PRIORITY',
     cell: ({ row }) => {
-      const priority = row.getValue('priority') as string;
+      const priority = row.getValue('priority') as SupportTicket['priority'];
       return (
-        <Badge
-          className={cn(
-            'capitalize',
-            priority === 'high' && 'bg-red-500/20 text-red-600 hover:bg-red-500/30',
-            priority === 'medium' && 'bg-orange-500/20 text-orange-600 hover:bg-orange-500/30',
-            priority === 'low' && 'bg-blue-500/20 text-blue-600 hover:bg-blue-500/30',
-          )}
-        >
-          {priority}
-        </Badge>
+        <Badge className={cn('capitalize', priorityStyles[priority])}>{priority}</Badge>
       );
     },
   },
@@ -72,19 +73,16 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
     accessorKey: 'status',
     header: 'STATUS',
     cell: ({ row }) => {
-      const status = row.getValue('status') as string;
+      const status = row.getValue('status') as SupportTicket['status'];
       return (
-        <button
+        <span
           className={cn(
             'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'resolved' && 'bg-green-500/20 text-green-600',
-            status === 'in-progress' && 'bg-blue-500/20 text-blue-600',
-            status === 'pending' && 'bg-yellow-500/20 text-yellow-600',
-            status === 'closed' && 'bg-gray-500/20 text-gray-600',
+            statusStyles[status],
           )}
         >
           <GoDotFill /> {status.replace('-', ' ')}
-        </button>
+        </span>
       );
     },
   },
@@ -99,7 +97,7 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
   {
     id: 'actions',
     enableHiding: false,
-    cell: () => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
           <Button variant="ghost" className="size-8 p-0">
@@ -109,25 +107,23 @@ export const supportColumns: ColumnDef<SupportTicket>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewTicket(row.original);
+            }}
+          >
             <Eye className="mr-2 size-4" />
             View Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-            Mark as In Progress
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Mark as Resolved</DropdownMenuItem>
-          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>Mark as Closed</DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-destructive"
             onClick={(e) => {
               e.stopPropagation();
+              onViewTicket(row.original);
             }}
           >
-            <Trash2 className="mr-2 size-4" />
-            Delete Ticket
+            Update Status
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
