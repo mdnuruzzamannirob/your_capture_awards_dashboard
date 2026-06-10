@@ -14,7 +14,7 @@ import { removeUser } from '@/store/features/auth/authSlice';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { DialogTrigger } from '@radix-ui/react-dialog';
-import { LuSettings } from 'react-icons/lu';
+
 
 const UserMenu = () => {
   const [open, setOpen] = useState(false);
@@ -106,19 +106,7 @@ const UserMenu = () => {
             <ProfileUser className="size-4" />
             Profile
           </Link>
-          <Link
-            href="/settings"
-            onClick={() => setOpen(false)}
-            className={cn(
-              'hover:bg-gray-20 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
-              pathname === '/settings'
-                ? 'bg-gray-800 font-medium'
-                : 'text-muted-foreground hover:bg-gray-800',
-            )}
-          >
-            <LuSettings className="size-4" />
-            Settings
-          </Link>
+
         </div>
         <div className="border-t border-gray-800"></div>
         <div className="flex flex-col p-1">

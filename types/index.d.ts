@@ -28,27 +28,7 @@ export interface SupportTicket {
   assignedTo?: string;
 }
 
-export type ReportType = 'user' | 'contest' | 'content' | 'payment' | 'other';
-export type ReportStatus = 'pending' | 'under-review' | 'resolved' | 'dismissed';
-export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
 
-export interface Report {
-  id: string;
-  reportNumber: string;
-  reportType: ReportType;
-  reportedBy: string;
-  reportedByEmail: string;
-  reportedItem: string;
-  reportedItemId: string;
-  severity: ReportSeverity;
-  status: ReportStatus;
-  reason: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  reviewedBy?: string;
-  reviewNote?: string;
-}
 
 export type TransactionType = 'withdrawal' | 'store_purchase' | 'subscription_payment' | 'refund';
 export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
@@ -99,32 +79,7 @@ export interface UserWallet {
   updatedAt: string;
 }
 
-export type SubscriptionBillingCycle = 'monthly' | 'yearly';
 
-export interface SubscriptionPlan {
-  id: string;
-  planId: string;
-  name: string;
-  description: string;
-  price: number;
-  currency: string;
-  billingCycle: SubscriptionBillingCycle;
-  features: string[];
-  subscribers: number;
-  isActive: boolean;
-  stripePriceId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface SubscriptionStats {
-  totalPlans: number;
-  activePlans: number;
-  totalSubscribers: number;
-  totalRevenue: number;
-  monthlyRevenue: number;
-  yearlyRevenue: number;
-}
 
 export type StoreProductType = 'key' | 'boost' | 'swap';
 
