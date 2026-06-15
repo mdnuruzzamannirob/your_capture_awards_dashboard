@@ -11,9 +11,7 @@ export const TipTapViewer: React.FC<TipTapViewerProps> = ({ content, className }
   if (!content) return null;
 
   return (
-    <div className={cn(proseBaseStyles, className)}>
-      <div dangerouslySetInnerHTML={{ __html: content }} />
-    </div>
+    <div className={cn(proseBaseStyles, className)} dangerouslySetInnerHTML={{ __html: content }} />
   );
 };
 
