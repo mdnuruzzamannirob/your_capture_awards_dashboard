@@ -1,5 +1,6 @@
 'use client';
 
+import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import { Button } from '@/components/ui/button';
 import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
 import { Info, Pencil } from 'lucide-react';
@@ -74,7 +75,11 @@ const DetailsTab = ({
 
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Description</h1>
-          <p className="text-base">{contest?.description}</p>
+          <div className="text-base">
+
+            <TipTapViewer content={contest?.description} />
+
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-5 text-sm md:grid-cols-3">
