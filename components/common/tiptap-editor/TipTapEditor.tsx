@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { cn } from '@/lib/utils';
 import Heading from '@tiptap/extension-heading';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
-import { cn } from '@/lib/utils';
-import { Spinner } from '@/components/ui/spinner';
+import { EditorContent, useEditor, type Editor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import React, { useEffect, useMemo, useState } from 'react';
 import Toolbar from './Toolbar';
 
 export const proseBaseStyles = cn(
@@ -117,25 +116,25 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     return (
       <div
         className={cn(
-          'overflow-hidden rounded-md border border-gray-800 bg-background animate-pulse',
-          className
+          'bg-background animate-pulse overflow-hidden rounded-md border border-gray-800',
+          className,
         )}
       >
         {/* Skeleton Toolbar */}
-        <div className="bg-gray-900/50 flex h-11 items-center gap-2 border-b border-gray-800 px-3">
+        <div className="flex h-11 items-center gap-2 border-b border-gray-800 bg-gray-900/50 px-3">
           <div className="h-6 w-6 rounded bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-1 bg-gray-800 mx-1" />
+          <div className="mx-1 h-6 w-1 bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-1 bg-gray-800 mx-1" />
+          <div className="mx-1 h-6 w-1 bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
           <div className="h-6 w-6 rounded bg-gray-800" />
         </div>
         {/* Skeleton Body */}
-        <div className={cn('p-4 space-y-3 bg-background', minHeight)}>
+        <div className={cn('bg-background space-y-3 p-4', minHeight)}>
           <div className="h-4 w-2/3 rounded bg-gray-800" />
           <div className="h-4 w-4/5 rounded bg-gray-800" />
           <div className="h-4 w-1/2 rounded bg-gray-800" />
