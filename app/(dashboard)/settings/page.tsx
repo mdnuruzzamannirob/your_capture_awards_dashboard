@@ -75,10 +75,31 @@ const PolicyEditor = ({
 
   if (isPolicyLoading || isPolicyFetching) {
     return (
-      <Card className="border-gray-800 bg-gray-900/50">
-        <CardContent className="flex flex-col gap-3 py-12 justify-center items-center">
-          <Spinner className="size-8" />
-          <p className="text-sm text-muted-foreground">Loading {title}...</p>
+      <Card className="border-gray-800 bg-gray-900/50 animate-pulse">
+        <CardHeader className="space-y-2">
+          <div className="h-6 w-32 rounded bg-gray-800" />
+          <div className="h-4 w-64 rounded bg-gray-800" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Skeleton Editor */}
+          <div className="overflow-hidden rounded-md border border-gray-800 bg-background">
+            <div className="bg-gray-900/50 flex h-11 items-center gap-2 border-b border-gray-800 px-3">
+              <div className="h-6 w-6 rounded bg-gray-800" />
+              <div className="h-6 w-6 rounded bg-gray-800" />
+              <div className="h-6 w-6 rounded bg-gray-800" />
+              <div className="h-6 w-1 bg-gray-800 mx-1" />
+              <div className="h-6 w-6 rounded bg-gray-800" />
+              <div className="h-6 w-6 rounded bg-gray-800" />
+              <div className="h-6 w-6 rounded bg-gray-800" />
+            </div>
+            <div className="p-4 space-y-3 bg-background min-h-[120px]">
+              <div className="h-4 w-2/3 rounded bg-gray-800" />
+              <div className="h-4 w-4/5 rounded bg-gray-800" />
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <div className="h-10 w-28 rounded bg-gray-800" />
+          </div>
         </CardContent>
       </Card>
     );
