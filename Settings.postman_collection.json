@@ -1,0 +1,598 @@
+{
+  "info": {
+    "_postman_id": "dd7e1229-c440-4068-a1b9-a0935d851802",
+    "name": "Settings",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48748156",
+    "_collection_link": "https://go.postman.co/collection/48748156-dd7e1229-c440-4068-a1b9-a0935d851802?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Site Policy",
+      "item": [
+        {
+          "name": "Add or Update Site Policy",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{user_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"content\":\"Terms of YCW\",\r\n    \"type\":\"ABOUT\"//TERMS, POLICY, ABOUT\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{local_url}}/site-policies",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "site-policies"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"content\":\"about the YCW\",\r\n    \"type\":\"ABOUT\"//TERMS, POLICY, ABOUT\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{local_url}}/site-policies",
+                  "host": [
+                    "{{local_url}}"
+                  ],
+                  "path": [
+                    "site-policies"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "219"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"db-qUUv4sBHK5LZDLLaS8Mc+QNGgjY\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 24 Sep 2025 05:05:07 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Site policy added successfully\",\n    \"data\": {\n        \"id\": \"68d37c02020a2787e9de3082\",\n        \"type\": \"ABOUT\",\n        \"content\": \"about the YCW\",\n        \"createdAt\": \"2025-09-24T05:05:06.951Z\",\n        \"updatedAt\": \"2025-09-24T05:05:06.951Z\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Site Policies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{local_url}}/site-policies?type=ABOUT",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "site-policies"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "ABOUT",
+                  "description": "TERMS, POLICY, ABOUT"
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{local_url}}/site-policies?type=ABOUT",
+                  "host": [
+                    "{{local_url}}"
+                  ],
+                  "path": [
+                    "site-policies"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "ABOUT",
+                      "description": "TERMS, POLICY, ABOUT"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "Text",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "225"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"e1-20qv/8UmDc4QGIqFa8IMTSj6Iuo\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Wed, 24 Sep 2025 05:13:03 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Site policies fetched successfully\",\n    \"data\": [\n        {\n            \"id\": \"68d37c02020a2787e9de3082\",\n            \"type\": \"ABOUT\",\n            \"content\": \"about the YCW\",\n            \"createdAt\": \"2025-09-24T05:05:06.951Z\",\n            \"updatedAt\": \"2025-09-24T05:05:06.951Z\"\n        }\n    ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "change password",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{user_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"oldPassword\":\"sahin1122\",\r\n    \"newPassword\":\"sahin234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{local_url}}/users/change-password",
+          "host": [
+            "{{local_url}}"
+          ],
+          "path": [
+            "users",
+            "change-password"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPassword\":\"sahin1122\",\r\n    \"newPassword\":\"sahin234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{local_url}}/users/change-password",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "users",
+                "change-password"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "97"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"61-fHOiR6V1cRwZ+2cPE1zuTOHJaDk\""
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 07 Aug 2025 03:56:51 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"message\": \"Password changed successfully\",\n    \"data\": \"Password updated successfully\"\n}"
+        },
+        {
+          "name": "400",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"oldPassword\":\"sahin1122\",\r\n    \"newPassword\":\"sahin234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{local_url}}/users/change-password",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "users",
+                "change-password"
+              ]
+            }
+          },
+          "status": "Bad Request",
+          "code": 400,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "446"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"1be-Hv9HEt4FsH4EaVai7aJxsYl3Qks\""
+            },
+            {
+              "key": "Date",
+              "value": "Thu, 07 Aug 2025 03:57:05 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"success\": false,\n    \"message\": \"Password does not mathced!\",\n    \"errorSources\": [\n        {\n            \"type\": \"ApiError\",\n            \"details\": \"Password does not mathced!\"\n        }\n    ],\n    \"err\": {\n        \"statusCode\": 406\n    },\n    \"stack\": \"Error: Password does not mathced!\\n    at D:\\\\projects\\\\ongoing\\\\Your-captuer-award\\\\src\\\\app\\\\modules\\\\User\\\\user.service.ts:126:15\\n    at Generator.next (<anonymous>)\\n    at fulfilled (D:\\\\projects\\\\ongoing\\\\Your-captuer-award\\\\src\\\\app\\\\modules\\\\User\\\\user.service.ts:5:58)\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "upload avatar",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{user_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "avatar",
+              "type": "file",
+              "uuid": "0fb8892c-674b-4841-9f92-c8bc3a96d920",
+              "value": null
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{live_url}}/users/avatar",
+          "host": [
+            "{{live_url}}"
+          ],
+          "path": [
+            "users",
+            "avatar"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "uuid": "0fb8892c-674b-4841-9f92-c8bc3a96d920",
+                  "src": [
+                    "/C:/Users/mdsah/OneDrive/Pictures/Screenshots/Screenshot 2025-07-31 090924.png"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{local_url}}/users/avatar",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "users",
+                "avatar"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "94"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"5e-N5Dzc6tNHrH6kd3iopVpynsmtEM\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 06 Aug 2025 09:48:15 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"message\": \"Avatar uploaded successfully\",\n    \"data\": \"avatar updated successfully\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "update my profile",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{user_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstName\":\"Sahin Siraj\",\r\n    \"lastName\":\"Siraj\",\r\n    \"location\":\"Bangladesh\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{local_url}}/users",
+          "host": [
+            "{{local_url}}"
+          ],
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "success",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"firstName\":\"Md Sahin\",\r\n    \"lastName\":\"Siraj\",\r\n    \"location\":\"Bangladesh\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{local_url}}/users",
+              "host": [
+                "{{local_url}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "Text",
+          "header": [
+            {
+              "key": "X-Powered-By",
+              "value": "Express"
+            },
+            {
+              "key": "Vary",
+              "value": "Origin"
+            },
+            {
+              "key": "Access-Control-Allow-Credentials",
+              "value": "true"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "Content-Length",
+              "value": "602"
+            },
+            {
+              "key": "ETag",
+              "value": "W/\"25a-WFS85SFd0l+cs1cZak1o1tsSfRg\""
+            },
+            {
+              "key": "Date",
+              "value": "Wed, 06 Aug 2025 09:50:43 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"message\": \"User updated successfully\",\n    \"data\": {\n        \"id\": \"6892eb1eb8992c5945824f34\",\n        \"firstName\": \"Md Sahin\",\n        \"lastName\": \"Siraj\",\n        \"username\": null,\n        \"email\": \"aanewsahinsiraj@gmail.com\",\n        \"role\": \"USER\",\n        \"phone\": \"+8801621839863\",\n        \"avatar\": \"https://nyc3.digitaloceanspaces.com/lerirides/captureaward/1754473692335_4a0985d4-00f0-4bc9-9c7f-f7a40ba0aa66_Screenshot 2025-07-31 090924.png\",\n        \"cover\": \"https://images.unsplash.com/photo-1689539137236-b68e436248de?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\",\n        \"level\": \"Beginner\",\n        \"location\": \"Bangladesh\"\n    }\n}"
+        }
+      ]
+    }
+  ]
+}

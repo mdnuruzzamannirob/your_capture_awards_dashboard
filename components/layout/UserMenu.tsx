@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { LogOut, User as ProfileUser } from 'lucide-react';
+import { LogOut, User as ProfileUser, Key, FileText } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import useAuth from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -24,6 +24,7 @@ const UserMenu = () => {
   const { user, token } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -40,6 +41,9 @@ const UserMenu = () => {
   if (!isMounted) {
     return;
   }
+
+  const tab = searchParams.get('tab');
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -94,11 +98,11 @@ const UserMenu = () => {
         <div className="border-t border-gray-800"></div>
         <div className="flex flex-col gap-1 p-1">
           <Link
-            href="/profile"
+            href="/settings?tab=profile"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-gray-20 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
-              pathname === '/profile'
+              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              pathname === '/settings' && (!tab || tab === 'profile')
                 ? 'bg-gray-800 font-medium'
                 : 'text-muted-foreground hover:bg-gray-800',
             )}
@@ -106,7 +110,32 @@ const UserMenu = () => {
             <ProfileUser className="size-4" />
             Profile
           </Link>
-
+          <Link
+            href="/settings?tab=change-password"
+            onClick={() => setOpen(false)}
+            className={cn(
+              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              pathname === '/settings' && tab === 'change-password'
+                ? 'bg-gray-800 font-medium'
+                : 'text-muted-foreground hover:bg-gray-800',
+            )}
+          >
+            <Key className="size-4" />
+            Change Password
+          </Link>
+          <Link
+            href="/settings?tab=site-policy"
+            onClick={() => setOpen(false)}
+            className={cn(
+              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              pathname === '/settings' && tab === 'site-policy'
+                ? 'bg-gray-800 font-medium'
+                : 'text-muted-foreground hover:bg-gray-800',
+            )}
+          >
+            <FileText className="size-4" />
+            Site Policy
+          </Link>
         </div>
         <div className="border-t border-gray-800"></div>
         <div className="flex flex-col p-1">

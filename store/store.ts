@@ -6,6 +6,7 @@ import { supportApi } from '@/store/features/support/supportApi';
 import { storeApi } from '@/store/features/store/storeApi';
 import { userApi } from '@/store/features/user/userApi';
 import { walletApi } from '@/store/features/wallet/walletApi';
+import { settingsApi } from '@/store/features/settings/settingsApi';
 import { configureStore } from '@reduxjs/toolkit';
 
 export const store = () => {
@@ -19,6 +20,7 @@ export const store = () => {
       [supportApi.reducerPath]: supportApi.reducer,
       [storeApi.reducerPath]: storeApi.reducer,
       [walletApi.reducerPath]: walletApi.reducer,
+      [settingsApi.reducerPath]: settingsApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
@@ -31,6 +33,7 @@ export const store = () => {
         supportApi.middleware,
         storeApi.middleware,
         walletApi.middleware,
+        settingsApi.middleware,
       ),
 
     devTools: process.env.NODE_ENV !== 'production',
