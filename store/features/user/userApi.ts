@@ -1,14 +1,7 @@
 import { baseQuery } from '@/store/baseQuery';
 import { dashboardApi } from '@/store/features/dashboard/dashboardApi';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import {
-  ApiSuccessResponse,
-  ChangePasswordBody,
-  GetUsersResponse,
-  ToggleBlockBody,
-  UpdateProfileBody,
-  User,
-} from './types';
+import { ApiSuccessResponse, GetUsersResponse, ToggleBlockBody, User } from './types';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
@@ -73,35 +66,6 @@ export const userApi = createApi({
         }
       },
     }),
-
-    updateUserProfile: builder.mutation<ApiSuccessResponse<User>, UpdateProfileBody>({
-      query: ({ userId, ...body }) => ({
-        url: `/users/${userId}`,
-        method: 'PATCH',
-        body,
-      }),
-      invalidatesTags: (result, error, { userId }) => [
-        { type: 'User', id: userId },
-        { type: 'Users', id: 'LIST' },
-      ],
-    }),
-
-    uploadUserAvatar: builder.mutation<ApiSuccessResponse<User>, FormData>({
-      query: (body) => ({
-        url: '/users/avatar',
-        method: 'PATCH',
-        body,
-      }),
-      invalidatesTags: [{ type: 'Users', id: 'LIST' }],
-    }),
-
-    changeUserPassword: builder.mutation<ApiSuccessResponse<string>, ChangePasswordBody>({
-      query: (body) => ({
-        url: '/users/change-password',
-        method: 'PUT',
-        body,
-      }),
-    }),
   }),
 });
 
@@ -111,7 +75,4 @@ export const {
   useGetUserQuery,
   useLazyGetUserQuery,
   useToggleUserBlockMutation,
-  useUpdateUserProfileMutation,
-  useUploadUserAvatarMutation,
-  useChangeUserPasswordMutation,
 } = userApi;

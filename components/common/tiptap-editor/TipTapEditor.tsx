@@ -107,19 +107,39 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     },
   }) as Editor | null;
 
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value);
+    }
+  }, [value, editor]);
+
   if (!mounted || !editor) {
     return (
       <div
         className={cn(
-          'flex w-full items-center justify-center rounded-md border bg-gray-900 p-3',
-          minHeight,
-          maxHeight,
+          'overflow-hidden rounded-md border border-gray-800 bg-background animate-pulse',
+          className
         )}
       >
-        <p className="text-muted-foreground flex items-center gap-2">
-          <Spinner />
-          Loading text editor...
-        </p>
+        {/* Skeleton Toolbar */}
+        <div className="bg-gray-900/50 flex h-11 items-center gap-2 border-b border-gray-800 px-3">
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-1 bg-gray-800 mx-1" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-1 bg-gray-800 mx-1" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="h-6 w-6 rounded bg-gray-800" />
+        </div>
+        {/* Skeleton Body */}
+        <div className={cn('p-4 space-y-3 bg-background', minHeight)}>
+          <div className="h-4 w-2/3 rounded bg-gray-800" />
+          <div className="h-4 w-4/5 rounded bg-gray-800" />
+          <div className="h-4 w-1/2 rounded bg-gray-800" />
+        </div>
       </div>
     );
   }
