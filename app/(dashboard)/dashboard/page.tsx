@@ -314,7 +314,12 @@ const Dashboard = () => {
                   <BarChart data={revenueData}>
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => currency.format(value)} />
+                    <Tooltip formatter={(value: any) => {
+                      if (Array.isArray(value)) {
+                        return value.map(v => currency.format(Number(v))).join(', ');
+                      }
+                      return value !== undefined && value !== null ? currency.format(Number(value)) : '';
+                    }} />
                     <Legend />
                     <Bar dataKey="subscription" fill="#0ea5e9" name="Subscription" />
                     <Bar dataKey="store" fill="#f59e0b" name="Store" />
@@ -334,7 +339,12 @@ const Dashboard = () => {
                   <LineChart data={growthData}>
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                    <Tooltip formatter={(value: any) => {
+                      if (Array.isArray(value)) {
+                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
+                      }
+                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
+                    }} />
                     <Legend />
                     <Line
                       type="monotone"
@@ -360,7 +370,12 @@ const Dashboard = () => {
                   <BarChart data={memberRatioData}>
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                    <Tooltip formatter={(value: any) => {
+                      if (Array.isArray(value)) {
+                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
+                      }
+                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
+                    }} />
                     <Legend />
                     <Bar dataKey="premium" fill="#14b8a6" name="Premium" />
                     <Bar dataKey="pro" fill="#f97316" name="Pro" />
@@ -390,7 +405,12 @@ const Dashboard = () => {
                         <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: number) => numberFormatter.format(value)} />
+                    <Tooltip formatter={(value: any) => {
+                      if (Array.isArray(value)) {
+                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
+                      }
+                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
+                    }} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
