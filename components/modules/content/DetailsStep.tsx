@@ -70,9 +70,9 @@ const DetailsStep = () => {
   );
 
   return (
-    <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
-      <h2 className="flex items-center gap-2 border-b border-gray-800 pb-4 text-lg font-semibold">
-        <FileText className="size-5 text-emerald-500" /> Details
+    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
+      <h2 className="flex items-center gap-2 border-b border-border pb-4 text-lg font-semibold">
+        <FileText className="text-primary size-5" /> Details
       </h2>
 
       <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
@@ -213,7 +213,7 @@ const DetailsStep = () => {
               />
 
               <FormControl>
-                <div className="relative overflow-hidden rounded-xl border border-gray-700 bg-gray-950">
+                <div className="relative overflow-hidden rounded-xl border border-border bg-background">
                   {/* Full preview */}
                   {preview ? (
                     <div className="relative h-56 w-full">
@@ -230,12 +230,12 @@ const DetailsStep = () => {
                       {/* File info bar */}
                       <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 px-4 py-3">
                         <div className="flex min-w-0 items-center gap-2">
-                          <Upload className="size-4 shrink-0 text-emerald-400" />
-                          <span className="truncate text-sm font-medium text-white">
+                          <Upload className="text-primary size-4 shrink-0" />
+                          <span className="truncate text-sm font-medium text-foreground">
                             {fileInfo?.name}
                           </span>
                           {fileInfo?.size && (
-                            <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-xs text-gray-300">
+                            <span className="shrink-0 rounded-full bg-background/10 px-2 py-0.5 text-xs text-muted-foreground">
                               {fileInfo.size}
                             </span>
                           )}
@@ -244,7 +244,7 @@ const DetailsStep = () => {
                           <button
                             type="button"
                             onClick={() => inputRef.current?.click()}
-                            className="flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium text-white backdrop-blur transition hover:bg-white/20"
+                            className="flex items-center gap-1.5 rounded-lg bg-background/10 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur transition hover:bg-background/20"
                           >
                             <ImagePlus className="size-3.5" />
                             Change
@@ -252,7 +252,7 @@ const DetailsStep = () => {
                           <button
                             type="button"
                             onClick={handleClearBanner}
-                            className="flex items-center gap-1.5 rounded-lg bg-red-500/20 px-3 py-1.5 text-xs font-medium text-red-300 backdrop-blur transition hover:bg-red-500/40"
+                            className="flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive backdrop-blur transition hover:bg-destructive/20"
                           >
                             <Trash2 className="size-3.5" />
                             Remove
@@ -266,17 +266,17 @@ const DetailsStep = () => {
                       htmlFor="banner-upload"
                       className={cn(
                         'flex h-48 cursor-pointer flex-col items-center justify-center gap-3 transition',
-                        'hover:bg-gray-800/50',
+                        'hover:bg-surface-tertiary/50',
                       )}
                     >
-                      <div className="flex size-14 items-center justify-center rounded-full border border-dashed border-gray-600 bg-gray-800">
-                        <ImagePlus className="size-6 text-gray-400" />
+                      <div className="flex size-14 items-center justify-center rounded-full border border-dashed border-border bg-surface-tertiary">
+                        <ImagePlus className="size-6 text-muted-foreground" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-medium text-gray-200">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Click to upload banner image
                         </p>
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           PNG, JPG, WEBP &mdash; max 24&nbsp;MB
                         </p>
                       </div>

@@ -44,7 +44,7 @@ const DetailsTab = ({
         </h1>
 
         {canEdit && (
-          <Button onClick={onEditClick} className="text-white">
+          <Button onClick={onEditClick} className="text-foreground">
             <Pencil /> Edit
           </Button>
         )}
@@ -59,7 +59,7 @@ const DetailsTab = ({
               src={contest?.creator?.avatar}
               width={40}
               height={40}
-              className="size-10 min-w-10 overflow-hidden rounded-full bg-gray-900 object-cover"
+              className="size-10 min-w-10 overflow-hidden rounded-full bg-surface object-cover"
             />
             <div>
               <h3 className="font-medium">{contest?.creator?.fullName}</h3>
@@ -120,8 +120,8 @@ const DetailsTab = ({
             <button
               className={cn(
                 'text-foreground flex cursor-default items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-                contest?.status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
-                contest?.status === 'CLOSED' && 'bg-red-500/20 text-red-600',
+                contest?.status === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+                contest?.status === 'CLOSED' && 'bg-destructive/10 text-destructive',
                 contest?.status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
               )}
             >

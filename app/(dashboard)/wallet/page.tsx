@@ -38,8 +38,8 @@ const Wallet = () => {
       title: 'Total Successful Payments',
       value: statsData?.totalSuccessfulPayments ?? 0,
       icon: WalletIcon,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'This Month Revenue',
@@ -52,15 +52,15 @@ const Wallet = () => {
       title: 'Store Revenue',
       value: currency.format(statsData?.totalStoreRevenue ?? 0),
       icon: ShoppingCart,
-      color: 'text-green-600',
-      bgColor: 'bg-green-500/10',
+      color: 'text-brand-500',
+      bgColor: 'bg-brand-500/10',
     },
     {
       title: 'Subscription Revenue',
       value: currency.format(statsData?.totalSubscriptionRevenue ?? 0),
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary-soft',
     },
   ];
 

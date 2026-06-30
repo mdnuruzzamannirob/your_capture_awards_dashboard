@@ -33,15 +33,15 @@ const ContestPage = () => {
       title: 'Total Contests',
       value: (statsData?.running ?? 0) + (statsData?.upcoming ?? 0) + (statsData?.completed ?? 0),
       icon: Trophy,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Active Contests',
       value: statsData?.running ?? 0,
       icon: CheckCircle2,
-      color: 'text-green-600',
-      bgColor: 'bg-green-500/10',
+      color: 'text-brand-500',
+      bgColor: 'bg-brand-500/10',
     },
     {
       title: 'Upcoming Contests',
@@ -54,8 +54,8 @@ const ContestPage = () => {
       title: 'Closed Contests',
       value: statsData?.completed ?? 0,
       icon: XCircle,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-500/10',
+      color: 'text-muted-foreground',
+      bgColor: 'bg-muted/10',
     },
   ];
 
@@ -67,7 +67,7 @@ const ContestPage = () => {
           description="Monitor and manage all contests, participants, and results"
         />
         <Link href="/contest/create-contest">
-          <Button className="text-white">Create Contest</Button>
+          <Button className="text-foreground">Create Contest</Button>
         </Link>
       </div>
 

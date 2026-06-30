@@ -22,8 +22,8 @@ const RulesStep = () => {
   const { fields, append, remove } = useFieldArray({ name: 'rules', control: form.control });
 
   return (
-    <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
-      <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <h2 className="text-lg font-semibold">Rules ({fields.length})</h2>
         <Button
           type="button"
@@ -38,7 +38,7 @@ const RulesStep = () => {
 
       <div className="space-y-4">
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-3 rounded-lg border border-gray-800 p-4">
+          <div key={field.id} className="space-y-3 rounded-lg border border-border p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Rule {index + 1}</h3>
               {fields.length > 1 && (
@@ -47,7 +47,7 @@ const RulesStep = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => remove(index)}
-                  className="text-red-400 hover:bg-red-500/10"
+                  className="text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="size-4" />
                 </Button>
@@ -138,7 +138,7 @@ const RulesStep = () => {
         ))}
 
         {form.formState.errors.rules && (
-          <p className="text-sm text-red-400">{(form.formState.errors.rules as any).message}</p>
+          <p className="text-sm text-destructive">{(form.formState.errors.rules as any).message}</p>
         )}
       </div>
     </div>
