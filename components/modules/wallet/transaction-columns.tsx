@@ -55,8 +55,8 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
         <button
           className={cn(
             'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium',
-            status === 'SUCCEEDED' && 'bg-brand-500/10 text-brand-500',
-            status === 'PENDING' && 'bg-primary/10 text-primary',
+            status === 'SUCCEEDED' && 'bg-success/10 text-success',
+            status === 'PENDING' && 'bg-warning/10 text-warning',
             status === 'FAILED' && 'bg-destructive/10 text-destructive',
             status === 'EXPIRED' && 'bg-muted/20 text-muted-foreground',
           )}

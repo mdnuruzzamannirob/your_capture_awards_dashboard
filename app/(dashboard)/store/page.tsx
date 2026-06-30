@@ -38,15 +38,15 @@ export default function StorePage() {
       title: 'Total Products',
       value: statsData?.totalProducts ?? 0,
       icon: Package,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       title: 'Total Purchases',
       value: statsData?.totalPurchases ?? 0,
       icon: ShoppingCart,
-      color: 'text-brand-500',
-      bgColor: 'bg-brand-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       title: 'Total Revenue',
@@ -59,8 +59,8 @@ export default function StorePage() {
       title: 'Active Products',
       value: statsData?.totalActiveProducts ?? 0,
       icon: TrendingUp,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
   ];
 

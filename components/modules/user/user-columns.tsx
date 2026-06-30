@@ -53,7 +53,7 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
         <button
           className={cn(
             'text-foreground flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+            status === 'ACTIVE' && 'bg-success/10 text-success',
             status === 'INACTIVE' && 'bg-destructive/10 text-destructive',
           )}
         >

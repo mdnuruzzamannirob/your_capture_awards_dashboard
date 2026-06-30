@@ -15,15 +15,15 @@ const UsersPage = () => {
       title: 'Total Users',
       value: statsData?.totalUsers ?? 0,
       icon: Users,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
     {
       title: 'Active Users',
       value: statsData?.active_user_count ?? 0,
       icon: UserCheck,
-      color: 'text-brand-500',
-      bgColor: 'bg-brand-500/10',
+      color: 'text-success',
+      bgColor: 'bg-success/10',
     },
     {
       title: 'Inactive Users',
@@ -36,8 +36,8 @@ const UsersPage = () => {
       title: 'Paid Members',
       value: statsData?.paid_members_count ?? 0,
       icon: ShieldCheck,
-      color: 'text-emerald-600',
-      bgColor: 'bg-emerald-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
   ];
 

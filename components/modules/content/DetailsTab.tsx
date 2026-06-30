@@ -120,9 +120,9 @@ const DetailsTab = ({
             <button
               className={cn(
                 'text-foreground flex cursor-default items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-                contest?.status === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+                contest?.status === 'ACTIVE' && 'bg-success/10 text-success',
                 contest?.status === 'CLOSED' && 'bg-destructive/10 text-destructive',
-                contest?.status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
+                contest?.status === 'UPCOMING' && 'bg-warning/10 text-warning',
               )}
             >
               <GoDotFill /> {contest?.status}

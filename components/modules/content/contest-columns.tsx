@@ -95,9 +95,9 @@ export const columns: ColumnDef<any>[] = [
         <button
           className={cn(
             'text-foreground flex items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+            status === 'ACTIVE' && 'bg-success/10 text-success',
             status === 'CLOSED' && 'bg-destructive/10 text-destructive',
-            status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
+            status === 'UPCOMING' && 'bg-warning/10 text-warning',
           )}
         >
           <GoDotFill /> {status}
