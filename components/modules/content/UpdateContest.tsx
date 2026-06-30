@@ -1,26 +1,36 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Resolver, useForm } from 'react-hook-form';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { CREATE_CONTEST_STEPS } from '@/lib/constants';
 import { contestFinalSchema, type ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { useCreateContestMutation } from '@/store/features/contest/contestApi';
+import { useGetContestQuery, useUpdateContestMutation } from '@/store/features/contest/contestApi';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import DetailsStep from './DetailsStep';
 import PrizesStep from './PrizesStep';
-import RulesStep from './RulesStep';
-import RewardsStep from './RewardsStep';
 import ReviewStep from './ReviewStep';
+import RewardsStep from './RewardsStep';
+import RulesStep from './RulesStep';
 
-const CreateContest: React.FC = () => {
+const UpdateContest: React.FC = () => {
   const router = useRouter();
+  const params = useParams();
+  const contestId = params?.id as string;
+
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [createContest, { isLoading }] = useCreateContestMutation();
+
+  const {
+    data: contestData,
+    isLoading: isFetching,
+    isError,
+  } = useGetContestQuery({ id: contestId }, { skip: !contestId });
+  const contest = contestData?.data ?? {};
+  const [updateContest, { isLoading: isUpdating }] = useUpdateContestMutation();
 
   const form = useForm<ContestFinalValues>({
     resolver: zodResolver(contestFinalSchema) as Resolver<ContestFinalValues>,
@@ -42,24 +52,49 @@ const CreateContest: React.FC = () => {
         coin_requirement: false,
         coin_required: 0,
       },
-      rules: [{ name: 'General Rule', description: 'General Rule', icon: 'Info' }],
-      rewards: [
-        {
-          category: 'TOP_PHOTOGRAPHER',
-          icon: 'User',
-          key: 0,
-          boost: 0,
-          swap: 0,
-        },
-      ],
+      rules: [],
+      rewards: [],
     },
     mode: 'onChange',
   });
 
-  const { watch, setValue, getValues, trigger } = form;
+  const { watch, setValue, getValues, reset } = form;
   const watchRecurring = watch('details.recurring');
-  const watchIsMoney = watch('prizes.isMoneyContest');
 
+  // Populate data on load
+  useEffect(() => {
+    if (!contest?.id) return;
+
+    reset({
+      details: {
+        title: contest.title ?? '',
+        description: contest.description ?? '',
+        banner: contest.banner ?? '',
+        maxUploads: contest.maxUploads ?? 4,
+        recurring: Boolean(contest.recurring),
+        recurringType: contest.recurringType ?? 'MONTHLY',
+        startDate: contest.startDate ? new Date(contest.startDate) : new Date(),
+        endDate: contest.endDate ? new Date(contest.endDate) : new Date(),
+      },
+      prizes: {
+        isMoneyContest: Boolean(contest.isMoneyContest),
+        minPrize: contest.minPrize ?? 0,
+        maxPrize: contest.maxPrize ?? 0,
+        coin_requirement: Boolean(contest.coin_requirement),
+        coin_required: contest.coin_required ?? 0,
+      },
+      rules: contest.rules ?? [],
+      rewards: (contest.prizes ?? []).map((p: any) => ({
+        category: p.category,
+        icon: p.icon || (p.category === 'TOP_PHOTO' ? 'Image' : 'User'),
+        key: p.key ?? 0,
+        boost: p.boost ?? 0,
+        swap: p.swap ?? 0,
+      })),
+    });
+  }, [contest, reset]);
+
+  // Restore recurringType side-effect only (not prize reset which causes data loss)
   useEffect(() => {
     if (!watchRecurring) {
       if (getValues('details.recurringType') !== undefined) {
@@ -69,21 +104,7 @@ const CreateContest: React.FC = () => {
       const val = getValues('details.recurringType');
       if (!val) setValue('details.recurringType', 'DAILY');
     }
-  }, [watchRecurring, getValues, setValue, trigger]);
-
-  useEffect(() => {
-    if (!watchIsMoney) {
-      const currentMinPrize = getValues('prizes.minPrize');
-      const currentMaxPrize = getValues('prizes.maxPrize');
-      const currentCoinRequirement = getValues('prizes.coin_requirement');
-      const currentCoinRequired = getValues('prizes.coin_required');
-
-      if (currentMinPrize !== 0) setValue('prizes.minPrize', 0);
-      if (currentMaxPrize !== 0) setValue('prizes.maxPrize', 0);
-      if (currentCoinRequirement !== false) setValue('prizes.coin_requirement', false);
-      if (currentCoinRequired !== 0) setValue('prizes.coin_required', 0);
-    }
-  }, [watchIsMoney, getValues, setValue]);
+  }, [watchRecurring, getValues, setValue]);
 
   const goToStep = async (targetIndex: number) => {
     if (targetIndex === currentStep) return;
@@ -191,7 +212,10 @@ const CreateContest: React.FC = () => {
     formData.append('startDate', details.startDate.toISOString());
     formData.append('endDate', details.endDate.toISOString());
     formData.append('maxUploads', String(details.maxUploads));
-    if (details.banner) formData.append('banner', details.banner);
+
+    if (details.banner instanceof File) {
+      formData.append('banner', details.banner);
+    }
 
     formData.append('isMoneyContest', String(prizes.isMoneyContest));
     formData.append('minPrize', String(prizes.minPrize));
@@ -210,13 +234,13 @@ const CreateContest: React.FC = () => {
       formData.append(`prizes[${idx}][boost]`, String(reward.boost));
       formData.append(`prizes[${idx}][key]`, String(reward.key));
       formData.append(`prizes[${idx}][swap]`, String(reward.swap));
-      formData.append(`prizes[${idx}][icon]`, reward.icon);
+      if (reward.icon) formData.append(`prizes[${idx}][icon]`, reward.icon);
     });
 
     try {
-      await createContest(formData).unwrap();
-      toast.success('New Contest Created');
-      router.push('/contest');
+      await updateContest({ id: contestId, body: formData }).unwrap();
+      toast.success('Contest updated successfully');
+      router.push(`/contest/${contestId}`);
     } catch (err: any) {
       toast.error(err?.message || err?.data?.message || 'Something went wrong!');
     }
@@ -238,6 +262,25 @@ const CreateContest: React.FC = () => {
         return null;
     }
   };
+
+  if (isFetching) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <Loader2 className="size-8 animate-spin text-emerald-500" />
+      </div>
+    );
+  }
+
+  if (isError || !contest?.id) {
+    return (
+      <div className="rounded-xl border border-gray-800 bg-gray-900 p-8 text-center text-gray-400">
+        <p>Contest not found or error loading data.</p>
+        <Button onClick={() => router.push('/contest')} className="mt-4">
+          Back to Contests
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -291,11 +334,11 @@ const CreateContest: React.FC = () => {
               {currentStep === CREATE_CONTEST_STEPS.length - 1 ? (
                 <Button
                   type="button"
-                  disabled={isLoading}
+                  disabled={isUpdating}
                   onClick={handleFinalSubmit}
                   className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
                 >
-                  {isLoading ? 'Submitting...' : 'Create Contest'}
+                  {isUpdating ? 'Updating...' : 'Save Changes'}
                 </Button>
               ) : (
                 <Button type="button" onClick={handleNext} className="gap-2 text-white">
@@ -310,4 +353,4 @@ const CreateContest: React.FC = () => {
   );
 };
 
-export default CreateContest;
+export default UpdateContest;
