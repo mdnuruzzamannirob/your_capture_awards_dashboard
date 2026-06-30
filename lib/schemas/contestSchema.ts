@@ -20,14 +20,28 @@ export const contestDetailsSchema = z
       .max(2000, 'Description is too long'),
 
     banner: z
-      .custom<File>((file) => file instanceof File, {
-        message: 'Banner image is required',
-      })
+      .union([
+        z.custom<File>((file) => file instanceof File),
+        z.string().min(1, 'Banner image is required'),
+      ])
       .refine(
-        (file) => ALLOWED_IMAGE_TYPES.includes(file.type),
+        (val) => {
+          if (val instanceof File) {
+            return ALLOWED_IMAGE_TYPES.includes(val.type);
+          }
+          return typeof val === 'string' && val.length > 0;
+        },
         'Only JPG, PNG, WEBP images are allowed',
       )
-      .refine((file) => file.size <= MAX_IMAGE_SIZE, 'Image must be under 5MB'),
+      .refine(
+        (val) => {
+          if (val instanceof File) {
+            return val.size <= MAX_IMAGE_SIZE;
+          }
+          return true;
+        },
+        'Image must be under 5MB',
+      ),
 
     maxUploads: z.coerce
       .number()
@@ -111,15 +125,16 @@ export const contestRulesSchema = z
 export const contestRewardsSchema = z
   .array(
     z.object({
-      category: z.enum(['TOP_PHOTO', 'TOP_PHOTOGRAPHER']),
-      icon: z.string().min(1, 'Reward icon required'),
+      category: z.string().min(1, 'Category is required'),
+      icon: z.string().default('User'),
 
       key: z.coerce.number().min(0).default(0),
       boost: z.coerce.number().min(0).default(0),
       swap: z.coerce.number().min(0).default(0),
     }),
   )
-  .min(1, 'At least one reward is required');
+  .min(1, 'At least one reward is required')
+  .max(2, 'Maximum of 2 rewards allowed');
 
 /* STEP 5 - FINAL PREVIEW / SUBMIT SCHEMA */
 export const contestFinalSchema = z.object({

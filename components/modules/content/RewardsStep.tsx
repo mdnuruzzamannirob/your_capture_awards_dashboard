@@ -26,17 +26,24 @@ const RewardsStep = () => {
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Gift className="size-5 text-amber-500" /> Rewards ({fields.length})
         </h2>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            append({ category: 'TOP_PHOTOGRAPHER', icon: 'User', key: 0, boost: 0, swap: 0 })
-          }
-          className="gap-2 border-dashed"
-        >
-          <Plus className="size-4" /> Add Reward
-        </Button>
+        {fields.length < 2 && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const existing = fields.map((f) => f.category);
+              const nextCategory = existing.includes('TOP_PHOTOGRAPHER')
+                ? 'TOP_PHOTO'
+                : 'TOP_PHOTOGRAPHER';
+              const nextIcon = nextCategory === 'TOP_PHOTO' ? 'Image' : 'User';
+              append({ category: nextCategory, icon: nextIcon, key: 0, boost: 0, swap: 0 });
+            }}
+            className="gap-2 border-dashed"
+          >
+            <Plus className="size-4" /> Add Reward
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">

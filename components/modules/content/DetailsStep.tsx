@@ -23,12 +23,18 @@ import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 const DetailsStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const watchRecurring = form.watch('details.recurring');
-  const bannerFile = form.watch('details.banner') as File | undefined;
+  const bannerFile = form.watch('details.banner') as File | string | undefined;
 
-  const preview = useMemo(
-    () => (bannerFile ? URL.createObjectURL(bannerFile) : null),
-    [bannerFile],
-  );
+  const preview = useMemo(() => {
+    if (!bannerFile) return null;
+    if (bannerFile instanceof File) {
+      return URL.createObjectURL(bannerFile);
+    }
+    if (typeof bannerFile === 'string') {
+      return bannerFile;
+    }
+    return null;
+  }, [bannerFile]);
 
   return (
     <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">

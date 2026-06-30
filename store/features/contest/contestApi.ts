@@ -22,7 +22,7 @@ export const contestApi = createApi({
     updateContest: builder.mutation<{ data: unknown }, { id: string; body: any }>({
       query: ({ id, body }) => ({
         url: `/contests/${id}`,
-        method: 'PATCH',
+        method: 'PUT',
         body,
       }),
     }),
