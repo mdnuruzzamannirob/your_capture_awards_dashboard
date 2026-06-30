@@ -4,7 +4,6 @@ import Title from '@/components/common/Title';
 import ContestTable from '@/components/modules/content/ContestTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetContestStatsQuery } from '@/store/features/contest/contestApi';
 import { CheckCircle2, Clock, Trophy, XCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -26,7 +25,7 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const ContestPage = () => {
-  const { data, isLoading, isFetching, isError, error, refetch } = useGetContestStatsQuery();
+  const { data, isError, error, refetch } = useGetContestStatsQuery();
   const statsData = data?.data;
 
   const stats = [
@@ -71,12 +70,6 @@ const ContestPage = () => {
           <Button className="text-white">Create Contest</Button>
         </Link>
       </div>
-
-      {(isLoading || isFetching) && (
-        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
-          <Spinner className="size-4" /> Loading contest stats...
-        </div>
-      )}
 
       {isError && (
         <Card>
