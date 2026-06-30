@@ -55,11 +55,11 @@ const categoryStyles: Record<
 > = {
   COINS: {
     tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
-    badge: 'bg-primary/15 text-primary border-primary/20',
+    badge: 'border-primary/20 bg-primary/10 text-primary',
   },
   BUNDLES: {
-    tab: 'data-[state=active]:bg-surface-tertiary data-[state=active]:text-foreground',
-    badge: 'bg-surface-tertiary text-foreground border-border/10',
+    tab: 'data-[state=active]:bg-info data-[state=active]:text-primary-foreground',
+    badge: 'border-info/20 bg-info/10 text-info',
   },
 };
 
@@ -187,7 +187,7 @@ const StoreProductManagement = () => {
                   setCategory(value as StoreProductCategory);
                   setPage(1);
                 }}
-                className={`gap-2 ${styles.tab}`}
+                className={`gap-2 border border-transparent text-muted-foreground hover:text-foreground data-[state=inactive]:hover:bg-primary-soft ${styles.tab}`}
               >
                 <Icon className="size-4" />
                 {meta.label}
