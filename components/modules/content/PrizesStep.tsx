@@ -15,7 +15,7 @@ const PrizesStep = () => {
   return (
     <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
       <h2 className="flex items-center gap-2 border-b border-gray-800 pb-4 text-lg font-semibold">
-        <Coins className="size-5 text-amber-400" /> Money & Coins
+        <Coins className="size-5 text-amber-400" /> Money &amp; Coins
       </h2>
 
       <div className="space-y-4">
@@ -55,9 +55,13 @@ const PrizesStep = () => {
                       onChange={(e) =>
                         field.onChange(e.target.value === '' ? '' : Number(e.target.value))
                       }
+                      onBlur={() => form.trigger('prizes.minPrize')}
                     />
                   </FormControl>
-                  <FormMessage />
+                  {/* Reserve space so layout doesn't jump */}
+                  <div className="min-h-5">
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />
@@ -79,9 +83,12 @@ const PrizesStep = () => {
                       onChange={(e) =>
                         field.onChange(e.target.value === '' ? '' : Number(e.target.value))
                       }
+                      onBlur={() => form.trigger('prizes.maxPrize')}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <div className="min-h-5">
+                    <FormMessage />
+                  </div>
                 </FormItem>
               )}
             />
@@ -123,9 +130,12 @@ const PrizesStep = () => {
                     onChange={(e) =>
                       field.onChange(e.target.value === '' ? '' : Number(e.target.value))
                     }
+                    onBlur={() => form.trigger('prizes.coin_required')}
                   />
                 </FormControl>
-                <FormMessage />
+                <div className="min-h-5">
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
