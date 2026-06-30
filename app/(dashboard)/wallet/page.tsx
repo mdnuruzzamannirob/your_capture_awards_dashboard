@@ -4,7 +4,6 @@ import Title from '@/components/common/Title';
 import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Spinner } from '@/components/ui/spinner';
 import { useGetTransactionStatsQuery } from '@/store/features/wallet/walletApi';
 import { DollarSign, ShoppingCart, TrendingUp, Wallet as WalletIcon } from 'lucide-react';
 
@@ -31,7 +30,7 @@ const getErrorMessage = (error: unknown) => {
 };
 
 const Wallet = () => {
-  const { data, isLoading, isFetching, isError, error, refetch } = useGetTransactionStatsQuery();
+  const { data, isError, error, refetch } = useGetTransactionStatsQuery();
 
   const statsData = data?.data;
   const stats = [
@@ -71,12 +70,6 @@ const Wallet = () => {
         title="Payment Transactions"
         description="Monitor store and subscription transactions with live wallet stats"
       />
-
-      {(isLoading || isFetching) && (
-        <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
-          <Spinner className="size-4" /> Loading wallet stats...
-        </div>
-      )}
 
       {isError && (
         <Card>
