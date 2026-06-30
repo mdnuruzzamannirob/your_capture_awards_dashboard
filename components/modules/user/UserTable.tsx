@@ -152,7 +152,7 @@ const UserTable = () => {
                         key={index}
                         className={cn(
                           'text-foreground mx-3 flex items-center justify-center gap-0.5 rounded-full px-1.5 py-1 text-[10px] font-medium capitalize',
-                          item.value === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+                          item.value === 'ACTIVE' && 'bg-success/10 text-success',
                           item.value === 'INACTIVE' && 'bg-destructive/10 text-destructive',
                         )}
                       >
