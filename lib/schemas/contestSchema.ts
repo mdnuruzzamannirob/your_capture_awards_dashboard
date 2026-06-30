@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /* CONSTANTS */
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 24 * 1024 * 1024; // 24MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 /* STEP 1 - DETAILS */
@@ -40,7 +40,7 @@ export const contestDetailsSchema = z
           }
           return true;
         },
-        'Image must be under 5MB',
+        'Image must be under 24MB',
       ),
 
     maxUploads: z.coerce

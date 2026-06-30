@@ -59,6 +59,7 @@ const UpdateContest: React.FC = () => {
   });
 
   const { watch, setValue, getValues, reset } = form;
+  const { isDirty } = form.formState;
   const watchRecurring = watch('details.recurring');
 
   // Populate data on load
@@ -334,9 +335,10 @@ const UpdateContest: React.FC = () => {
               {currentStep === CREATE_CONTEST_STEPS.length - 1 ? (
                 <Button
                   type="button"
-                  disabled={isUpdating}
+                  disabled={isUpdating || !isDirty}
                   onClick={handleFinalSubmit}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
+                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  title={!isDirty ? 'No changes to save' : undefined}
                 >
                   {isUpdating ? 'Updating...' : 'Save Changes'}
                 </Button>
