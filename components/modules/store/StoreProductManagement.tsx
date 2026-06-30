@@ -54,12 +54,12 @@ const categoryStyles: Record<
   { tab: string; badge: string }
 > = {
   COINS: {
-    tab: 'data-[state=active]:bg-orange-500 data-[state=active]:text-white',
-    badge: 'bg-orange-500/15 text-orange-300 border-orange-500/20',
+    tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
+    badge: 'bg-primary/15 text-primary border-primary/20',
   },
   BUNDLES: {
-    tab: 'data-[state=active]:bg-slate-100 data-[state=active]:text-slate-950',
-    badge: 'bg-slate-100/10 text-slate-100 border-white/10',
+    tab: 'data-[state=active]:bg-surface-tertiary data-[state=active]:text-foreground',
+    badge: 'bg-surface-tertiary text-foreground border-border/10',
   },
 };
 
@@ -123,35 +123,35 @@ const StoreProductManagement = () => {
     <div className="space-y-5">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
-          <Card key={index} className="overflow-hidden border-white/10 bg-slate-900/90 p-0">
+          <Card key={index} className="overflow-hidden border-border/10 bg-surface p-0">
             <CardContent className="space-y-4 p-5 text-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">
-                  <div className="bg-white/10 h-4 w-32 animate-pulse rounded" />
-                  <div className="bg-white/10 h-5 w-18 animate-pulse rounded-full" />
+                  <div className="bg-background/10 h-4 w-32 animate-pulse rounded" />
+                  <div className="bg-background/10 h-5 w-18 animate-pulse rounded-full" />
                 </div>
-                <div className="bg-white/10 h-5 w-16 animate-pulse rounded-full" />
+                <div className="bg-background/10 h-5 w-16 animate-pulse rounded-full" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="grid grid-cols-2 gap-3 rounded-lg border border-border/10 bg-background/5 p-3">
                 <div className="space-y-2">
-                  <div className="bg-white/10 h-3 w-10 animate-pulse rounded" />
-                  <div className="bg-white/10 h-4 w-20 animate-pulse rounded" />
+                  <div className="bg-background/10 h-3 w-10 animate-pulse rounded" />
+                  <div className="bg-background/10 h-4 w-20 animate-pulse rounded" />
                 </div>
                 <div className="space-y-2 text-right">
-                  <div className="bg-white/10 ml-auto h-3 w-10 animate-pulse rounded" />
-                  <div className="bg-white/10 ml-auto h-4 w-12 animate-pulse rounded" />
+                  <div className="bg-background/10 ml-auto h-3 w-10 animate-pulse rounded" />
+                  <div className="bg-background/10 ml-auto h-4 w-12 animate-pulse rounded" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <div className="bg-white/10 h-3 w-16 animate-pulse rounded" />
-                <div className="bg-white/10 h-9 w-full animate-pulse rounded-md" />
+                <div className="bg-background/10 h-3 w-16 animate-pulse rounded" />
+                <div className="bg-background/10 h-9 w-full animate-pulse rounded-md" />
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="bg-white/10 h-9 flex-1 animate-pulse rounded-md" />
-                <div className="bg-white/10 h-9 w-24 animate-pulse rounded-md" />
+                <div className="bg-background/10 h-9 flex-1 animate-pulse rounded-md" />
+                <div className="bg-background/10 h-9 w-24 animate-pulse rounded-md" />
               </div>
             </CardContent>
           </Card>
@@ -159,10 +159,10 @@ const StoreProductManagement = () => {
       </div>
 
       <div className="flex items-center justify-between gap-3">
-        <div className="bg-white/10 h-4 w-40 animate-pulse rounded" />
+        <div className="bg-background/10 h-4 w-40 animate-pulse rounded" />
         <div className="flex items-center gap-2">
-          <div className="bg-white/10 h-9 w-24 animate-pulse rounded" />
-          <div className="bg-white/10 h-9 w-20 animate-pulse rounded" />
+          <div className="bg-background/10 h-9 w-24 animate-pulse rounded" />
+          <div className="bg-background/10 h-9 w-20 animate-pulse rounded" />
         </div>
       </div>
     </div>
@@ -171,7 +171,7 @@ const StoreProductManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-end">
-        <div className="inline-flex rounded-lg border border-white/10 bg-slate-950 p-1">
+        <div className="inline-flex rounded-lg border border-border/10 bg-background p-1">
           {Object.entries(categoryMeta).map(([value, meta]) => {
             const Icon = meta.icon;
             const isActive = category === value;
@@ -206,7 +206,7 @@ const StoreProductManagement = () => {
       {(isLoading || isFetching) && renderSkeleton()}
 
       {isError && (
-        <Card className="border-white/10 bg-slate-900/90">
+        <Card className="border-border/10 bg-surface">
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <p className="text-destructive text-sm">
               {getErrorMessage(error, 'Failed to load store products.')}
@@ -270,7 +270,7 @@ const StoreProductManagement = () => {
                             product.items.map((item) => (
                               <span
                                 key={`${product.id}-${item.type}`}
-                                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs"
+                                className="rounded-full border border-border/10 bg-background/5 px-2.5 py-1 text-xs"
                               >
                                 {item.type} x {item.quantity}
                               </span>
@@ -306,7 +306,7 @@ const StoreProductManagement = () => {
           </div>
 
           {!products.length && (
-            <Card className="border-white/10 bg-slate-900/90">
+            <Card className="border-border/10 bg-surface">
               <CardContent className="py-10 text-center text-sm text-muted-foreground">
                 No products found for {categoryLabel}.
               </CardContent>

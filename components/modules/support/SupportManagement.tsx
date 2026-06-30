@@ -33,9 +33,9 @@ const statusLabels: Record<SupportTicketStatus, string> = {
 
 const statusStyles: Record<SupportTicketStatus, string> = {
   pending: 'bg-yellow-500/20 text-yellow-600',
-  'in_progress': 'bg-blue-500/20 text-blue-600',
-  resolved: 'bg-green-500/20 text-green-600',
-  closed: 'bg-gray-500/20 text-gray-600',
+  'in_progress': 'bg-primary/10 text-primary',
+  resolved: 'bg-brand-500/10 text-brand-500',
+  closed: 'bg-muted/20 text-muted-foreground',
 };
 
 const getErrorMessage = (error: unknown, fallback: string) => {

@@ -17,16 +17,16 @@ import { Eye, MoreHorizontal } from 'lucide-react';
 import { GoDotFill } from 'react-icons/go';
 
 const statusStyles: Record<SupportTicket['status'], string> = {
-  pending: 'bg-yellow-500/20 text-yellow-600',
-  in_progress: 'bg-blue-500/20 text-blue-600',
-  resolved: 'bg-green-500/20 text-green-600',
-  closed: 'bg-gray-500/20 text-gray-600',
+  pending: 'bg-primary/10 text-primary',
+  in_progress: 'bg-primary/10 text-primary',
+  resolved: 'bg-brand-500/10 text-brand-500',
+  closed: 'bg-muted/20 text-muted-foreground',
 };
 
 const priorityStyles: Record<SupportTicket['priority'], string> = {
-  high: 'bg-red-500/20 text-red-600 hover:bg-red-500/30',
-  medium: 'bg-orange-500/20 text-orange-600 hover:bg-orange-500/30',
-  low: 'bg-blue-500/20 text-blue-600 hover:bg-blue-500/30',
+  high: 'bg-destructive/10 text-destructive hover:bg-destructive/20',
+  medium: 'bg-primary/10 text-primary hover:bg-primary/20',
+  low: 'bg-muted/20 text-muted-foreground hover:bg-muted/30',
 };
 
 export const createSupportColumns = (

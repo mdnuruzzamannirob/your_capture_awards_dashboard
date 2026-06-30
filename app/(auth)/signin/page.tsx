@@ -55,7 +55,7 @@ const Signin = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="w-full max-w-lg space-y-5 rounded-xl border border-gray-700 bg-gray-800 p-5 lg:p-10">
+      <div className="w-full max-w-lg space-y-5 rounded-xl border border-border bg-surface-tertiary p-5 lg:p-10">
         <AuthTitle
           title="Sign In"
           description="Please enter your email and password to continue."
@@ -109,7 +109,7 @@ const Signin = () => {
               onClick={() => setRememberMe(!rememberMe)}
               className={cn(
                 'flex items-center gap-2 text-sm font-medium select-none',
-                rememberMe ? 'text-primary' : 'text-gray-100',
+                rememberMe ? 'text-primary' : 'text-foreground',
               )}
             >
               {rememberMe ? (
@@ -130,7 +130,7 @@ const Signin = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary mt-4 flex w-full items-center justify-center rounded-sm py-[9px] text-white transition-all duration-300 disabled:cursor-default disabled:opacity-60"
+            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary mt-4 flex w-full items-center justify-center rounded-sm py-[9px] text-foreground transition-all duration-300 disabled:cursor-default disabled:opacity-60"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">

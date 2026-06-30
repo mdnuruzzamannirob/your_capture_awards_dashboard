@@ -112,11 +112,11 @@ const UserTable = () => {
                   src={selectedRow?.cover || '/images/logo.png'}
                   width={300}
                   height={200}
-                  className="size-full rounded-xl bg-black object-cover"
+                  className="size-full rounded-xl bg-background object-cover"
                 />
               </div>
               <div className="flex items-center gap-3 px-5 py-3">
-                <div className="-mt-14 size-28 overflow-hidden rounded-full border-3 border-black">
+                <div className="-mt-14 size-28 overflow-hidden rounded-full border-3 border-background">
                   <Image
                     alt="Profile Photo"
                     src={selectedRow?.avatar || '/images/logo.png'}
@@ -152,8 +152,8 @@ const UserTable = () => {
                         key={index}
                         className={cn(
                           'text-foreground mx-3 flex items-center justify-center gap-0.5 rounded-full px-1.5 py-1 text-[10px] font-medium capitalize',
-                          item.value === 'ACTIVE' && 'bg-green-500/20 text-green-600',
-                          item.value === 'INACTIVE' && 'bg-red-500/20 text-red-600',
+                          item.value === 'ACTIVE' && 'bg-brand-500/10 text-brand-500',
+                          item.value === 'INACTIVE' && 'bg-destructive/10 text-destructive',
                         )}
                       >
                         <GoDotFill className="mb-0.5 size-2" /> {item.value}

@@ -143,7 +143,7 @@ const Notification = () => {
   const tabContent = () => {
     if (filteredNotifications.length === 0) {
       return (
-        <div className="py-6 text-center text-sm text-gray-500">
+        <div className="py-6 text-center text-sm text-muted-foreground">
           No {tab === 'unread' ? 'unread' : ''} notifications
         </div>
       );
@@ -155,7 +155,7 @@ const Notification = () => {
           <div
             className={cn(
               'relative flex items-center gap-2 rounded-sm border border-transparent p-3.5',
-              notify.unread ? 'border-gray-700/60 bg-gray-800/80' : 'bg-gray-900',
+              notify.unread ? 'border-border/80 bg-surface-tertiary' : 'bg-surface',
             )}
             key={index}
           >
@@ -171,7 +171,7 @@ const Notification = () => {
               <div className="text-sm font-medium">{notify.text}</div>
               <div className="text-muted-foreground text-xs">{formatTime(notify.date)}</div>
             </div>
-            <div className="h-8 w-16 rounded-full bg-gray-700"></div>
+            <div className="h-8 w-16 rounded-full bg-muted"></div>
             {/* unread badge */}
             {notify.unread && (
               <div className="bg-primary absolute top-1/2 left-1 size-1.5 -translate-y-1/2 rounded-full"></div>
@@ -187,36 +187,36 @@ const Notification = () => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="relative flex size-8 min-w-8 items-center justify-center rounded-full bg-gray-900 transition hover:bg-gray-800">
+        <button className="relative flex size-8 min-w-8 items-center justify-center rounded-full bg-surface transition hover:bg-surface-tertiary">
           <RiNotification3Fill />
 
           {/* Unread dot */}
           {notifyData.some((n) => n.unread) && (
-            <span className="bg-primary absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-gray-900" />
+            <span className="bg-primary absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-surface" />
           )}
         </button>
       </PopoverTrigger>
 
       <PopoverContent
         align="end"
-        className="w-sm space-y-2 rounded-md border border-gray-800 bg-gray-900"
+        className="w-sm space-y-2 rounded-md border border-border bg-surface"
       >
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="font-medium">Notifications</h3>
 
-          <button className="flex items-center gap-1 text-sm text-blue-500">
+          <button className="flex items-center gap-1 text-sm text-primary">
             <IoCheckmarkDone className="size-5" /> Mark all as read
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="relative flex items-center border-b border-gray-700">
+        <div className="relative flex items-center border-b border-border">
           <button
             onClick={() => setTab('')}
             className={cn(
               'relative z-10 h-7 flex-1 text-xs transition',
-              tab === '' ? 'font-medium' : 'text-muted-foreground hover:bg-gray-800',
+              tab === '' ? 'font-medium' : 'text-muted-foreground hover:bg-surface-tertiary',
             )}
           >
             All
@@ -226,7 +226,7 @@ const Notification = () => {
             onClick={() => setTab('unread')}
             className={cn(
               'relative z-10 h-7 flex-1 text-xs transition',
-              tab === 'unread' ? 'font-medium' : 'text-muted-foreground hover:bg-gray-800',
+              tab === 'unread' ? 'font-medium' : 'text-muted-foreground hover:bg-surface-tertiary',
             )}
           >
             Unread

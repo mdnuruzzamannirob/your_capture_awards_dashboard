@@ -128,13 +128,13 @@ const WalletManagement = () => {
                   className={cn(
                     'text-sm',
                     selectedTransaction.status === 'SUCCEEDED' &&
-                      'border-green-500/50 bg-green-500/10 text-green-600',
+                      'border-brand-500/50 bg-brand-500/10 text-brand-500',
                     selectedTransaction.status === 'PENDING' &&
-                      'border-yellow-500/50 bg-yellow-500/10 text-yellow-600',
+                      'border-primary/50 bg-primary/10 text-primary',
                     selectedTransaction.status === 'FAILED' &&
-                      'border-red-500/50 bg-red-500/10 text-red-600',
+                      'border-red-500/50 bg-destructive/10 text-destructive',
                     selectedTransaction.status === 'EXPIRED' &&
-                      'border-zinc-500/50 bg-zinc-500/10 text-zinc-600',
+                      'border-border/50 bg-muted/10 text-muted-foreground',
                   )}
                 >
                   {selectedTransaction.status}

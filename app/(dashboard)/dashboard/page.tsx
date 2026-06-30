@@ -180,43 +180,43 @@ const Dashboard = () => {
         title: 'Total Revenue',
         value: currency.format(overview?.totalRevenue ?? 0),
         icon: DollarSign,
-        color: 'text-emerald-600',
-        bgColor: 'bg-emerald-500/10',
+        color: 'text-brand-500',
+        bgColor: 'bg-brand-500/10',
       },
       {
         title: 'Total Users',
         value: numberFormatter.format(overview?.totalUsers ?? 0),
         icon: Users,
-        color: 'text-blue-600',
-        bgColor: 'bg-blue-500/10',
+        color: 'text-primary',
+        bgColor: 'bg-primary/10',
       },
       {
         title: 'Active Contests',
         value: numberFormatter.format(overview?.totalActiveContests ?? 0),
         icon: Trophy,
-        color: 'text-amber-600',
-        bgColor: 'bg-amber-500/10',
+        color: 'text-primary',
+        bgColor: 'bg-primary/10',
       },
       {
         title: 'Store Revenue',
         value: currency.format(overview?.totalStoreSalesRevenue ?? 0),
         icon: ShoppingCart,
-        color: 'text-indigo-600',
-        bgColor: 'bg-indigo-500/10',
+        color: 'text-primary',
+        bgColor: 'bg-primary-soft',
       },
       {
         title: 'Paid Members',
         value: numberFormatter.format(overview?.paid_members_count ?? 0),
         icon: UserCheck,
-        color: 'text-green-600',
-        bgColor: 'bg-green-500/10',
+        color: 'text-brand-500',
+        bgColor: 'bg-brand-500/10',
       },
       {
         title: 'Total Payments',
         value: numberFormatter.format(overview?.totalPayments ?? 0),
         icon: CreditCard,
-        color: 'text-cyan-600',
-        bgColor: 'bg-cyan-500/10',
+        color: 'text-primary',
+        bgColor: 'bg-primary-soft',
       },
     ],
     [overview],
@@ -255,9 +255,9 @@ const Dashboard = () => {
 
   const contestDistribution = useMemo(
     () => [
-      { name: 'Running', value: overview?.totalContests?.running ?? 0, color: '#16a34a' },
-      { name: 'Upcoming', value: overview?.totalContests?.upcoming ?? 0, color: '#f59e0b' },
-      { name: 'Completed', value: overview?.totalContests?.completed ?? 0, color: '#3b82f6' },
+      { name: 'Running', value: overview?.totalContests?.running ?? 0, color: 'var(--color-brand-500)' },
+      { name: 'Upcoming', value: overview?.totalContests?.upcoming ?? 0, color: 'var(--color-brand-400)' },
+      { name: 'Completed', value: overview?.totalContests?.completed ?? 0, color: 'var(--color-brand-600)' },
     ],
     [overview],
   );
@@ -321,9 +321,9 @@ const Dashboard = () => {
                       return value !== undefined && value !== null ? currency.format(Number(value)) : '';
                     }} />
                     <Legend />
-                    <Bar dataKey="subscription" fill="#0ea5e9" name="Subscription" />
-                    <Bar dataKey="store" fill="#f59e0b" name="Store" />
-                    <Bar dataKey="contest" fill="#8b5cf6" name="Contest" />
+                    <Bar dataKey="subscription" fill="var(--color-brand-400)" name="Subscription" />
+                    <Bar dataKey="store" fill="var(--color-brand-500)" name="Store" />
+                    <Bar dataKey="contest" fill="var(--color-brand-600)" name="Contest" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -349,7 +349,7 @@ const Dashboard = () => {
                     <Line
                       type="monotone"
                       dataKey="users"
-                      stroke="#2563eb"
+                      stroke="var(--color-brand-500)"
                       strokeWidth={2}
                       name="Users"
                     />
@@ -377,8 +377,8 @@ const Dashboard = () => {
                       return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
                     }} />
                     <Legend />
-                    <Bar dataKey="premium" fill="#14b8a6" name="Premium" />
-                    <Bar dataKey="pro" fill="#f97316" name="Pro" />
+                    <Bar dataKey="premium" fill="var(--color-brand-400)" name="Premium" />
+                    <Bar dataKey="pro" fill="var(--color-brand-600)" name="Pro" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>

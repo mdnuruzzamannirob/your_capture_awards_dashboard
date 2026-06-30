@@ -75,30 +75,30 @@ const PolicyEditor = ({
 
   if (isPolicyLoading || isPolicyFetching) {
     return (
-      <Card className="border-gray-800 bg-gray-900/50 animate-pulse">
+      <Card className="border-border bg-surface/50 animate-pulse">
         <CardHeader className="space-y-2">
-          <div className="h-6 w-32 rounded bg-gray-800" />
-          <div className="h-4 w-64 rounded bg-gray-800" />
+          <div className="bg-muted h-6 w-32 rounded" />
+          <div className="bg-muted h-4 w-64 rounded" />
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Skeleton Editor */}
-          <div className="overflow-hidden rounded-md border border-gray-800 bg-background">
-            <div className="bg-gray-900/50 flex h-11 items-center gap-2 border-b border-gray-800 px-3">
-              <div className="h-6 w-6 rounded bg-gray-800" />
-              <div className="h-6 w-6 rounded bg-gray-800" />
-              <div className="h-6 w-6 rounded bg-gray-800" />
-              <div className="h-6 w-1 bg-gray-800 mx-1" />
-              <div className="h-6 w-6 rounded bg-gray-800" />
-              <div className="h-6 w-6 rounded bg-gray-800" />
-              <div className="h-6 w-6 rounded bg-gray-800" />
+          <div className="overflow-hidden rounded-md border border-border bg-background">
+            <div className="bg-surface/50 flex h-11 items-center gap-2 border-b border-border px-3">
+              <div className="bg-muted h-6 w-6 rounded" />
+              <div className="bg-muted h-6 w-6 rounded" />
+              <div className="bg-muted h-6 w-6 rounded" />
+              <div className="bg-muted mx-1 h-6 w-1" />
+              <div className="bg-muted h-6 w-6 rounded" />
+              <div className="bg-muted h-6 w-6 rounded" />
+              <div className="bg-muted h-6 w-6 rounded" />
             </div>
-            <div className="p-4 space-y-3 bg-background min-h-[120px]">
-              <div className="h-4 w-2/3 rounded bg-gray-800" />
-              <div className="h-4 w-4/5 rounded bg-gray-800" />
+            <div className="bg-background min-h-[120px] space-y-3 p-4">
+              <div className="bg-muted h-4 w-2/3 rounded" />
+              <div className="bg-muted h-4 w-4/5 rounded" />
             </div>
           </div>
           <div className="flex justify-end">
-            <div className="h-10 w-28 rounded bg-gray-800" />
+            <div className="bg-muted h-10 w-28 rounded" />
           </div>
         </CardContent>
       </Card>
@@ -106,7 +106,7 @@ const PolicyEditor = ({
   }
 
   return (
-    <Card className="border-gray-800 bg-gray-900/50 animate-fadeIn">
+    <Card className="border-border bg-surface/50 animate-fadeIn">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="size-5 text-primary" />
@@ -248,9 +248,9 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 animate-fadeIn">
+    <div className="grid grid-cols-1 gap-6 animate-fadeIn lg:grid-cols-3">
       {/* Left side: Avatar Manager */}
-      <Card className="border-gray-800 bg-gray-900/50 flex flex-col justify-between">
+      <Card className="border-border bg-surface/50 flex flex-col justify-between">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="size-5 text-primary" />
@@ -259,7 +259,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
           <CardDescription>Update your profile picture.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-6 pb-6">
-          <div className="relative size-32 overflow-hidden rounded-full border-4 border-gray-800 bg-gray-800">
+          <div className="relative size-32 overflow-hidden rounded-full border-4 border-border bg-surface-tertiary">
             {previewUrl ? (
               <Image
                 alt="Avatar Preview"
@@ -274,9 +274,9 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
             )}
             <label
               htmlFor="avatarInput"
-              className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/60 opacity-0 transition-opacity hover:opacity-100"
+              className="bg-overlay absolute inset-0 flex cursor-pointer items-center justify-center opacity-0 transition-opacity hover:opacity-100"
             >
-              <Camera className="size-8 text-white" />
+              <Camera className="text-foreground size-8" />
             </label>
             <input
               id="avatarInput"
@@ -304,7 +304,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
                 size="sm"
                 onClick={handleAvatarUpload}
                 disabled={isUploading}
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
               >
                 {isUploading ? 'Uploading...' : 'Save Avatar'}
               </Button>
@@ -314,7 +314,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
       </Card>
 
       {/* Right side: profile info form */}
-      <Card className="border-gray-800 bg-gray-900/50 lg:col-span-2">
+      <Card className="border-border bg-surface/50 lg:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserCheck className="size-5 text-primary" />
@@ -404,7 +404,7 @@ const PasswordTab = () => {
   };
 
   return (
-    <Card className="border-gray-800 bg-gray-900/50 animate-fadeIn">
+    <Card className="border-border bg-surface/50 animate-fadeIn">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldCheck className="size-5 text-primary" />
@@ -498,7 +498,7 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full grid-cols-3 max-w-md bg-gray-900 border border-gray-800">
+        <TabsList className="grid w-full max-w-md grid-cols-3 border border-border bg-surface">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
