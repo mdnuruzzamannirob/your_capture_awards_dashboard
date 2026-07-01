@@ -207,7 +207,6 @@ const UserTable = () => {
                     src={selectedRow?.avatar || '/images/logo.png'}
                     width={100}
                     height={100}
-                    
                     className="bg-background size-full object-cover"
                   />
                 </div>
@@ -226,7 +225,7 @@ const UserTable = () => {
                   { title: 'Phone', value: selectedRow?.phone },
                   { title: 'Location', value: selectedRow?.location },
                   { title: 'Role', value: selectedRow?.role },
-                  { title: 'Level', value: selectedRow?.currentLevel },
+                  { title: 'Level', value: selectedRow?.currentLevel || 1 },
                   // { title: 'Voting Power', value: selectedRow?.voting_power },
                   { title: 'Status', value: getUserStatus(selectedRow) },
                 ].map((item, index) => (

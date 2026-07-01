@@ -26,8 +26,8 @@ import {
   StoreProductCategory,
   StoreProductStatus,
 } from '@/store/features/store/types';
-import { Check, ImageIcon, Plus, Trash2, Upload } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Check, Plus, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { z } from 'zod';
 
 interface StoreProductFormProps {
@@ -51,22 +51,12 @@ type FormState = {
   amount: number;
   currency: string;
   status: StoreProductStatus;
-  image: File | null;
-  imagePreview: string;
   items: BundleItemDraft[];
 };
 
 type FormErrors = Partial<
   Record<
-    | 'title'
-    | 'category'
-    | 'description'
-    | 'status'
-    | 'quantity'
-    | 'amount'
-    | 'currency'
-    | 'items'
-    | 'image',
+    'title' | 'category' | 'description' | 'status' | 'quantity' | 'amount' | 'currency' | 'items',
     string
   >
 >;
@@ -94,8 +84,6 @@ const mapInitialValues = (
     amount: product?.amount ?? 0,
     currency: product?.currency ?? (category === 'BUNDLES' ? 'COINS' : 'USD'),
     status: product?.status ?? 'ACTIVE',
-    image: null,
-    imagePreview: product?.image ?? '',
     items: category === 'BUNDLES' ? normalizeItems(product?.items) : [],
   };
 };
@@ -113,9 +101,6 @@ const schema = z.object({
   amount: z.number().gt(0, 'Amount is required.'),
   currency: z.string().trim().min(1, 'Currency is required.'),
   status: z.enum(['ACTIVE', 'INACTIVE']),
-  image: z
-    .any()
-    .refine((v) => !!v || (typeof v === 'string' && v.length > 0), 'Image is required.'),
   items: z.array(
     z.object({
       type: z.enum(['KEY', 'BOOST', 'SWAP']),
@@ -174,24 +159,6 @@ export default function StoreProductForm({
     setErrors((prev) => ({ ...prev, category: undefined }));
   };
 
-  const handleImageChange = (file?: File | null) => {
-    setFormData((prev) => {
-      if (prev.imagePreview.startsWith('blob:')) URL.revokeObjectURL(prev.imagePreview);
-      return {
-        ...prev,
-        image: file ?? null,
-        imagePreview: file ? URL.createObjectURL(file) : (initialValues?.image ?? ''),
-      };
-    });
-    setErrors((prev) => ({ ...prev, image: undefined }));
-  };
-
-  useEffect(() => {
-    return () => {
-      if (formData.imagePreview.startsWith('blob:')) URL.revokeObjectURL(formData.imagePreview);
-    };
-  }, [formData.imagePreview]);
-
   const availableTypes = bundleTypes.filter(
     (type) => !formData.items.some((item) => item.type === type),
   );
@@ -212,7 +179,6 @@ export default function StoreProductForm({
       amount: formData.amount,
       currency: formData.currency,
       status: formData.status,
-      image: formData.image,
       items: isBundle ? formData.items : [],
     };
 
@@ -516,63 +482,6 @@ export default function StoreProductForm({
                   {errors.items && <p className="text-destructive text-xs">{errors.items}</p>}
                 </div>
               )}
-
-              <div className="space-y-1.5">
-                <Label>Image</Label>
-                <div className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
-                  <div className="bg-muted flex size-10 shrink-0 items-center justify-center rounded-md border">
-                    {formData.imagePreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={formData.imagePreview}
-                        alt="Product"
-                        className="size-10 rounded-md object-cover"
-                      />
-                    ) : (
-                      <ImageIcon className="text-muted-foreground size-5" />
-                    )}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm leading-tight font-medium">
-                      {formData.imagePreview ? 'Image selected' : 'No image selected'}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      JPG, PNG or WEBP - displayed on the product card.
-                    </p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-2">
-                    {formData.imagePreview && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-muted-foreground hover:text-destructive text-xs"
-                        onClick={() => handleImageChange(null)}
-                      >
-                        Remove
-                      </Button>
-                    )}
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                      <Button type="button" variant="outline" size="sm" asChild>
-                        <span>
-                          <Upload className="mr-1.5 size-3.5" />
-                          Upload
-                        </span>
-                      </Button>
-                    </label>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
-                    />
-                  </div>
-                </div>
-                {errors.image && <p className="text-destructive text-xs">{errors.image}</p>}
-              </div>
             </div>
           </div>
 
