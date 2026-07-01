@@ -38,6 +38,7 @@ interface StoreProductFormProps {
   initialValues?: StoreProduct;
   defaultCategory?: StoreProductCategory;
   isLoading?: boolean;
+  triggerClassName?: string;
 }
 
 type BundleItemDraft = { type: StoreBundleItemType; quantity: number };
@@ -131,6 +132,7 @@ export default function StoreProductForm({
   initialValues,
   defaultCategory = 'COINS',
   isLoading = false,
+  triggerClassName,
 }: StoreProductFormProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<FormState>(() =>
@@ -243,7 +245,10 @@ export default function StoreProductForm({
       }}
     >
       <DialogTrigger asChild>
-        <Button variant={triggerLabel ? 'outline' : 'default'} className="max-sm:w-full">
+        <Button
+          variant={triggerLabel ? 'outline' : 'default'}
+          className={triggerClassName ?? 'w-auto'}
+        >
           {!triggerLabel && <Plus className="size-4" />} {triggerLabel || 'Add New Item'}
         </Button>
       </DialogTrigger>
@@ -571,11 +576,17 @@ export default function StoreProductForm({
             </div>
           </div>
 
-          <div className="flex shrink-0 gap-2 border-t pt-4">
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+          <div className="flex shrink-0 flex-col-reverse gap-2 border-t pt-4 sm:flex-row">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={handleClose}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="flex-1">
+            <Button type="submit" disabled={isLoading} className="w-full sm:flex-1">
               {isLoading ? 'Saving...' : isEditMode ? 'Update Product' : 'Create Product'}
             </Button>
           </div>
