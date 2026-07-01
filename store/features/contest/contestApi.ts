@@ -27,8 +27,12 @@ export const contestApi = createApi({
       }),
     }),
 
-    getContests: builder.query<{ data: any }, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 20 }) => `/contests/all?page=${page}&limit=${limit}`,
+    getContests: builder.query<{ data: any }, { page?: number; limit?: number; search?: string }>({
+      query: ({ page = 1, limit = 20, search }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search?.trim()) params.set('search', search.trim());
+        return `/contests/all?${params.toString()}`;
+      },
       providesTags: (result) =>
         result
           ? [
