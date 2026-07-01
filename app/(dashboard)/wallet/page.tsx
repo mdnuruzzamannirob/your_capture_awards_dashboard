@@ -34,33 +34,33 @@ const Wallet = () => {
 
   const statsData = data?.data;
   const stats = [
-    {
-      title: 'Total Successful Payments',
-      value: statsData?.totalSuccessfulPayments ?? 0,
-      icon: WalletIcon,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-500/10',
-    },
-    {
-      title: 'This Month Revenue',
-      value: currency.format(statsData?.thisMonthTotalRevenue ?? 0),
-      icon: DollarSign,
-      color: 'text-yellow-600',
-      bgColor: 'bg-yellow-500/10',
-    },
-    {
-      title: 'Store Revenue',
-      value: currency.format(statsData?.totalStoreRevenue ?? 0),
-      icon: ShoppingCart,
-      color: 'text-green-600',
-      bgColor: 'bg-green-500/10',
-    },
+      {
+        title: 'Total Successful Payments',
+        value: statsData?.totalSuccessfulPayments ?? 0,
+        icon: WalletIcon,
+        color: 'text-success',
+        bgColor: 'bg-success/10',
+      },
+      {
+        title: 'This Month Revenue',
+        value: currency.format(statsData?.thisMonthTotalRevenue ?? 0),
+        icon: DollarSign,
+        color: 'text-warning',
+        bgColor: 'bg-warning/10',
+      },
+      {
+        title: 'Store Revenue',
+        value: currency.format(statsData?.totalStoreRevenue ?? 0),
+        icon: ShoppingCart,
+        color: 'text-info',
+        bgColor: 'bg-info/10',
+      },
     {
       title: 'Subscription Revenue',
       value: currency.format(statsData?.totalSubscriptionRevenue ?? 0),
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-500/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary-soft',
     },
   ];
 

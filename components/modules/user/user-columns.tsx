@@ -52,9 +52,11 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
       return (
         <button
           className={cn(
-            'text-foreground flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
-            status === 'INACTIVE' && 'bg-red-500/20 text-red-600',
+            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
+            status === 'ACTIVE' &&
+              'bg-success/10 text-success ring-1 ring-success/20 hover:bg-success/20',
+            status === 'INACTIVE' &&
+              'bg-destructive/10 text-destructive ring-1 ring-destructive/20 hover:bg-destructive/20',
           )}
         >
           <GoDotFill /> {status}
@@ -73,6 +75,12 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
       return (
         <Button
           variant="outline"
+          className={cn(
+            'gap-2',
+            isActive
+              ? 'border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive'
+              : 'border-success/20 bg-success/10 text-success hover:bg-success/20 hover:text-success',
+          )}
           onClick={(event) => {
             event.stopPropagation();
             onToggleBlock(row.original);

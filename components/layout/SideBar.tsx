@@ -66,12 +66,12 @@ const SideBar = () => {
     <>
       {/* Mobile overlay */}
       {isMobile && isMobileOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={closeMobileMenu} />
+        <div className="fixed inset-0 z-40 bg-overlay lg:hidden" onClick={closeMobileMenu} />
       )}
 
       <aside
         className={cn(
-          'bg-background fixed z-50 h-dvh overflow-hidden border-r transition-all duration-300',
+          'bg-background fixed z-50 h-dvh overflow-hidden border-r border-border transition-all duration-300',
           isMobile ? (isMobileOpen ? 'w-60' : 'w-0') : realExpand ? 'w-60' : 'w-16',
         )}
         onMouseEnter={() => !isPinned && !isMobile && setIsHovered(true)}
@@ -114,10 +114,10 @@ const SideBar = () => {
                   <button
                     onClick={() => toggleGroup(item.name)}
                     className={cn(
-                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize',
+                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize transition-colors',
                       isActive
-                        ? 'bg-gray-800 font-medium'
-                        : 'text-muted-foreground hover:bg-gray-800',
+                        ? 'bg-surface-tertiary font-medium text-foreground'
+                        : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
                     )}
                   >
                     <span className="size-6 min-w-6 transition-all duration-300">{item.icon}</span>
@@ -141,10 +141,10 @@ const SideBar = () => {
                     href={item.href}
                     onClick={closeMobileMenu}
                     className={cn(
-                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize',
+                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize transition-colors',
                       isActive
-                        ? 'bg-gray-800 font-medium'
-                        : 'text-muted-foreground hover:bg-gray-800',
+                        ? 'bg-surface-tertiary font-medium text-foreground'
+                        : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
                     )}
                   >
                     <span className="size-6 min-w-6 transition-all duration-300">{item.icon}</span>
@@ -170,10 +170,10 @@ const SideBar = () => {
                           href={child.href}
                           onClick={closeMobileMenu}
                           className={cn(
-                            'rounded-md px-3 py-1.5 text-sm',
+                            'rounded-md px-3 py-1.5 text-sm transition-colors',
                             childActive
-                              ? 'bg-gray-800 font-medium'
-                              : 'text-muted-foreground hover:bg-gray-800',
+                              ? 'bg-surface-tertiary font-medium text-foreground'
+                              : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
                           )}
                         >
                           {child.name}
@@ -191,7 +191,7 @@ const SideBar = () => {
         {!isMobile && (
           <button
             onClick={() => setIsPinned(!isPinned)}
-            className="group absolute right-0 bottom-0 left-0 flex items-center gap-1 bg-gray-900 p-3 transition-all duration-300"
+            className="group absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t border-border bg-surface p-3 transition-all duration-300"
           >
             <span className="flex size-10 min-w-10 items-center justify-center">
               <TbLayoutSidebarLeftCollapse
@@ -216,7 +216,7 @@ const SideBar = () => {
         {isMobile && isMobileOpen && (
           <button
             onClick={closeMobileMenu}
-            className="group absolute right-0 bottom-0 left-0 flex items-center gap-1 bg-gray-900 p-3 transition-all duration-300"
+            className="group absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t border-border bg-surface p-3 transition-all duration-300"
           >
             <span className="flex size-10 min-w-10 items-center justify-center">
               <X className="size-6" />

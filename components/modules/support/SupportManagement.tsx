@@ -32,10 +32,10 @@ const statusLabels: Record<SupportTicketStatus, string> = {
 };
 
 const statusStyles: Record<SupportTicketStatus, string> = {
-  pending: 'bg-yellow-500/20 text-yellow-600',
-  'in_progress': 'bg-blue-500/20 text-blue-600',
-  resolved: 'bg-green-500/20 text-green-600',
-  closed: 'bg-gray-500/20 text-gray-600',
+  pending: 'bg-warning/10 text-warning',
+  'in_progress': 'bg-info/10 text-info',
+  resolved: 'bg-success/10 text-success',
+  closed: 'bg-destructive/10 text-destructive',
 };
 
 const getErrorMessage = (error: unknown, fallback: string) => {

@@ -267,14 +267,14 @@ const UpdateContest: React.FC = () => {
   if (isFetching) {
     return (
       <div className="flex h-64 w-full items-center justify-center">
-        <Loader2 className="size-8 animate-spin text-emerald-500" />
+        <Loader2 className="text-primary size-8 animate-spin" />
       </div>
     );
   }
 
   if (isError || !contest?.id) {
     return (
-      <div className="rounded-xl border border-gray-800 bg-gray-900 p-8 text-center text-gray-400">
+      <div className="rounded-xl border border-border bg-surface p-8 text-center text-muted-foreground">
         <p>Contest not found or error loading data.</p>
         <Button onClick={() => router.push('/contest')} className="mt-4">
           Back to Contests
@@ -287,7 +287,7 @@ const UpdateContest: React.FC = () => {
     <Form {...form}>
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-          <aside className="sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border border-gray-800 bg-gray-900 p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
+          <aside className="scrollbar-thin sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border border-border bg-surface p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
             {CREATE_CONTEST_STEPS.map((step, index) => {
               const isActive = index === currentStep;
               const isCompleted = index < currentStep;
@@ -296,22 +296,24 @@ const UpdateContest: React.FC = () => {
                   key={step.id}
                   type="button"
                   onClick={() => void goToStep(index)}
-                  className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition hover:bg-gray-800"
+                  className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-surface-tertiary"
                 >
                   <span
-                    className={
-                      'flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold'
-                    }
+                    className="flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"
                     style={{
-                      borderColor: isActive ? '#34d399' : isCompleted ? '#9ca3af' : '#4b5563',
-                      color: isActive ? '#34d399' : '#e5e7eb',
+                      borderColor: isActive
+                        ? 'var(--color-success-500)'
+                        : isCompleted
+                          ? 'var(--color-zinc-400)'
+                          : 'var(--color-zinc-600)',
+                      color: isActive ? 'var(--color-success-500)' : 'var(--foreground)',
                     }}
                   >
                     {isCompleted ? <CheckCircle className="size-4 min-w-4" /> : index + 1}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-white">{step.title}</p>
-                    <p className="text-xs text-gray-400">Step {index + 1} of 5</p>
+                    <p className="text-sm font-semibold text-foreground">{step.title}</p>
+                    <p className="text-xs text-muted-foreground">Step {index + 1} of 5</p>
                   </div>
                 </button>
               );
@@ -321,7 +323,7 @@ const UpdateContest: React.FC = () => {
           <div className="col-span-12 space-y-6 xl:col-span-10">
             {stepContent()}
 
-            <div className="flex items-center justify-between rounded-xl border border-gray-800 bg-gray-900 p-4">
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-4">
               <Button
                 type="button"
                 variant="ghost"
@@ -337,13 +339,13 @@ const UpdateContest: React.FC = () => {
                   type="button"
                   disabled={isUpdating || !isDirty}
                   onClick={handleFinalSubmit}
-                  className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                   title={!isDirty ? 'No changes to save' : undefined}
                 >
                   {isUpdating ? 'Updating...' : 'Save Changes'}
                 </Button>
               ) : (
-                <Button type="button" onClick={handleNext} className="gap-2 text-white">
+                <Button type="button" onClick={handleNext} className="gap-2">
                   Next Step <ArrowRight className="size-4" />
                 </Button>
               )}

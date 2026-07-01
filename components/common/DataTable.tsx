@@ -4,8 +4,8 @@ import {
   ColumnDef,
   useReactTable,
   getCoreRowModel,
+  getFilteredRowModel,
   SortingState,
-  ColumnFiltersState,
   flexRender,
 } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
@@ -38,6 +38,7 @@ interface DataTableProps<TData, TValue> {
   onRowClick?: (rowData: TData) => void;
   isLoading?: boolean;
   filterableColumns?: FilterableColumn[];
+  searchPlaceholder?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,9 +52,10 @@ export function DataTable<TData, TValue>({
   onRowClick,
   isLoading = false,
   filterableColumns = [],
+  searchPlaceholder,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
     data,
@@ -65,7 +67,7 @@ export function DataTable<TData, TValue>({
     state: {
       pagination: { pageIndex: page - 1, pageSize },
       sorting,
-      columnFilters,
+      globalFilter,
     },
     onPaginationChange: (updater) => {
       const next =
@@ -75,8 +77,19 @@ export function DataTable<TData, TValue>({
       if (next.pageSize !== pageSize) onPageSizeChange(next.pageSize);
     },
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const query = String(filterValue ?? '').trim().toLowerCase();
+      if (!query) return true;
+
+      return row.getVisibleCells().some((cell) => {
+        const value = cell.getValue();
+        if (value === null || value === undefined) return false;
+        return String(value).toLowerCase().includes(query);
+      });
+    },
   });
 
   const handleRowClick = (row: TData) => {
@@ -89,19 +102,17 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-full">
-      <div className="mb-3 flex items-center">
-        {firstFilterableColumn && (
-          <Input
-            placeholder={firstFilterableColumn.placeholder}
-            disabled={isLoading}
-            value={(table.getColumn(firstFilterableColumn.id)?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn(firstFilterableColumn.id)?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-        )}
-        <DataTableViewOptions table={table} />
+      <div className="mb-3 flex items-center gap-3">
+        <Input
+          placeholder={searchPlaceholder ?? firstFilterableColumn?.placeholder ?? 'Search...'}
+          disabled={isLoading}
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-sm"
+        />
+        <div className="ml-auto">
+          <DataTableViewOptions table={table} />
+        </div>
       </div>
 
       <div className="my-3 overflow-hidden rounded-md border">

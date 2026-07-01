@@ -21,10 +21,10 @@ const RewardsStep = () => {
   const { fields, append, remove } = useFieldArray({ name: 'rewards', control: form.control });
 
   return (
-    <div className="space-y-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
-      <div className="flex items-center justify-between border-b border-gray-800 pb-4">
+    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
+      <div className="flex items-center justify-between border-b border-border pb-4">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <Gift className="size-5 text-amber-500" /> Rewards ({fields.length})
+          <Gift className="text-primary size-5" /> Rewards ({fields.length})
         </h2>
         {fields.length < 2 && (
           <Button
@@ -48,7 +48,7 @@ const RewardsStep = () => {
 
       <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-3 rounded-lg border border-gray-800 p-4">
+          <div key={field.id} className="space-y-3 rounded-lg border border-border p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Reward {index + 1}</h3>
               {fields.length > 1 && (
@@ -57,7 +57,7 @@ const RewardsStep = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => remove(index)}
-                  className="text-red-400 hover:bg-red-500/10"
+                  className="text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="size-4" />
                 </Button>
@@ -183,7 +183,7 @@ const RewardsStep = () => {
         ))}
 
         {form.formState.errors.rewards && (
-          <p className="text-sm text-red-400">{(form.formState.errors.rewards as any).message}</p>
+          <p className="text-sm text-destructive">{(form.formState.errors.rewards as any).message}</p>
         )}
       </div>
     </div>
