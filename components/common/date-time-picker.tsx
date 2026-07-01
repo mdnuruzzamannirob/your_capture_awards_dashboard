@@ -40,7 +40,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
           <Button
             variant={'outline'}
             className={cn(
-              'h-11 flex-1 justify-start border-gray-800 bg-gray-900 text-left font-normal hover:bg-gray-800',
+              'h-11 flex-1 justify-start border-border bg-surface text-left font-normal hover:bg-surface-tertiary',
               !date && 'text-muted-foreground',
             )}
           >
@@ -49,7 +49,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto border-gray-700 bg-gray-900 p-0 text-gray-200"
+          className="w-auto border-border bg-surface p-0 text-foreground"
           align="start"
         >
           <Calendar
@@ -57,7 +57,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
             selected={date}
             onSelect={setDate}
             initialFocus
-            className="text-gray-200"
+            className="text-muted-foreground"
             styles={{
               head_cell: { color: 'gray' },
               day: { color: 'white' },
@@ -68,7 +68,7 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
       </Popover>
 
       <div className="relative flex items-center">
-        <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-500" />
+        <Clock className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="time"
           value={time}

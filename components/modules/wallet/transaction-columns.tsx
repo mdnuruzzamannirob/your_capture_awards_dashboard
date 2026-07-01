@@ -55,10 +55,10 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
         <button
           className={cn(
             'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium',
-            status === 'SUCCEEDED' && 'bg-green-500/20 text-green-600',
-            status === 'PENDING' && 'bg-yellow-500/20 text-yellow-600',
-            status === 'FAILED' && 'bg-red-500/20 text-red-600',
-            status === 'EXPIRED' && 'bg-zinc-500/20 text-zinc-600',
+            status === 'SUCCEEDED' && 'bg-success/10 text-success',
+            status === 'PENDING' && 'bg-warning/10 text-warning',
+            status === 'FAILED' && 'bg-destructive/10 text-destructive',
+            status === 'EXPIRED' && 'bg-muted/20 text-muted-foreground',
           )}
         >
           <GoDotFill /> {status}

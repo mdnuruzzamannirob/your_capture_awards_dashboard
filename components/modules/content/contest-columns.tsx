@@ -31,7 +31,7 @@ export const columns: ColumnDef<any>[] = [
             src={creator?.avatar}
             width={32}
             height={32}
-            className="size-8 min-w-8 overflow-hidden rounded-full bg-gray-900 object-cover"
+            className="size-8 min-w-8 overflow-hidden rounded-full bg-surface object-cover"
           />
           <div className="">
             <h3 className="text-sm font-medium">{creator?.fullName}</h3>
@@ -95,9 +95,9 @@ export const columns: ColumnDef<any>[] = [
         <button
           className={cn(
             'text-foreground flex items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' && 'bg-green-500/20 text-green-600',
-            status === 'CLOSED' && 'bg-red-500/20 text-red-600',
-            status === 'UPCOMING' && 'bg-yellow-500/20 text-yellow-600',
+            status === 'ACTIVE' && 'bg-success/10 text-success',
+            status === 'CLOSED' && 'bg-destructive/10 text-destructive',
+            status === 'UPCOMING' && 'bg-warning/10 text-warning',
           )}
         >
           <GoDotFill /> {status}

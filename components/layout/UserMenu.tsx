@@ -92,19 +92,19 @@ const UserMenu = () => {
             <span className="truncate font-medium">
               {user?.firstName} {user?.lastName}
             </span>
-            <span className="text-black-2-300 truncate text-xs">{user?.email}</span>
+            <span className="text-muted-foreground truncate text-xs">{user?.email}</span>
           </div>
         </div>
-        <div className="border-t border-gray-800"></div>
+        <div className="border-t border-border"></div>
         <div className="flex flex-col gap-1 p-1">
           <Link
             href="/settings?tab=profile"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
               pathname === '/settings' && (!tab || tab === 'profile')
-                ? 'bg-gray-800 font-medium'
-                : 'text-muted-foreground hover:bg-gray-800',
+                ? 'bg-surface-tertiary font-medium text-foreground'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <ProfileUser className="size-4" />
@@ -114,10 +114,10 @@ const UserMenu = () => {
             href="/settings?tab=change-password"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
               pathname === '/settings' && tab === 'change-password'
-                ? 'bg-gray-800 font-medium'
-                : 'text-muted-foreground hover:bg-gray-800',
+                ? 'bg-surface-tertiary font-medium text-foreground'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <Key className="size-4" />
@@ -127,22 +127,21 @@ const UserMenu = () => {
             href="/settings?tab=site-policy"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-gray-80 flex h-10 items-center gap-2 rounded-sm p-2 text-sm',
+              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
               pathname === '/settings' && tab === 'site-policy'
-                ? 'bg-gray-800 font-medium'
-                : 'text-muted-foreground hover:bg-gray-800',
+                ? 'bg-surface-tertiary font-medium text-foreground'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <FileText className="size-4" />
             Site Policy
           </Link>
         </div>
-        <div className="border-t border-gray-800"></div>
+        <div className="border-t border-border"></div>
         <div className="flex flex-col p-1">
           <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
             <DialogTrigger asChild>
               <button
-                onClick={() => handleLogout}
                 className={cn(
                   'text-destructive hover:bg-destructive/10 flex h-10 items-center gap-2 rounded-sm px-2 text-sm outline-none',
                 )}
@@ -151,7 +150,7 @@ const UserMenu = () => {
                 Logout
               </button>
             </DialogTrigger>
-            <DialogContent className="rounded-xl border-gray-700 bg-gray-900">
+            <DialogContent className="rounded-xl border-border bg-surface">
               <DialogTitle />
 
               <div className="flex flex-col items-center justify-center gap-3">

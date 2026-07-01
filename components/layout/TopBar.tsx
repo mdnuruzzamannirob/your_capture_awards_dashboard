@@ -36,7 +36,7 @@ const TopBar = () => {
       <div className="flex flex-1 items-center lg:hidden">
         <button
           onClick={toggleMobileMenu}
-          className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-zinc-800"
+          className="flex size-10 items-center justify-center rounded-md transition-colors hover:bg-surface-tertiary"
           aria-label="Toggle menu"
         >
           <Menu className="size-5" />

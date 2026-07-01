@@ -31,7 +31,7 @@ export const proseBaseStyles = cn(
   '[&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1',
 
   // Links: color + underline
-  '[&_a]:text-blue-400 [&_a]:underline hover:[&_a]:text-blue-500',
+  '[&_a]:text-primary [&_a]:underline hover:[&_a]:text-primary/90',
 
   // Images
   '[&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-md',
@@ -86,7 +86,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
       Placeholder.configure({
         placeholder,
         emptyEditorClass:
-          'before:content-[attr(data-placeholder)] before:text-gray-500 before:pointer-events-none before:float-left before:h-0',
+          'before:content-[attr(data-placeholder)] before:text-muted-foreground before:pointer-events-none before:float-left before:h-0',
       }),
     ],
     [placeholder],
@@ -116,28 +116,28 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     return (
       <div
         className={cn(
-          'bg-background animate-pulse overflow-hidden rounded-md border border-gray-800',
+          'bg-background animate-pulse overflow-hidden rounded-md border border-border',
           className,
         )}
       >
         {/* Skeleton Toolbar */}
-        <div className="flex h-11 items-center gap-2 border-b border-gray-800 bg-gray-900/50 px-3">
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="mx-1 h-6 w-1 bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="mx-1 h-6 w-1 bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
-          <div className="h-6 w-6 rounded bg-gray-800" />
+        <div className="bg-surface/50 flex h-11 items-center gap-2 border-b border-border px-3">
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted mx-1 h-6 w-1" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted mx-1 h-6 w-1" />
+          <div className="bg-muted h-6 w-6 rounded" />
+          <div className="bg-muted h-6 w-6 rounded" />
         </div>
         {/* Skeleton Body */}
         <div className={cn('bg-background space-y-3 p-4', minHeight)}>
-          <div className="h-4 w-2/3 rounded bg-gray-800" />
-          <div className="h-4 w-4/5 rounded bg-gray-800" />
-          <div className="h-4 w-1/2 rounded bg-gray-800" />
+          <div className="bg-muted h-4 w-2/3 rounded" />
+          <div className="bg-muted h-4 w-4/5 rounded" />
+          <div className="bg-muted h-4 w-1/2 rounded" />
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-md border transition-all focus-within:ring-2 focus-within:ring-white/20',
+        'overflow-hidden rounded-md border transition-all focus-within:ring-2 focus-within:ring-ring/20',
         className,
       )}
     >

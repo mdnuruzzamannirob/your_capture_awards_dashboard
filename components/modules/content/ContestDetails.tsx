@@ -90,7 +90,7 @@ const ContestDetails = () => {
           src={contest.banner}
           width={1920}
           height={500}
-          className="size-full bg-gray-900 object-cover"
+          className="size-full bg-surface object-cover"
         />
       </div>
 
@@ -106,7 +106,7 @@ const ContestDetails = () => {
               'relative z-10 px-5 py-3 text-sm whitespace-nowrap transition',
               activeTab === tab.key
                 ? 'text-primary font-medium'
-                : 'text-muted-foreground hover:bg-gray-800',
+                : 'text-muted-foreground hover:bg-surface-tertiary',
             )}
           >
             {tab.label}
