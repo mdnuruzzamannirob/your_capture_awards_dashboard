@@ -4,6 +4,7 @@ import { DataTable } from '@/components/common/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -26,14 +27,14 @@ import { createSupportColumns } from './support-columns';
 
 const statusLabels: Record<SupportTicketStatus, string> = {
   pending: 'Pending',
-  'in_progress': 'In Progress',
+  in_progress: 'In Progress',
   resolved: 'Resolved',
   closed: 'Closed',
 };
 
 const statusStyles: Record<SupportTicketStatus, string> = {
   pending: 'bg-warning/10 text-warning',
-  'in_progress': 'bg-info/10 text-info',
+  in_progress: 'bg-info/10 text-info',
   resolved: 'bg-success/10 text-success',
   closed: 'bg-destructive/10 text-destructive',
 };
@@ -57,11 +58,18 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 const SupportManagement = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [draftStatus, setDraftStatus] = useState<SupportTicketStatus>('pending');
 
-  const ticketsQuery = useGetSupportTicketsQuery({ page, limit });
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSearch(searchInput.trim()), 400);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  const ticketsQuery = useGetSupportTicketsQuery({ page, limit, search });
   const singleTicketQuery = useGetSupportTicketQuery(
     { ticketId: selectedTicketId ?? '' },
     { skip: !selectedTicketId || !isDialogOpen },
@@ -119,6 +127,23 @@ const SupportManagement = () => {
           </div>
         )}
 
+        <div className="mb-4">
+          <label htmlFor="support-search" className="sr-only">
+            Search support tickets
+          </label>
+          <Input
+            id="support-search"
+            type="text"
+            value={searchInput}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
+            placeholder="Search support tickets..."
+            className="max-w-md"
+          />
+        </div>
+
         <DataTable
           columns={columns}
           data={tickets}
@@ -132,7 +157,8 @@ const SupportManagement = () => {
           }}
           onRowClick={handleViewTicket}
           isLoading={ticketsQuery.isLoading || ticketsQuery.isFetching}
-          filterableColumns={[{ id: 'subject', placeholder: 'Search by subject...' }]}
+          hideViewOptions
+          hideSearch
         />
       </div>
 
@@ -201,17 +227,20 @@ const SupportManagement = () => {
               </div>
 
               <div className="rounded-lg border p-4">
-                <h4 className="mb-3 font-semibold">Current Status</h4>
-                <div className="mb-4">
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium capitalize ${statusStyles[currentTicket.status]}`}
-                  >
-                    <Ticket className="size-4" />
-                    {statusLabels[currentTicket.status]}
-                  </span>
+                <div className="flex items-center justify-between">
+                  {' '}
+                  <h4 className="mb-3 font-semibold">Current Status</h4>
+                  <div className="mb-4">
+                    <span
+                      className={`inline-flex items-center gap-1 rounded px-3 py-1.5 text-sm font-medium capitalize ${statusStyles[currentTicket.status]}`}
+                    >
+                      <Ticket className="size-4" />
+                      {statusLabels[currentTicket.status]}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="mt-2 flex items-center justify-between ">
                   <Label htmlFor="ticket-status">Update Status</Label>
                   <Select
                     value={draftStatus}

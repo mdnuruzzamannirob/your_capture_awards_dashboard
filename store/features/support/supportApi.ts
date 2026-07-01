@@ -1,11 +1,7 @@
 import { baseQuery } from '@/store/baseQuery';
 import type { SupportTicket, SupportTicketStatus } from '@/types';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import {
-  SupportTicketResponse,
-  SupportTicketsResponse,
-  UpdateSupportStatusBody,
-} from './types';
+import { SupportTicketResponse, SupportTicketsResponse, UpdateSupportStatusBody } from './types';
 
 const normalizeStatus = (status: string): SupportTicketStatus =>
   status.toLowerCase() as SupportTicketStatus;
@@ -29,8 +25,15 @@ export const supportApi = createApi({
   baseQuery,
   tagTypes: ['SupportTickets', 'SupportTicket'],
   endpoints: (builder) => ({
-    getSupportTickets: builder.query<SupportTicketsResponse, { page?: number; limit?: number }>({
-      query: ({ page = 1, limit = 10 }) => `/support?page=${page}&limit=${limit}`,
+    getSupportTickets: builder.query<
+      SupportTicketsResponse,
+      { page?: number; limit?: number; search?: string }
+    >({
+      query: ({ page = 1, limit = 10, search }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search?.trim()) params.set('search', search.trim());
+        return `/support?${params.toString()}`;
+      },
       transformResponse: (response: any) => ({
         ...response,
         meta: response.meta,

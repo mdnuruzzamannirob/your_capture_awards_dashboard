@@ -2,18 +2,10 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { SupportTicket } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
-import { Eye, MoreHorizontal } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { GoDotFill } from 'react-icons/go';
 
 const statusStyles: Record<SupportTicket['status'], string> = {
@@ -64,9 +56,7 @@ export const createSupportColumns = (
     header: 'PRIORITY',
     cell: ({ row }) => {
       const priority = row.getValue('priority') as SupportTicket['priority'];
-      return (
-        <Badge className={cn('capitalize', priorityStyles[priority])}>{priority}</Badge>
-      );
+      return <Badge className={cn('capitalize', priorityStyles[priority])}>{priority}</Badge>;
     },
   },
   {
@@ -77,7 +67,7 @@ export const createSupportColumns = (
       return (
         <span
           className={cn(
-            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
+            'inline-flex w-fit items-center justify-center gap-1 rounded px-2 py-1 text-xs font-medium capitalize',
             statusStyles[status],
           )}
         >
@@ -98,35 +88,16 @@ export const createSupportColumns = (
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" className="size-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewTicket(row.original);
-            }}
-          >
-            <Eye className="mr-2 size-4" />
-            View Details
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewTicket(row.original);
-            }}
-          >
-            Update Status
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          onViewTicket(row.original);
+        }}
+        variant="ghost"
+        className="size-8 p-0"
+      >
+        <Eye className="size-4" />
+      </Button>
     ),
   },
 ];
