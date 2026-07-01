@@ -15,8 +15,6 @@ import {
 } from 'lucide-react';
 import { useMemo } from 'react';
 import {
-  Bar,
-  BarChart,
   Cell,
   Legend,
   Line,
@@ -84,7 +82,7 @@ const getErrorMessage = (error: unknown) => {
 /* ─────────────────────────── Skeleton ─────────────────────────── */
 
 const DashboardSkeleton = () => (
-  <div className="space-y-5">
+  <div className="space-y-5 overflow-hidden">
     {/* Stats Grid */}
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
@@ -100,7 +98,7 @@ const DashboardSkeleton = () => (
       ))}
     </div>
 
-    {/* Revenue + User Growth */}
+    {/* User Growth + Contest Status */}
     <div className="grid gap-5 lg:grid-cols-2">
       {Array.from({ length: 2 }).map((_, i) => (
         <Card key={i}>
@@ -113,29 +111,6 @@ const DashboardSkeleton = () => (
           </CardContent>
         </Card>
       ))}
-    </div>
-
-    {/* Member Ratio + Contest Status */}
-    <div className="grid gap-5 lg:grid-cols-3">
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <div className="bg-muted h-5 w-48 animate-pulse rounded" />
-          <div className="bg-muted h-3 w-40 animate-pulse rounded" />
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted h-[300px] w-full animate-pulse rounded-lg" />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <div className="bg-muted h-5 w-36 animate-pulse rounded" />
-          <div className="bg-muted h-3 w-44 animate-pulse rounded" />
-        </CardHeader>
-        <CardContent className="flex items-center justify-center">
-          <div className="bg-muted size-[200px] animate-pulse rounded-full" />
-        </CardContent>
-      </Card>
     </div>
 
     {/* Recent Contests */}
@@ -222,33 +197,23 @@ const Dashboard = () => {
     [overview],
   );
 
-  const revenueData = useMemo(
-    () =>
-      MONTH_LABELS.map((month, index) => ({
-        month,
-        store: overview?.revenueByType?.[index]?.store ?? 0,
-        contest: overview?.revenueByType?.[index]?.contest ?? 0,
-        subscription: overview?.revenueByType?.[index]?.subscription ?? 0,
-        total: overview?.revenueByType?.[index]?.total ?? 0,
-      })),
-    [overview],
-  );
+  // const revenueData = useMemo(
+  //   () =>
+  //     MONTH_LABELS.map((month, index) => ({
+  //       month,
+  //       store: overview?.revenueByType?.[index]?.store ?? 0,
+  //       contest: overview?.revenueByType?.[index]?.contest ?? 0,
+  //       subscription: overview?.revenueByType?.[index]?.subscription ?? 0,
+  //       total: overview?.revenueByType?.[index]?.total ?? 0,
+  //     })),
+  //   [overview],
+  // );
 
   const growthData = useMemo(
     () =>
       MONTH_LABELS.map((month, index) => ({
         month,
         users: overview?.userGrowthByMonth?.[index] ?? 0,
-      })),
-    [overview],
-  );
-
-  const memberRatioData = useMemo(
-    () =>
-      MONTH_LABELS.map((month, index) => ({
-        month,
-        premium: overview?.member_ratio?.[index]?.premium ?? 0,
-        pro: overview?.member_ratio?.[index]?.pro ?? 0,
       })),
     [overview],
   );
@@ -316,7 +281,7 @@ const Dashboard = () => {
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Revenue by Type</CardTitle>
                 <CardDescription>Monthly subscription, store, and contest revenue</CardDescription>
@@ -326,12 +291,16 @@ const Dashboard = () => {
                   <BarChart data={revenueData}>
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value: any) => {
-                      if (Array.isArray(value)) {
-                        return value.map(v => currency.format(Number(v))).join(', ');
-                      }
-                      return value !== undefined && value !== null ? currency.format(Number(value)) : '';
-                    }} />
+                    <Tooltip
+                      formatter={(value: any) => {
+                        if (Array.isArray(value)) {
+                          return value.map((v) => currency.format(Number(v))).join(', ');
+                        }
+                        return value !== undefined && value !== null
+                          ? currency.format(Number(value))
+                          : '';
+                      }}
+                    />
                     <Legend />
                     <Bar dataKey="subscription" fill="var(--color-brand-400)" name="Subscription" />
                     <Bar dataKey="store" fill="var(--color-brand-500)" name="Store" />
@@ -339,7 +308,7 @@ const Dashboard = () => {
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card>
               <CardHeader>
@@ -351,12 +320,16 @@ const Dashboard = () => {
                   <LineChart data={growthData}>
                     <XAxis dataKey="month" />
                     <YAxis />
-                    <Tooltip formatter={(value: any) => {
-                      if (Array.isArray(value)) {
-                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
-                      }
-                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
-                    }} />
+                    <Tooltip
+                      formatter={(value: any) => {
+                        if (Array.isArray(value)) {
+                          return value.map((v) => numberFormatter.format(Number(v))).join(', ');
+                        }
+                        return value !== undefined && value !== null
+                          ? numberFormatter.format(Number(value))
+                          : '';
+                      }}
+                    />
                     <Legend />
                     <Line
                       type="monotone"
@@ -366,32 +339,6 @@ const Dashboard = () => {
                       name="Users"
                     />
                   </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid gap-5 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
-                <CardDescription>Month-wise membership split</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={memberRatioData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip formatter={(value: any) => {
-                      if (Array.isArray(value)) {
-                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
-                      }
-                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
-                    }} />
-                    <Legend />
-                    <Bar dataKey="premium" fill="var(--color-brand-400)" name="Premium" />
-                    <Bar dataKey="pro" fill="var(--color-brand-600)" name="Pro" />
-                  </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
@@ -417,17 +364,51 @@ const Dashboard = () => {
                         <Cell key={entry.name} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value: any) => {
-                      if (Array.isArray(value)) {
-                        return value.map(v => numberFormatter.format(Number(v))).join(', ');
-                      }
-                      return value !== undefined && value !== null ? numberFormatter.format(Number(value)) : '';
-                    }} />
+                    <Tooltip
+                      formatter={(value: any) => {
+                        if (Array.isArray(value)) {
+                          return value.map((v) => numberFormatter.format(Number(v))).join(', ');
+                        }
+                        return value !== undefined && value !== null
+                          ? numberFormatter.format(Number(value))
+                          : '';
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
           </div>
+
+          {/* <div className="grid gap-5 lg:grid-cols-3">
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
+                <CardDescription>Month-wise membership split</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={memberRatioData}>
+                    <XAxis dataKey="month" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value: any) => {
+                        if (Array.isArray(value)) {
+                          return value.map((v) => numberFormatter.format(Number(v))).join(', ');
+                        }
+                        return value !== undefined && value !== null
+                          ? numberFormatter.format(Number(value))
+                          : '';
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="premium" fill="var(--color-brand-400)" name="Premium" />
+                    <Bar dataKey="pro" fill="var(--color-brand-600)" name="Pro" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div> */}
 
           <Card>
             <CardHeader>
