@@ -10,9 +10,16 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<
       ApiSuccessResponse<GetUsersResponse>,
-      { page?: number; limit?: number }
+      { page?: number; limit?: number; search?: string; role?: string }
     >({
-      query: ({ page = 1, limit = 20 }) => `/users?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 20, search, role }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+
+        if (search?.trim()) params.set('search', search.trim());
+        if (role && role !== 'all') params.set('role', role.toUpperCase());
+
+        return `/users?${params.toString()}`;
+      },
       transformResponse: (response: any) => {
         // Transform the API response to match GetUsersResponse structure
         return {
