@@ -382,9 +382,9 @@ export default function StoreProductForm({
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-sm font-medium">Bundle Items</p>
-                      <p className="text-muted-foreground text-xs">
-                        Up to 3 - KEY, BOOST, and SWAP can each appear once.
-                      </p>
+                      {/* <p className="text-muted-foreground text-xs">
+                        KEY, BOOST, and SWAP can each appear once.
+                      </p> */}
                     </div>
                     <Button
                       type="button"
