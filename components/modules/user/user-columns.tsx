@@ -65,7 +65,7 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
       return (
         <span
           className={cn(
-            'flex w-fit items-center gap-0.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap capitalize',
+            'flex w-fit items-center gap-0.5 rounded px-2 py-1 text-xs font-medium whitespace-nowrap capitalize',
             statusStyles[status as keyof typeof statusStyles],
           )}
         >
