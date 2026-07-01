@@ -4,12 +4,13 @@ import { DataTable } from '@/components/common/DataTable';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 import { PaymentTransaction } from '@/store/features/wallet/types';
 import { useGetPaymentsQuery, useGetTransactionsQuery } from '@/store/features/wallet/walletApi';
 import { Calendar, Clock, CreditCard, DollarSign, FileText, Mail, User } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { transactionColumns } from './transaction-columns';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -31,8 +32,15 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 const WalletManagement = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState<PaymentTransaction | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setSearch(searchInput.trim()), 400);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
 
   const {
     data: transactionsResponse,
@@ -41,7 +49,7 @@ const WalletManagement = () => {
     isError,
     error,
     refetch,
-  } = useGetTransactionsQuery({ page, limit });
+  } = useGetTransactionsQuery({ page, limit, search });
 
   const {
     data: paymentsResponse,
@@ -56,7 +64,7 @@ const WalletManagement = () => {
   return (
     <>
       <div className="mb-4 rounded-lg border p-4">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-sm font-semibold">Latest Successful Payments</h3>
           {isPaymentsLoading && <Spinner className="size-4" />}
         </div>
@@ -70,7 +78,7 @@ const WalletManagement = () => {
             {(paymentsResponse?.data ?? []).slice(0, 5).map((payment) => (
               <div
                 key={payment.id}
-                className="flex items-center justify-between rounded-md border p-2 text-sm"
+                className="bg-card flex items-center justify-between rounded-md border p-2 text-sm"
               >
                 <p className="truncate pr-3">{payment.user.fullName || payment.user.email}</p>
                 <p className="font-medium">
@@ -83,6 +91,25 @@ const WalletManagement = () => {
             )}
           </div>
         )}
+      </div>
+
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex-1">
+          <label htmlFor="wallet-search" className="sr-only">
+            Search transactions
+          </label>
+          <Input
+            id="wallet-search"
+            type="text"
+            value={searchInput}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
+            placeholder="Search transactions..."
+            className="max-w-md"
+          />
+        </div>
       </div>
 
       {isError && (
@@ -112,6 +139,8 @@ const WalletManagement = () => {
           setSelectedTransaction(transaction);
           setIsDialogOpen(true);
         }}
+        hideViewOptions
+        hideSearch
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -139,10 +168,6 @@ const WalletManagement = () => {
                 >
                   {selectedTransaction.status}
                 </Badge>
-
-                <span className="text-muted-foreground font-mono text-xs">
-                  {selectedTransaction.id}
-                </span>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
