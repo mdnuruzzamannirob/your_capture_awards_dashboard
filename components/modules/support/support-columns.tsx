@@ -1,6 +1,5 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SupportTicket } from '@/types';
@@ -13,12 +12,6 @@ const statusStyles: Record<SupportTicket['status'], string> = {
   in_progress: 'bg-info/10 text-info',
   resolved: 'bg-success/10 text-success',
   closed: 'bg-destructive/10 text-destructive',
-};
-
-const priorityStyles: Record<SupportTicket['priority'], string> = {
-  high: 'bg-destructive/10 text-destructive hover:bg-destructive/20',
-  medium: 'bg-warning/10 text-warning hover:bg-warning/20',
-  low: 'bg-muted/20 text-muted-foreground hover:bg-muted/30',
 };
 
 export const createSupportColumns = (
@@ -51,14 +44,14 @@ export const createSupportColumns = (
     header: 'EMAIL',
     cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
   },
-  {
-    accessorKey: 'priority',
-    header: 'PRIORITY',
-    cell: ({ row }) => {
-      const priority = row.getValue('priority') as SupportTicket['priority'];
-      return <Badge className={cn('capitalize', priorityStyles[priority])}>{priority}</Badge>;
-    },
-  },
+  // {
+  //   accessorKey: 'priority',
+  //   header: 'PRIORITY',
+  //   cell: ({ row }) => {
+  //     const priority = row.getValue('priority') as SupportTicket['priority'];
+  //     return <Badge className={cn('capitalize', priorityStyles[priority])}>{priority}</Badge>;
+  //   },
+  // },
   {
     accessorKey: 'status',
     header: 'STATUS',

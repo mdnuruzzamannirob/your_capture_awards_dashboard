@@ -24,7 +24,6 @@ export interface StoreProduct {
   currency: string;
   icon: string | null;
   description: string | null;
-  image: string | null;
   status: StoreProductStatus;
   items: StoreBundleItem[];
   createdAt?: string;
@@ -51,7 +50,6 @@ export interface CreateStoreProductBody {
   amount: number;
   currency: string;
   status: StoreProductStatus;
-  image?: File | string | null;
   items: StoreProductFormItem[];
 }
 

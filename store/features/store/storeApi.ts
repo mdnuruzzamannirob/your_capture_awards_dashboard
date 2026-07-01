@@ -4,8 +4,8 @@ import {
   ApiSuccessResponse,
   CreateStoreProductBody,
   StoreProduct,
-  StoreStats,
   StoreProductsResponse,
+  StoreStats,
   UpdateStoreProductBody,
 } from './types';
 
@@ -19,10 +19,6 @@ const toFormData = (body: CreateStoreProductBody) => {
   formData.append('currency', body.currency);
   formData.append('status', body.status);
   formData.append('description', body.description ?? '');
-
-  if (body.image instanceof File) {
-    formData.append('image', body.image);
-  }
 
   body.items.forEach((item, index) => {
     formData.append(`items[${index}][type]`, item.type);
