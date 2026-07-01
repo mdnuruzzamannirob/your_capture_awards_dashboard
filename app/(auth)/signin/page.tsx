@@ -8,7 +8,6 @@ import { SigninFormData, signinSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { useSigninMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -29,16 +28,11 @@ const Signin = () => {
 
   const signInSubmit = async (data: SigninFormData) => {
     try {
-      const response = await signin({ email: data?.email, password: data?.password }).unwrap();
-
-      if (response?.data?.token) {
-        Cookies.set('token', response.data.token, {
-          expires: rememberMe ? 30 : 7,
-          secure: true,
-          sameSite: 'Strict',
-          path: '/',
-        });
-      }
+      await signin({
+        email: data?.email,
+        password: data?.password,
+        remember_me: rememberMe,
+      }).unwrap();
 
       toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',
@@ -55,7 +49,7 @@ const Signin = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="w-full max-w-lg space-y-5 rounded-xl border border-border bg-surface-tertiary p-5 lg:p-10">
+      <div className="border-border bg-surface-tertiary w-full max-w-lg space-y-5 rounded-xl border p-5 lg:p-10">
         <AuthTitle
           title="Sign In"
           description="Please enter your email and password to continue."
@@ -130,7 +124,7 @@ const Signin = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary mt-4 flex w-full items-center justify-center rounded-sm py-[9px] text-foreground transition-all duration-300 disabled:cursor-default disabled:opacity-60"
+            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary text-foreground mt-4 flex w-full items-center justify-center rounded-sm py-[9px] transition-all duration-300 disabled:cursor-default disabled:opacity-60"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">
