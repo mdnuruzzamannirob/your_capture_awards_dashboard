@@ -1,6 +1,6 @@
+import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
-import { baseQuery } from '@/store/baseQuery';
 import { setTempEmail, setTempToken, setUser } from './authSlice';
 import { AuthUser, SigninData } from './types';
 
@@ -15,14 +15,14 @@ export const authApi = createApi({
         method: 'POST',
         body: credentials,
       }),
-      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const {
             data: { data },
           } = await queryFulfilled;
           dispatch(setUser(data?.user));
           Cookies.set('token', data?.token, {
-            expires: 7,
+            expires: arg.remember_me ? 7 : 1,
             secure: true,
             sameSite: 'Strict',
             path: '/',

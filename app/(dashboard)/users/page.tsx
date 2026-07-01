@@ -4,7 +4,7 @@ import Title from '@/components/common/Title';
 import UserTable from '@/components/modules/user/UserTable';
 import { Card, CardContent } from '@/components/ui/card';
 import { useGetDashboardUserStatsQuery } from '@/store/features/dashboard/dashboardApi';
-import { ShieldCheck, UserCheck, Users, UserX } from 'lucide-react';
+import { UserCheck, Users, UserX } from 'lucide-react';
 
 const UsersPage = () => {
   const { data } = useGetDashboardUserStatsQuery();
@@ -26,18 +26,11 @@ const UsersPage = () => {
       bgColor: 'bg-success/10',
     },
     {
-      title: 'Inactive Users',
-      value: statsData?.inactive_user_count ?? 0,
+      title: 'Blocked Users',
+      value: statsData?.blocked_user_count ?? 0,
       icon: UserX,
       color: 'text-muted-foreground',
       bgColor: 'bg-muted/10',
-    },
-    {
-      title: 'Paid Members',
-      value: statsData?.paid_members_count ?? 0,
-      icon: ShieldCheck,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
     },
   ];
 
@@ -49,12 +42,12 @@ const UsersPage = () => {
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="py-4">
-              <CardContent className="flex items-center gap-4 p-6">
+            <Card key={index} className="p-0">
+              <CardContent className="flex items-center gap-4 p-4">
                 <div
                   className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
                 >

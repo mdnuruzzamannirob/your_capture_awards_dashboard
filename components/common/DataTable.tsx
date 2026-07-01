@@ -1,13 +1,7 @@
 'use client';
 
-import {
-  ColumnDef,
-  useReactTable,
-  getCoreRowModel,
-  getFilteredRowModel,
-  SortingState,
-  flexRender,
-} from '@tanstack/react-table';
+import { DataTablePagination } from '@/components/common/data-table-pagination';
+import { DataTableViewOptions } from '@/components/common/data-table-view-options';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -17,9 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  SortingState,
+  useReactTable,
+} from '@tanstack/react-table';
 import { useState } from 'react';
-import { DataTablePagination } from '@/components/common/data-table-pagination';
-import { DataTableViewOptions } from '@/components/common/data-table-view-options';
 
 // FilterableColumn interface
 export interface FilterableColumn {
@@ -39,6 +39,8 @@ interface DataTableProps<TData, TValue> {
   isLoading?: boolean;
   filterableColumns?: FilterableColumn[];
   searchPlaceholder?: string;
+  hideViewOptions?: boolean;
+  hideSearch?: boolean;
 }
 
 export function DataTable<TData, TValue>({
@@ -53,6 +55,8 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   filterableColumns = [],
   searchPlaceholder,
+  hideViewOptions = false,
+  hideSearch = false,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -81,7 +85,9 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     globalFilterFn: (row, _columnId, filterValue) => {
-      const query = String(filterValue ?? '').trim().toLowerCase();
+      const query = String(filterValue ?? '')
+        .trim()
+        .toLowerCase();
       if (!query) return true;
 
       return row.getVisibleCells().some((cell) => {
@@ -103,16 +109,20 @@ export function DataTable<TData, TValue>({
   return (
     <div className="w-full">
       <div className="mb-3 flex items-center gap-3">
-        <Input
-          placeholder={searchPlaceholder ?? firstFilterableColumn?.placeholder ?? 'Search...'}
-          disabled={isLoading}
-          value={globalFilter}
-          onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
-        />
-        <div className="ml-auto">
-          <DataTableViewOptions table={table} />
-        </div>
+        {!hideSearch && (
+          <Input
+            placeholder={searchPlaceholder ?? firstFilterableColumn?.placeholder ?? 'Search...'}
+            disabled={isLoading}
+            value={globalFilter}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            className="max-w-sm"
+          />
+        )}
+        {!hideViewOptions && (
+          <div className="ml-auto">
+            <DataTableViewOptions table={table} />
+          </div>
+        )}
       </div>
 
       <div className="my-3 overflow-hidden rounded-md border">

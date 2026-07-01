@@ -255,9 +255,21 @@ const Dashboard = () => {
 
   const contestDistribution = useMemo(
     () => [
-      { name: 'Running', value: overview?.totalContests?.running ?? 0, color: 'var(--color-brand-500)' },
-      { name: 'Upcoming', value: overview?.totalContests?.upcoming ?? 0, color: 'var(--color-brand-400)' },
-      { name: 'Completed', value: overview?.totalContests?.completed ?? 0, color: 'var(--color-brand-600)' },
+      {
+        name: 'Running',
+        value: overview?.totalContests?.running ?? 0,
+        color: 'var(--color-info-500)',
+      },
+      {
+        name: 'Upcoming',
+        value: overview?.totalContests?.upcoming ?? 0,
+        color: 'var(--color-warning-500)',
+      },
+      {
+        name: 'Completed',
+        value: overview?.totalContests?.completed ?? 0,
+        color: 'var(--color-success-500)',
+      },
     ],
     [overview],
   );
