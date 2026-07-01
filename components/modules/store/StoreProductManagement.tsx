@@ -60,6 +60,12 @@ const categoryStyles: Record<StoreProductCategory, { tab: string; badge: string 
   },
 };
 
+const bundleItemStyles: Record<string, string> = {
+  KEY: ' bg-amber-500 text-white',
+  BOOST: ' bg-sky-500 text-white',
+  SWAP: ' bg-fuchsia-500 text-white',
+};
+
 const StoreProductManagement = () => {
   const [category, setCategory] = useState<StoreProductCategory>('COINS');
   const [page, setPage] = useState(1);
@@ -172,8 +178,8 @@ const StoreProductManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center flex-wrap justify-between gap-3">
-        <div className="border-border/10 bg-background inline-flex flex-wrap rounded-xl border p-1 w-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="border-border/10 bg-background inline-flex w-auto flex-wrap rounded-xl border p-1">
           {Object.entries(categoryMeta).map(([value, meta]) => {
             const Icon = meta.icon;
             const isActive = category === value;
@@ -188,7 +194,7 @@ const StoreProductManagement = () => {
                   setCategory(value as StoreProductCategory);
                   setPage(1);
                 }}
-                className={`text-muted-foreground whitespace-nowrap flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 transition-colors ${isActive ? '' : 'hover:bg-primary/10 hover:text-primary'} data-[state=inactive]:hover:border-primary/15 data-[state=active]:shadow-sm ${styles.tab}`}
+                className={`text-muted-foreground flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 whitespace-nowrap transition-colors ${isActive ? '' : 'hover:bg-primary/10 hover:text-primary'} data-[state=inactive]:hover:border-primary/15 data-[state=active]:shadow-sm ${styles.tab}`}
               >
                 <Icon className="size-4" />
                 {meta.label}
@@ -269,7 +275,7 @@ const StoreProductManagement = () => {
                             product.items.map((item) => (
                               <span
                                 key={`${product.id}-${item.type}`}
-                                className="border-border/10 bg-background/60 rounded-full border px-2.5 py-1 text-xs"
+                                className={`rounded-full px-2.5 py-1 text-xs ${bundleItemStyles[item.type] ?? 'bg-background/60 text-foreground'}`}
                               >
                                 {item.type} x {item.quantity}
                               </span>
