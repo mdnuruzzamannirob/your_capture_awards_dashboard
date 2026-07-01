@@ -24,7 +24,7 @@ import {
   StoreProductCategory,
 } from '@/store/features/store/types';
 import { Coins, Package, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import StoreProductForm from './StoreProductForm';
 
@@ -49,17 +49,14 @@ const categoryMeta: Record<StoreProductCategory, { label: string; icon: typeof C
   BUNDLES: { label: 'Bundles', icon: Package },
 };
 
-const categoryStyles: Record<
-  StoreProductCategory,
-  { tab: string; badge: string }
-> = {
+const categoryStyles: Record<StoreProductCategory, { tab: string; badge: string }> = {
   COINS: {
     tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
     badge: 'border-primary/20 bg-primary/10 text-primary',
   },
   BUNDLES: {
-    tab: 'data-[state=active]:bg-info data-[state=active]:text-primary-foreground',
-    badge: 'border-info/20 bg-info/10 text-info',
+    tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
+    badge: 'border-primary/20 bg-primary/10 text-primary',
   },
 };
 
@@ -67,6 +64,11 @@ const StoreProductManagement = () => {
   const [category, setCategory] = useState<StoreProductCategory>('COINS');
   const [page, setPage] = useState(1);
   const [deletingProduct, setDeletingProduct] = useState<StoreProduct | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { data, isLoading, isFetching, isError, error, refetch } = useGetStoreProductsQuery({
     category,
@@ -121,10 +123,10 @@ const StoreProductManagement = () => {
 
   const renderSkeleton = () => (
     <div className="space-y-5">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
-          <Card key={index} className="overflow-hidden border-border/10 bg-surface p-0">
-            <CardContent className="space-y-4 p-5 text-sm">
+          <Card key={index} className="border-border/10 bg-surface overflow-hidden p-0 shadow-xs">
+            <CardContent className="space-y-3 p-4 text-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">
                   <div className="bg-background/10 h-4 w-32 animate-pulse rounded" />
@@ -133,7 +135,7 @@ const StoreProductManagement = () => {
                 <div className="bg-background/10 h-5 w-16 animate-pulse rounded-full" />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 rounded-lg border border-border/10 bg-background/5 p-3">
+              <div className="border-border/10 bg-background/40 grid grid-cols-2 gap-3 rounded-lg border p-3">
                 <div className="space-y-2">
                   <div className="bg-background/10 h-3 w-10 animate-pulse rounded" />
                   <div className="bg-background/10 h-4 w-20 animate-pulse rounded" />
@@ -149,9 +151,9 @@ const StoreProductManagement = () => {
                 <div className="bg-background/10 h-9 w-full animate-pulse rounded-md" />
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <div className="bg-background/10 h-9 flex-1 animate-pulse rounded-md" />
-                <div className="bg-background/10 h-9 w-24 animate-pulse rounded-md" />
+                <div className="bg-background/10 h-9 w-full animate-pulse rounded-md sm:w-24" />
               </div>
             </CardContent>
           </Card>
@@ -170,28 +172,27 @@ const StoreProductManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-end">
-        <div className="inline-flex rounded-lg border border-border/10 bg-background p-1">
+      <div className="flex items-center flex-wrap justify-between gap-3">
+        <div className="border-border/10 bg-background inline-flex flex-wrap rounded-xl border p-1 w-auto">
           {Object.entries(categoryMeta).map(([value, meta]) => {
             const Icon = meta.icon;
             const isActive = category === value;
             const styles = categoryStyles[value as StoreProductCategory];
 
             return (
-              <Button
+              <button
                 key={value}
                 type="button"
-                variant="ghost"
                 data-state={isActive ? 'active' : 'inactive'}
                 onClick={() => {
                   setCategory(value as StoreProductCategory);
                   setPage(1);
                 }}
-                className={`gap-2 border border-transparent text-muted-foreground hover:text-foreground data-[state=inactive]:hover:bg-primary-soft ${styles.tab}`}
+                className={`text-muted-foreground whitespace-nowrap flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 transition-colors ${isActive ? '' : 'hover:bg-primary/10 hover:text-primary'} data-[state=inactive]:hover:border-primary/15 data-[state=active]:shadow-sm ${styles.tab}`}
               >
                 <Icon className="size-4" />
                 {meta.label}
-              </Button>
+              </button>
             );
           })}
         </div>
@@ -203,11 +204,11 @@ const StoreProductManagement = () => {
         />
       </div>
 
-      {(isLoading || isFetching) && renderSkeleton()}
+      {!isMounted || isLoading || isFetching ? renderSkeleton() : null}
 
-      {isError && (
+      {isMounted && isError && (
         <Card className="border-border/10 bg-surface">
-          <CardContent className="flex items-center justify-between gap-3 p-4">
+          <CardContent className="flex items-center justify-between gap-3 p-4 max-sm:flex-col max-sm:items-start">
             <p className="text-destructive text-sm">
               {getErrorMessage(error, 'Failed to load store products.')}
             </p>
@@ -218,37 +219,35 @@ const StoreProductManagement = () => {
         </Card>
       )}
 
-      {!isLoading && !isFetching && !isError && (
+      {isMounted && !isLoading && !isFetching && !isError && (
         <>
-          <div className="flex items-center justify-between gap-3 max-md:flex-col md:items-start">
-            <div>
-              <p className="text-sm font-semibold">{categoryLabel}</p>
-              <p className="text-muted-foreground text-xs">
-                Page {meta?.page ?? page} of {meta?.totalPages ?? 1} · Total {totalCount}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => {
               const styles = categoryStyles[product.category];
 
               return (
-                <Card key={product.id} className="overflow-hidden p-0">
-                  <CardContent className="space-y-4 p-5 text-sm">
+                <Card
+                  key={product.id}
+                  className="border-border/10 bg-surface overflow-hidden p-0 shadow-xs"
+                >
+                  <CardContent className="space-y-3 p-4 text-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
-                        <h3 className="text-foreground leading-tight font-semibold">{product.title}</h3>
+                        <h3 className="text-foreground line-clamp-1 leading-tight font-semibold">
+                          {product.title}
+                        </h3>
                       </div>
-                      <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}>
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}
+                      >
                         {product.status}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted/30 p-3">
+                    <div className="border-border/10 bg-background/40 grid grid-cols-2 gap-3 rounded-lg border p-3">
                       <div className="space-y-0.5">
                         <p className="text-muted-foreground text-xs">Price</p>
-                        <p className="font-semibold">
+                        <p className="leading-tight font-semibold">
                           {product.category === 'COINS'
                             ? `${product.amount} ${product.currency}`
                             : `${product.amount} coins`}
@@ -256,13 +255,13 @@ const StoreProductManagement = () => {
                       </div>
                       <div className="space-y-0.5 text-right">
                         <p className="text-muted-foreground text-xs">Stock</p>
-                        <p className="font-semibold">{product.quantity}</p>
+                        <p className="leading-tight font-semibold">{product.quantity}</p>
                       </div>
                     </div>
 
                     {product.category === 'BUNDLES' ? (
                       <div className="space-y-2">
-                        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
+                        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
                           Bundle items
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -270,7 +269,7 @@ const StoreProductManagement = () => {
                             product.items.map((item) => (
                               <span
                                 key={`${product.id}-${item.type}`}
-                                className="rounded-full border border-border/10 bg-background/5 px-2.5 py-1 text-xs"
+                                className="border-border/10 bg-background/60 rounded-full border px-2.5 py-1 text-xs"
                               >
                                 {item.type} x {item.quantity}
                               </span>
@@ -286,7 +285,7 @@ const StoreProductManagement = () => {
                       {product.description || 'No description available.'}
                     </p>
 
-                    <div className="flex items-center gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <StoreProductForm
                         triggerLabel="Edit"
                         title="Update Store Product"
@@ -294,8 +293,14 @@ const StoreProductManagement = () => {
                         initialValues={product}
                         onSubmit={(payload) => handleUpdateProduct(product.id, payload)}
                         isLoading={isUpdating}
+                        triggerClassName="w-full"
                       />
-                      <Button type="button" variant="destructive" onClick={() => setDeletingProduct(product)}>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setDeletingProduct(product)}
+                      >
                         <Trash2 className="size-4" /> Delete
                       </Button>
                     </div>
@@ -307,20 +312,21 @@ const StoreProductManagement = () => {
 
           {!products.length && (
             <Card className="border-border/10 bg-surface">
-              <CardContent className="py-10 text-center text-sm text-muted-foreground">
+              <CardContent className="text-muted-foreground py-10 text-center text-sm">
                 No products found for {categoryLabel}.
               </CardContent>
             </Card>
           )}
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col items-start justify-between gap-3 border-t pt-4 sm:flex-row sm:items-center">
             <p className="text-muted-foreground text-sm">
               Page {meta?.page ?? page} of {meta?.totalPages ?? 1} · Total {totalCount}
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
+                className="flex-1 sm:flex-none"
                 disabled={(meta?.page ?? page) <= 1 || isFetching}
                 onClick={() => setPage((prev) => Math.max(1, prev - 1))}
               >
@@ -329,6 +335,7 @@ const StoreProductManagement = () => {
               <Button
                 variant="outline"
                 size="sm"
+                className="flex-1 sm:flex-none"
                 disabled={(meta?.page ?? page) >= (meta?.totalPages ?? 1) || isFetching}
                 onClick={() => setPage((prev) => prev + 1)}
               >
@@ -344,11 +351,12 @@ const StoreProductManagement = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Product</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-semibold">{deletingProduct?.title}</span>?
-              This action cannot be undone.
+              Are you sure you want to delete{' '}
+              <span className="font-semibold">{deletingProduct?.title}</span>? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteProduct}

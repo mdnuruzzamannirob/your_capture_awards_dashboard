@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useGetStoreStatsQuery } from '@/store/features/store/storeApi';
 import { DollarSign, Package, ShoppingCart, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const getErrorMessage = (error: unknown) => {
   if (!error || typeof error !== 'object') return 'Failed to load store stats.';
@@ -30,16 +31,21 @@ const currency = new Intl.NumberFormat('en-US', {
 });
 
 export default function StorePage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { data, isError, error, refetch } = useGetStoreStatsQuery();
   const statsData = data?.data;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const stats = [
     {
       title: 'Total Products',
       value: statsData?.totalProducts ?? 0,
       icon: Package,
-      color: 'text-info',
-      bgColor: 'bg-info/10',
+      color: 'text-primary',
+      bgColor: 'bg-primary/10',
     },
     {
       title: 'Total Purchases',
@@ -71,7 +77,7 @@ export default function StorePage() {
         description="Create and manage store items with live product and revenue stats."
       />
 
-      {isError && (
+      {isMounted && isError && (
         <Card>
           <CardContent className="flex items-center justify-between gap-3 p-4">
             <p className="text-destructive text-sm">{getErrorMessage(error)}</p>
@@ -82,21 +88,25 @@ export default function StorePage() {
         </Card>
       )}
 
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="py-4">
-              <CardContent className="flex items-center gap-4 p-6">
+            <Card key={index} className="overflow-hidden border-border/10 bg-surface p-0 shadow-xs">
+              <CardContent className="flex items-center gap-4 p-4">
                 <div
-                  className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
+                  className={`flex size-11 items-center justify-center rounded-xl ${stat.bgColor}`}
                 >
-                  <Icon className={`size-6 ${stat.color}`} />
+                  <Icon className={`size-5 ${stat.color}`} />
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">
-                    {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+                  <h3 className="text-xl font-bold leading-tight sm:text-2xl">
+                    {isMounted
+                      ? typeof stat.value === 'number'
+                        ? stat.value.toLocaleString()
+                        : stat.value
+                      : '—'}
                   </h3>
                 </div>
               </CardContent>
@@ -105,7 +115,7 @@ export default function StorePage() {
         })}
       </div>
 
-      <StoreProductManagement />
+      {isMounted ? <StoreProductManagement /> : null}
     </section>
   );
 }
