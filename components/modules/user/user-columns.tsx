@@ -11,6 +11,12 @@ interface UserColumnsOptions {
   onToggleBlock: (user: User) => void;
 }
 
+const getUserStatus = (user: User) => {
+  if (user.isDeleted) return 'Deleted';
+  if (user.isBlocked || user.is_blocked) return 'Blocked';
+  return 'Active';
+};
+
 export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef<User>[] => [
   {
     id: 'sl',
@@ -46,21 +52,25 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
   {
     id: 'activeStatus',
     header: 'STATUS',
+    size: 120,
+    minSize: 110,
     cell: ({ row }) => {
-      const status = row.original.isActive ? 'ACTIVE' : 'INACTIVE';
+      const status = getUserStatus(row.original);
+      const statusStyles = {
+        Active: 'bg-success/10 text-success ring-1 ring-success/20',
+        Blocked: 'bg-destructive/10 text-destructive ring-1 ring-destructive/20',
+        Deleted: 'bg-muted/10 text-muted-foreground ring-1 ring-muted/20',
+      } as const;
 
       return (
-        <button
+        <span
           className={cn(
-            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' &&
-              'bg-success/10 text-success ring-1 ring-success/20 hover:bg-success/20',
-            status === 'INACTIVE' &&
-              'bg-destructive/10 text-destructive ring-1 ring-destructive/20 hover:bg-destructive/20',
+            'flex w-fit items-center gap-0.5 rounded-full px-3 py-2 text-xs font-medium whitespace-nowrap capitalize',
+            statusStyles[status as keyof typeof statusStyles],
           )}
         >
           <GoDotFill /> {status}
-        </button>
+        </span>
       );
     },
   },
@@ -70,24 +80,36 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
     header: 'ACTIONS',
     enableHiding: false,
     cell: ({ row }) => {
-      const isActive = row.original.isActive;
+      const isDeleted = Boolean(row.original.isDeleted);
+      const isBlocked = Boolean(row.original.isBlocked || row.original.is_blocked);
+      const isDisabled = isDeleted;
+      const label = isDeleted ? 'Deleted' : isBlocked ? 'Unblock' : 'Block';
 
       return (
         <Button
           variant="outline"
           className={cn(
             'gap-2',
-            isActive
-              ? 'border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive'
-              : 'border-success/20 bg-success/10 text-success hover:bg-success/20 hover:text-success',
+            isDisabled
+              ? 'border-muted/20 bg-muted/10 text-muted-foreground cursor-not-allowed'
+              : isBlocked
+                ? 'border-success/20 bg-success/10 text-success hover:bg-success/20 hover:text-success'
+                : 'border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive',
           )}
+          disabled={isDisabled}
           onClick={(event) => {
             event.stopPropagation();
-            onToggleBlock(row.original);
+            if (!isDisabled) onToggleBlock(row.original);
           }}
         >
-          {isActive ? <ShieldMinus className="size-4" /> : <ShieldCheck className="size-4" />}{' '}
-          {isActive ? 'Block' : 'Unblock'}
+          {isDeleted ? (
+            <ShieldMinus className="size-4" />
+          ) : isBlocked ? (
+            <ShieldCheck className="size-4" />
+          ) : (
+            <ShieldMinus className="size-4" />
+          )}{' '}
+          {label}
         </Button>
       );
     },

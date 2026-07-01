@@ -57,8 +57,7 @@ export interface DashboardOverview {
 export interface DashboardUserStats {
   totalUsers: number;
   active_user_count: number;
-  inactive_user_count: number;
-  paid_members_count: number;
+  blocked_user_count: number;
 }
 
 export interface ApiSuccessResponse<T> {
