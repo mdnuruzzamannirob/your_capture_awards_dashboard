@@ -1,248 +1,140 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { RiNotification3Fill } from 'react-icons/ri';
+import { cn } from '@/lib/utils';
+import {
+  useGetAdminNotificationsQuery,
+  useMarkAllNotificationsReadMutation,
+} from '@/store/features/notification/notificationApi';
+import { NotificationItem, NotificationType } from '@/store/features/notification/types';
+import { formatDistanceToNow } from 'date-fns';
 import { IoCheckmarkDone } from 'react-icons/io5';
-import { cn, formatTime } from '@/lib/utils';
-import Image from 'next/image';
+import { RiNotification3Line } from 'react-icons/ri';
+import { useMemo, useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { toast } from 'sonner';
+
+const typeLabel: Record<NotificationType, string> = {
+  [NotificationType.DEFAULT]: 'Update',
+  [NotificationType.INVITATION]: 'Invitation',
+  [NotificationType.PAYMENT]: 'Payment',
+  [NotificationType.VOTE]: 'Vote',
+  [NotificationType.LIKE]: 'Like',
+  [NotificationType.TEAM_JOIN_REQUEST]: 'Team request',
+  [NotificationType.TEAM_JOIN_APPROVED]: 'Team approved',
+  [NotificationType.TEAM_JOIN_REJECTED]: 'Team rejected',
+};
+
+const formatRelative = (dateString: string) => {
+  try {
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+  } catch {
+    return dateString;
+  }
+};
 
 const Notification = () => {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
+  const { data, isLoading, isFetching } = useGetAdminNotificationsQuery({ page: 1, limit: 10 });
+  const [markAllRead, { isLoading: isMarking }] = useMarkAllNotificationsReadMutation();
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  const notifications = data?.data.notifications ?? [];
+  const unreadCount = useMemo(
+    () => notifications.filter((notification) => !notification.isRead).length,
+    [notifications],
+  );
 
-  const notifyData = [
-    {
-      text: 'New message received',
-      unread: false,
-      date: '2025-11-28T14:32:12.000Z',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-    },
-    {
-      text: 'Your file is ready to download',
-      unread: false,
-      date: '2025-11-28T14:29:03.000Z',
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    },
-    {
-      text: 'Payment processed successfully',
-      unread: false,
-      date: '2025-11-28T14:21:55.000Z',
-      image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde',
-    },
-
-    {
-      text: 'System scan completed',
-      unread: false,
-      date: '2025-11-28T12:40:18.000Z',
-      image: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39',
-    },
-    {
-      text: 'New login from Chrome',
-      unread: true,
-      date: '2025-11-28T09:28:49.000Z',
-      image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
-    },
-    {
-      text: 'Security alert on your account',
-      unread: false,
-      date: '2025-11-28T07:12:33.000Z',
-      image: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12',
-    },
-
-    {
-      text: 'Server maintenance completed',
-      unread: true,
-      date: '2025-11-27T18:22:10.000Z',
-      image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
-    },
-    {
-      text: 'Password changed successfully',
-      unread: false,
-      date: '2025-11-26T10:05:44.000Z',
-      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2',
-    },
-    {
-      text: 'Backup completed',
-      unread: false,
-      date: '2025-11-24T16:55:02.000Z',
-      image: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e',
-    },
-    {
-      text: 'New device connected',
-      unread: true,
-      date: '2025-11-22T09:14:31.000Z',
-      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c',
-    },
-
-    {
-      text: 'Weekly report ready',
-      unread: false,
-      date: '2025-11-18T08:27:22.000Z',
-      image: 'https://images.unsplash.com/photo-1552374196-c4e7ffc6e126',
-    },
-    {
-      text: 'Subscription updated',
-      unread: false,
-      date: '2025-11-08T17:40:55.000Z',
-      image: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c',
-    },
-    {
-      text: 'Profile updated',
-      unread: false,
-      date: '2025-10-29T12:12:11.000Z',
-      image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1',
-    },
-    {
-      text: 'New feature available',
-      unread: true,
-      date: '2025-10-13T15:44:02.000Z',
-      image: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce',
-    },
-    {
-      text: 'Your post received new comments',
-      unread: false,
-      date: '2025-09-28T11:31:49.000Z',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-    },
-
-    {
-      text: 'Email verified successfully',
-      unread: false,
-      date: '2025-08-30T09:14:07.000Z',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d',
-    },
-    {
-      text: 'You earned a new badge',
-      unread: false,
-      date: '2025-05-28T18:50:41.000Z',
-      image: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe',
-    },
-    {
-      text: 'Account setup completed',
-      unread: false,
-      date: '2025-03-12T13:05:29.000Z',
-      image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91',
-    },
-
-    {
-      text: 'Welcome to our platform!',
-      unread: false,
-      date: '2024-11-25T07:22:18.000Z',
-      image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce',
-    },
-  ];
-
-  const filteredNotifications = tab === 'unread' ? notifyData.filter((n) => n.unread) : notifyData;
-
-  const tabContent = () => {
-    if (filteredNotifications.length === 0) {
-      return (
-        <div className="py-6 text-center text-sm text-muted-foreground">
-          No {tab === 'unread' ? 'unread' : ''} notifications
-        </div>
-      );
+  const handleMarkAllRead = async () => {
+    if (!unreadCount) return;
+    try {
+      await markAllRead().unwrap();
+      toast.success('All notifications marked as read');
+    } catch {
+      toast.error('Failed to mark notifications as read');
     }
-
-    return (
-      <div className="scrollbar-thin h-full max-h-[400px] space-y-1.5 overflow-y-auto">
-        {filteredNotifications?.map((notify, index) => (
-          <div
-            className={cn(
-              'relative flex items-center gap-2 rounded-sm border border-transparent p-3.5',
-              notify.unread ? 'border-border/80 bg-surface-tertiary' : 'bg-surface',
-            )}
-            key={index}
-          >
-            <Image
-              alt="User Avatar"
-              src={notify?.image}
-              width={28}
-              height={28}
-              className="size-9 min-w-9 overflow-hidden rounded-full object-cover"
-            />
-
-            <div className="flex flex-1 flex-col gap-1">
-              <div className="text-sm font-medium">{notify.text}</div>
-              <div className="text-muted-foreground text-xs">{formatTime(notify.date)}</div>
-            </div>
-            <div className="h-8 w-16 rounded-full bg-muted"></div>
-            {/* unread badge */}
-            {notify.unread && (
-              <div className="bg-primary absolute top-1/2 left-1 size-1.5 -translate-y-1/2 rounded-full"></div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
   };
-  if (!isMounted) {
-    return;
-  }
+
+  const renderNotification = (notification: NotificationItem) => (
+    <div
+      key={notification.id}
+      className={cn(
+        'relative flex items-start gap-3 rounded-xl border p-3 transition',
+        notification.isRead
+          ? 'border-border bg-background'
+          : 'border-primary/20 bg-primary/5',
+      )}
+    >
+      <div
+        className={cn(
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+          notification.isRead ? 'bg-surface-secondary text-foreground' : 'bg-primary text-white',
+        )}
+      >
+        {typeLabel[notification.type].slice(0, 1)}
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold">{notification.title}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{notification.message}</p>
+          </div>
+          {!notification.isRead && <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" />}
+        </div>
+        <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{typeLabel[notification.type]}</span>
+          <span>{formatRelative(notification.createdAt)}</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="relative flex size-8 min-w-8 items-center justify-center rounded-full bg-surface transition hover:bg-surface-tertiary">
-          <RiNotification3Fill />
-
-          {/* Unread dot */}
-          {notifyData.some((n) => n.unread) && (
-            <span className="bg-primary absolute top-0 right-0 h-2.5 w-2.5 rounded-full border border-surface" />
-          )}
+        <button
+          type="button"
+          aria-label="Open notifications"
+          className="group bg-surface-secondary text-muted-foreground hover:bg-surface-tertiary inline-flex h-8.5 items-center justify-center rounded-md px-3 transition"
+        >
+          <span className="relative flex items-center justify-center">
+            <RiNotification3Line className="group-hover:text-foreground size-4 transition-colors" />
+            {unreadCount > 0 && (
+              <span className="bg-primary ring-background absolute -top-1.5 -right-1.5 h-2.5 w-2.5 rounded-full ring-2" />
+            )}
+          </span>
         </button>
       </PopoverTrigger>
 
-      <PopoverContent
-        align="end"
-        className="w-sm space-y-2 rounded-md border border-border bg-surface"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium">Notifications</h3>
-
-          <button className="flex items-center gap-1 text-sm text-primary">
-            <IoCheckmarkDone className="size-5" /> Mark all as read
+      <PopoverContent align="end" side="bottom" sideOffset={8} className="w-96 p-0">
+        <div className="border-border flex items-center justify-between border-b px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold">Notifications</p>
+            <p className="text-muted-foreground text-xs">
+              {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up'}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleMarkAllRead}
+            disabled={!unreadCount || isMarking}
+            className="text-primary inline-flex items-center gap-1 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <IoCheckmarkDone className="size-4" />
+            Mark all read
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="relative flex items-center border-b border-border">
-          <button
-            onClick={() => setTab('')}
-            className={cn(
-              'relative z-10 h-7 flex-1 text-xs transition',
-              tab === '' ? 'font-medium' : 'text-muted-foreground hover:bg-surface-tertiary',
-            )}
-          >
-            All
-          </button>
-
-          <button
-            onClick={() => setTab('unread')}
-            className={cn(
-              'relative z-10 h-7 flex-1 text-xs transition',
-              tab === 'unread' ? 'font-medium' : 'text-muted-foreground hover:bg-surface-tertiary',
-            )}
-          >
-            Unread
-          </button>
-
-          {/* Animated underline */}
-          <div
-            className={cn(
-              'bg-primary absolute bottom-0 left-0 h-0.5 w-1/2 transition-transform duration-300',
-              tab === 'unread' ? 'translate-x-full' : 'translate-x-0',
-            )}
-          />
+        <div className="max-h-[420px] space-y-2 overflow-y-auto p-3">
+          {isLoading || isFetching ? (
+            <div className="text-muted-foreground p-4 text-center text-sm">Loading...</div>
+          ) : notifications.length > 0 ? (
+            notifications.map(renderNotification)
+          ) : (
+            <div className="text-muted-foreground p-8 text-center text-sm">
+              No notifications found.
+            </div>
+          )}
         </div>
-
-        {/* Content */}
-        {tabContent()}
       </PopoverContent>
     </Popover>
   );

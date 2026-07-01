@@ -6,6 +6,7 @@ import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Notification from './Notification';
 import UserMenu from './UserMenu';
 
 const TopBar = () => {
@@ -61,7 +62,7 @@ const TopBar = () => {
 
       {/* 4. Right Section: Notification & UserMenu */}
       <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
-        {/* <Notification /> */}
+        <Notification />
         <UserMenu />
       </div>
     </header>
