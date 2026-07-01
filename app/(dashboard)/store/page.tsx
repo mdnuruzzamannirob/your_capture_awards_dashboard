@@ -92,7 +92,7 @@ export default function StorePage() {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="overflow-hidden border-border/10 bg-surface p-0 shadow-xs">
+            <Card key={index} className="overflow-hidden border-border bg-surface p-0 shadow-xs">
               <CardContent className="flex items-center gap-4 p-4">
                 <div
                   className={`flex size-11 items-center justify-center rounded-xl ${stat.bgColor}`}
