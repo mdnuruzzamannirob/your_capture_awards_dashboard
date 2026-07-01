@@ -86,8 +86,8 @@ const Wallet = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="py-4">
-              <CardContent className="flex items-center gap-4 p-6">
+            <Card key={index} className="p-0">
+              <CardContent className="flex items-center gap-4 p-4">
                 <div
                   className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
                 >

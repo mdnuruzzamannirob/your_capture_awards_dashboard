@@ -19,9 +19,23 @@ export const walletApi = createApi({
 
     getTransactions: builder.query<
       ApiSuccessResponse<TransactionsListData>,
-      { page?: number; limit?: number }
+      { page?: number; limit?: number; search?: string }
     >({
-      query: ({ page = 1, limit = 10 }) => `/dashboard/transactions?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10, search }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search?.trim()) params.set('search', search.trim());
+        return `/dashboard/transactions?${params.toString()}`;
+      },
+      transformResponse: (response: any) => ({
+        success: response.success,
+        message: response.message,
+        data: {
+          payments: Array.isArray(response.data) ? response.data : [],
+          total: response.meta?.total ?? 0,
+          page: response.meta?.page ?? 1,
+          limit: response.meta?.limit ?? 10,
+        },
+      }),
       providesTags: [{ type: 'Transactions', id: 'LIST' }],
     }),
 
