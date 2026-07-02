@@ -87,7 +87,7 @@ export const formatDateWithTime = (isoString: string) => {
   const minutes = String(date.getUTCMinutes()).padStart(2, '0');
 
   // Combining Date and Time
-  return { day, month, year, hours, minutes, timeZone: 'UTC' };
+  return { day, month, year, hours, minutes, timeZone: '' };
 };
 
 export const toPascalCase = (str: string) => {

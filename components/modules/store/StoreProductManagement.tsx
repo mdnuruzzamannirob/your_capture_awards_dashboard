@@ -60,6 +60,12 @@ const categoryStyles: Record<StoreProductCategory, { tab: string; badge: string 
   },
 };
 
+const statusStyles: Record<StoreProduct['status'], string> = {
+  ACTIVE: 'border-store-active-border bg-store-active-soft text-store-active',
+  INACTIVE: 'border-store-inactive-border bg-store-inactive-soft text-store-inactive',
+  DISCONTINUED: 'border-border/20 bg-muted text-muted-foreground',
+};
+
 const bundleItemStyles: Record<string, string> = {
   KEY: ' bg-amber-500 text-white',
   BOOST: ' bg-sky-500 text-white',
@@ -229,8 +235,6 @@ const StoreProductManagement = () => {
         <>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => {
-              const styles = categoryStyles[product.category];
-
               return (
                 <Card
                   key={product.id}
@@ -243,9 +247,7 @@ const StoreProductManagement = () => {
                           {product.title}
                         </h3>
                       </div>
-                      <span
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${styles.badge}`}
-                      >
+                      <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${statusStyles[product.status]}`}>
                         {product.status}
                       </span>
                     </div>
@@ -287,9 +289,9 @@ const StoreProductManagement = () => {
                       </div>
                     ) : null}
 
-                    <p className="text-muted-foreground line-clamp-2 text-xs">
+                    {/* <p className="text-muted-foreground line-clamp-2 text-xs">
                       {product.description || 'No description available.'}
-                    </p>
+                    </p> */}
 
                     <div className="grid grid-cols-2 gap-2">
                       <StoreProductForm
