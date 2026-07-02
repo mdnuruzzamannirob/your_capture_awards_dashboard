@@ -263,7 +263,7 @@ const StoreProductManagement = () => {
                       </div>
                       <div className="space-y-0.5 text-right">
                         <p className="text-muted-foreground text-xs">Stock</p>
-                        <p className="leading-tight font-semibold">{product.quantity}</p>
+                        <p className="leading-tight font-semibold">{product.quantity || 1}</p>
                       </div>
                     </div>
 
