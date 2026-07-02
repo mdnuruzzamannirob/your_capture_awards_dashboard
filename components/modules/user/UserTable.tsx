@@ -18,62 +18,40 @@ import { User } from '@/store/features/user/types';
 import { useGetUsersQuery, useToggleUserBlockMutation } from '@/store/features/user/userApi';
 import { Info } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 import { toast } from 'sonner';
 import { getUserColumns } from './user-columns';
 
 const UserTable = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'all' | 'USER' | 'ADMIN'>('all');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
-  const [role, setRole] = useState('all');
   const [selectedRow, setSelectedRow] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [toggleTarget, setToggleTarget] = useState<User | null>(null);
   const [isToggleDialogOpen, setIsToggleDialogOpen] = useState(false);
 
   useEffect(() => {
-    const queryPage = Number(searchParams.get('page') ?? '1');
-    const queryLimit = Number(searchParams.get('limit') ?? '20');
-    const querySearch = searchParams.get('search') ?? '';
-    const queryRole = searchParams.get('role') ?? 'all';
-
-    setPage(Number.isFinite(queryPage) && queryPage > 0 ? queryPage : 1);
-    setLimit(Number.isFinite(queryLimit) && queryLimit > 0 ? queryLimit : 20);
-    setSearchInput(querySearch);
-    setSearch(querySearch);
-    setRole(queryRole.toUpperCase() || 'all');
-  }, [searchParams]);
-
-  useEffect(() => {
     const timer = window.setTimeout(() => {
-      setSearch(searchInput);
+      setSearchTerm(searchInput.trim());
+      setPage(1);
     }, 400);
 
     return () => window.clearTimeout(timer);
   }, [searchInput]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    params.set('page', String(page));
-    params.set('limit', String(limit));
-
-    if (search.trim()) params.set('search', search.trim());
-    if (role && role !== 'all') params.set('role', role.toUpperCase());
-
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, [page, limit, search, role, router]);
+    setPage(1);
+  }, [selectedRole]);
 
   const { data, isLoading, isFetching } = useGetUsersQuery({
     page,
     limit,
-    search,
-    role: role === 'all' ? undefined : role,
+    search: searchTerm || undefined,
+    role: selectedRole === 'all' ? undefined : selectedRole,
   });
   const [toggleUserBlock, { isLoading: isTogglingBlock }] = useToggleUserBlockMutation();
 
@@ -145,16 +123,14 @@ const UserTable = () => {
           value={searchInput}
           onChange={(event) => {
             setSearchInput(event.target.value);
-            setPage(1);
           }}
           className="max-w-sm"
         />
 
         <select
-          value={role}
+          value={selectedRole}
           onChange={(event) => {
-            setRole(event.target.value);
-            setPage(1);
+            setSelectedRole(event.target.value as 'all' | 'USER' | 'ADMIN');
           }}
           className="border-input bg-background h-11 rounded-md border px-3 py-2 text-sm"
         >
@@ -170,7 +146,7 @@ const UserTable = () => {
         page={page}
         pageSize={limit}
         total={data?.data?.total ?? 0}
-        onPageChange={setPage}
+        onPageChange={(nextPage) => setPage(nextPage)}
         onPageSizeChange={(size) => {
           setLimit(size);
           setPage(1);
