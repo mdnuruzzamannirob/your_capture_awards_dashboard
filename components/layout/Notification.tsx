@@ -7,11 +7,11 @@ import {
 } from '@/store/features/notification/notificationApi';
 import { NotificationItem, NotificationType } from '@/store/features/notification/types';
 import { formatDistanceToNow } from 'date-fns';
+import { useMemo, useState } from 'react';
 import { IoCheckmarkDone } from 'react-icons/io5';
 import { RiNotification3Line } from 'react-icons/ri';
-import { useMemo, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 const typeLabel: Record<NotificationType, string> = {
   [NotificationType.DEFAULT]: 'Update',
@@ -58,9 +58,7 @@ const Notification = () => {
       key={notification.id}
       className={cn(
         'relative flex items-start gap-3 rounded-xl border p-3 transition',
-        notification.isRead
-          ? 'border-border bg-background'
-          : 'border-primary/20 bg-primary/5',
+        notification.isRead ? 'border-border bg-background' : 'border-primary/20 bg-primary/5',
       )}
     >
       <div
@@ -76,11 +74,13 @@ const Notification = () => {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold">{notification.title}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">{notification.message}</p>
+            <p className="text-muted-foreground mt-0.5 text-xs">{notification.message}</p>
           </div>
-          {!notification.isRead && <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" />}
+          {!notification.isRead && (
+            <span className="bg-primary mt-1 size-2 shrink-0 rounded-full" />
+          )}
         </div>
-        <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="text-muted-foreground mt-2 flex items-center justify-between text-[11px]">
           <span>{typeLabel[notification.type]}</span>
           <span>{formatRelative(notification.createdAt)}</span>
         </div>
@@ -107,12 +107,8 @@ const Notification = () => {
 
       <PopoverContent align="end" side="bottom" sideOffset={8} className="w-96 p-0">
         <div className="border-border flex items-center justify-between border-b px-4 py-3">
-          <div>
-            <p className="text-sm font-semibold">Notifications</p>
-            <p className="text-muted-foreground text-xs">
-              {unreadCount > 0 ? `${unreadCount} unread notifications` : 'All caught up'}
-            </p>
-          </div>
+          <p className="text-sm font-semibold">Notifications</p>
+
           <button
             type="button"
             onClick={handleMarkAllRead}
