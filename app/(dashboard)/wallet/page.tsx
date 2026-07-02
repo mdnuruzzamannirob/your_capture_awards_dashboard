@@ -5,7 +5,7 @@ import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useGetTransactionStatsQuery } from '@/store/features/wallet/walletApi';
-import { DollarSign, ShoppingCart, TrendingUp, Wallet as WalletIcon } from 'lucide-react';
+import { DollarSign, ShoppingCart, Wallet as WalletIcon } from 'lucide-react';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -34,33 +34,26 @@ const Wallet = () => {
 
   const statsData = data?.data;
   const stats = [
-      {
-        title: 'Total Successful Payments',
-        value: statsData?.totalSuccessfulPayments ?? 0,
-        icon: WalletIcon,
-        color: 'text-success',
-        bgColor: 'bg-success/10',
-      },
-      {
-        title: 'This Month Revenue',
-        value: currency.format(statsData?.thisMonthTotalRevenue ?? 0),
-        icon: DollarSign,
-        color: 'text-warning',
-        bgColor: 'bg-warning/10',
-      },
-      {
-        title: 'Store Revenue',
-        value: currency.format(statsData?.totalStoreRevenue ?? 0),
-        icon: ShoppingCart,
-        color: 'text-info',
-        bgColor: 'bg-info/10',
-      },
     {
-      title: 'Subscription Revenue',
-      value: currency.format(statsData?.totalSubscriptionRevenue ?? 0),
-      icon: TrendingUp,
-      color: 'text-primary',
-      bgColor: 'bg-primary-soft',
+      title: 'Total Successful Payments',
+      value: statsData?.totalSuccessfulPayments ?? 0,
+      icon: WalletIcon,
+      color: 'text-success',
+      bgColor: 'bg-success/10',
+    },
+    {
+      title: 'This Month Revenue',
+      value: currency.format(statsData?.thisMonthTotalRevenue ?? 0),
+      icon: DollarSign,
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
+    },
+    {
+      title: 'Store Revenue',
+      value: currency.format(statsData?.totalStoreRevenue ?? 0),
+      icon: ShoppingCart,
+      color: 'text-info',
+      bgColor: 'bg-info/10',
     },
   ];
 
@@ -82,7 +75,7 @@ const Wallet = () => {
         </Card>
       )}
 
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
