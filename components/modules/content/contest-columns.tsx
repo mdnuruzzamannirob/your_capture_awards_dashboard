@@ -1,8 +1,8 @@
 'use client';
 
+import { cn, formatDateWithTime } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import Image from 'next/image';
-import { cn, formatDateWithTime } from '@/lib/utils';
 import { GoDotFill } from 'react-icons/go';
 
 export const columns: ColumnDef<any>[] = [
@@ -31,7 +31,7 @@ export const columns: ColumnDef<any>[] = [
             src={creator?.avatar}
             width={32}
             height={32}
-            className="size-8 min-w-8 overflow-hidden rounded-full bg-surface object-cover"
+            className="bg-surface size-8 min-w-8 overflow-hidden rounded-full object-cover"
           />
           <div className="">
             <h3 className="text-sm font-medium">{creator?.fullName}</h3>
@@ -46,11 +46,6 @@ export const columns: ColumnDef<any>[] = [
     id: 'maxUpload',
     header: 'MAX UPLOAD',
     cell: ({ row }) => <div className="capitalize">{row.original.maxUploads}</div>,
-  },
-  {
-    id: 'mode',
-    header: 'MODE',
-    cell: ({ row }) => <div className="capitalize">{row.original.mode}</div>,
   },
   {
     id: 'startDate',

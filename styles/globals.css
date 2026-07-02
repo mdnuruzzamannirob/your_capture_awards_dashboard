@@ -98,6 +98,16 @@
   --destructive: var(--color-danger-500);
   --destructive-foreground: var(--color-zinc-50);
 
+  /* Store status */
+  --store-active: var(--color-success-500);
+  --store-active-foreground: var(--color-zinc-50);
+  --store-active-soft: color-mix(in oklab, var(--store-active) 14%, var(--background));
+  --store-active-border: color-mix(in oklab, var(--store-active) 22%, transparent);
+  --store-inactive: var(--color-danger-500);
+  --store-inactive-foreground: var(--color-zinc-50);
+  --store-inactive-soft: color-mix(in oklab, var(--store-inactive) 14%, var(--background));
+  --store-inactive-border: color-mix(in oklab, var(--store-inactive) 24%, transparent);
+
   /* Borders */
   --border: color-mix(in oklab, var(--color-zinc-50) 10%, transparent);
   --border-subtle: color-mix(in oklab, var(--color-zinc-50) 7%, transparent);
@@ -183,6 +193,14 @@
 
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-store-active: var(--store-active);
+  --color-store-active-foreground: var(--store-active-foreground);
+  --color-store-active-soft: var(--store-active-soft);
+  --color-store-active-border: var(--store-active-border);
+  --color-store-inactive: var(--store-inactive);
+  --color-store-inactive-foreground: var(--store-inactive-foreground);
+  --color-store-inactive-soft: var(--store-inactive-soft);
+  --color-store-inactive-border: var(--store-inactive-border);
   --color-success: var(--color-success-500);
   --color-success-foreground: var(--color-zinc-50);
   --color-warning: var(--color-warning-500);
