@@ -29,11 +29,7 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
       </div>
     ),
   },
-  {
-    accessorKey: 'type',
-    header: 'TYPE',
-    cell: ({ row }) => <div className="text-xs font-medium">{row.getValue('type')}</div>,
-  },
+
   {
     accessorKey: 'amount',
     header: 'AMOUNT',
