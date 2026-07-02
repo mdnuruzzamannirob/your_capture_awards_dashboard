@@ -16,7 +16,7 @@ export const userApi = createApi({
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
 
         if (search?.trim()) params.set('search', search.trim());
-        if (role && role !== 'all') params.set('role', role.toUpperCase());
+        if (role && role.toLowerCase() !== 'all') params.set('role', role.toUpperCase());
 
         return `/users?${params.toString()}`;
       },
