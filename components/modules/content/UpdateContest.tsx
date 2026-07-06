@@ -274,7 +274,7 @@ const UpdateContest: React.FC = () => {
 
   if (isError || !contest?.id) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-8 text-center text-muted-foreground">
+      <div className="border-border bg-surface text-muted-foreground rounded-xl border p-8 text-center">
         <p>Contest not found or error loading data.</p>
         <Button onClick={() => router.push('/contest')} className="mt-4">
           Back to Contests
@@ -287,7 +287,7 @@ const UpdateContest: React.FC = () => {
     <Form {...form}>
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-          <aside className="scrollbar-thin sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border border-border bg-surface p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
+          <aside className="scrollbar-thin border-border bg-surface sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
             {CREATE_CONTEST_STEPS.map((step, index) => {
               const isActive = index === currentStep;
               const isCompleted = index < currentStep;
@@ -296,7 +296,7 @@ const UpdateContest: React.FC = () => {
                   key={step.id}
                   type="button"
                   onClick={() => void goToStep(index)}
-                  className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-surface-tertiary"
+                  className="group hover:bg-surface-tertiary flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors"
                 >
                   <span
                     className="flex size-9 items-center justify-center rounded-full border-2 text-sm font-semibold"
@@ -312,8 +312,8 @@ const UpdateContest: React.FC = () => {
                     {isCompleted ? <CheckCircle className="size-4 min-w-4" /> : index + 1}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{step.title}</p>
-                    <p className="text-xs text-muted-foreground">Step {index + 1} of 5</p>
+                    <p className="text-foreground text-sm font-semibold">{step.title}</p>
+                    <p className="text-muted-foreground text-xs">Step {index + 1} of 5</p>
                   </div>
                 </button>
               );
@@ -323,7 +323,7 @@ const UpdateContest: React.FC = () => {
           <div className="col-span-12 space-y-6 xl:col-span-10">
             {stepContent()}
 
-            <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-4">
+            <div className="border-border bg-surface flex items-center justify-between rounded-xl border p-4">
               <Button
                 type="button"
                 variant="ghost"
@@ -339,7 +339,7 @@ const UpdateContest: React.FC = () => {
                   type="button"
                   disabled={isUpdating || !isDirty}
                   onClick={handleFinalSubmit}
-                  className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 disabled:cursor-not-allowed disabled:opacity-50"
                   title={!isDirty ? 'No changes to save' : undefined}
                 >
                   {isUpdating ? 'Updating...' : 'Save Changes'}

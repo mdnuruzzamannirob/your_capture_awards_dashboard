@@ -90,7 +90,7 @@ const ContestDetails = () => {
           src={contest.banner}
           width={1920}
           height={500}
-          className="size-full bg-surface object-cover"
+          className="bg-surface size-full object-cover"
         />
       </div>
 

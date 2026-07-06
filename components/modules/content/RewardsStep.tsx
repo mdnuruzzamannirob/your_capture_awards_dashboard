@@ -21,8 +21,8 @@ const RewardsStep = () => {
   const { fields, append, remove } = useFieldArray({ name: 'rewards', control: form.control });
 
   return (
-    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
+      <div className="border-border flex items-center justify-between border-b pb-4">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <Gift className="text-primary size-5" /> Rewards ({fields.length})
         </h2>
@@ -48,7 +48,7 @@ const RewardsStep = () => {
 
       <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-3 rounded-lg border border-border p-4">
+          <div key={field.id} className="border-border space-y-3 rounded-lg border p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Reward {index + 1}</h3>
               {fields.length > 1 && (
@@ -183,7 +183,9 @@ const RewardsStep = () => {
         ))}
 
         {form.formState.errors.rewards && (
-          <p className="text-sm text-destructive">{(form.formState.errors.rewards as any).message}</p>
+          <p className="text-destructive text-sm">
+            {(form.formState.errors.rewards as any).message}
+          </p>
         )}
       </div>
     </div>

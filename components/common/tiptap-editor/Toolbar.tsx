@@ -18,7 +18,7 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
 
   return (
     <div
-      className={`bg-surface/30 flex h-11 flex-wrap items-center gap-1 border-b border-border px-2 ${className ?? ''}`}
+      className={`bg-surface/30 border-border flex h-11 flex-wrap items-center gap-1 border-b px-2 ${className ?? ''}`}
     >
       {/* Bold */}
       <Toggle
@@ -45,14 +45,14 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
       {/* Underline Toggle */}
       <AddUnderlineToggle editor={editor} />
 
-      <div className="mx-1 h-4 w-px self-center bg-border" />
+      <div className="bg-border mx-1 h-4 w-px self-center" />
 
       {/* Headings */}
       <Toggle
         size="sm"
         pressed={editor.isActive('heading', { level: 1 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        className="font-bold text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary"
+        className="text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary font-bold"
         title="H1"
       >
         <Heading1 className="size-4" />
@@ -62,7 +62,7 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
         size="sm"
         pressed={editor.isActive('heading', { level: 2 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        className="font-bold text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary"
+        className="text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary font-bold"
         title="H2"
       >
         <Heading2 className="size-4" />
@@ -72,13 +72,13 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
         size="sm"
         pressed={editor.isActive('heading', { level: 3 })}
         onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        className="font-bold text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary"
+        className="text-muted-foreground hover:bg-surface-tertiary data-[state=on]:bg-surface-tertiary font-bold"
         title="H3"
       >
         <Heading3 className="size-4" />
       </Toggle>
 
-      <div className="mx-1 h-4 w-px self-center bg-border" />
+      <div className="bg-border mx-1 h-4 w-px self-center" />
 
       {/* Lists */}
       <Toggle
@@ -101,7 +101,7 @@ export const Toolbar: React.FC<Props> = ({ editor, className }) => {
         <ListOrdered className="size-4" />
       </Toggle>
 
-      <div className="mx-1 h-4 w-px self-center bg-border" />
+      <div className="bg-border mx-1 h-4 w-px self-center" />
 
       {/* Image & Link */}
       <AddImagePopover editor={editor} />

@@ -240,7 +240,7 @@ const SupportManagement = () => {
                   </div>
                 </div>
 
-                <div className="mt-2 flex items-center justify-between ">
+                <div className="mt-2 flex items-center justify-between">
                   <Label htmlFor="ticket-status">Update Status</Label>
                   <Select
                     value={draftStatus}

@@ -70,8 +70,8 @@ const DetailsStep = () => {
   );
 
   return (
-    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
-      <h2 className="flex items-center gap-2 border-b border-border pb-4 text-lg font-semibold">
+    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
+      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
         <FileText className="text-primary size-5" /> Details
       </h2>
 
@@ -213,7 +213,7 @@ const DetailsStep = () => {
               />
 
               <FormControl>
-                <div className="relative overflow-hidden rounded-xl border border-border bg-background">
+                <div className="border-border bg-background relative overflow-hidden rounded-xl border">
                   {/* Full preview */}
                   {preview ? (
                     <div className="relative h-56 w-full">
@@ -228,14 +228,14 @@ const DetailsStep = () => {
                       <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
 
                       {/* File info bar */}
-                      <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between gap-3 px-4 py-3">
+                      <div className="absolute right-0 bottom-0 left-0 flex items-center justify-between gap-3 px-4 py-3">
                         <div className="flex min-w-0 items-center gap-2">
                           <Upload className="text-primary size-4 shrink-0" />
-                          <span className="truncate text-sm font-medium text-foreground">
+                          <span className="text-foreground truncate text-sm font-medium">
                             {fileInfo?.name}
                           </span>
                           {fileInfo?.size && (
-                            <span className="shrink-0 rounded-full bg-background/10 px-2 py-0.5 text-xs text-muted-foreground">
+                            <span className="bg-background/10 text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
                               {fileInfo.size}
                             </span>
                           )}
@@ -244,7 +244,7 @@ const DetailsStep = () => {
                           <button
                             type="button"
                             onClick={() => inputRef.current?.click()}
-                            className="flex items-center gap-1.5 rounded-lg bg-background/10 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur transition hover:bg-background/20"
+                            className="bg-background/10 text-foreground hover:bg-background/20 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium backdrop-blur transition"
                           >
                             <ImagePlus className="size-3.5" />
                             Change
@@ -252,7 +252,7 @@ const DetailsStep = () => {
                           <button
                             type="button"
                             onClick={handleClearBanner}
-                            className="flex items-center gap-1.5 rounded-lg bg-destructive/10 px-3 py-1.5 text-xs font-medium text-destructive backdrop-blur transition hover:bg-destructive/20"
+                            className="bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium backdrop-blur transition"
                           >
                             <Trash2 className="size-3.5" />
                             Remove
@@ -269,14 +269,14 @@ const DetailsStep = () => {
                         'hover:bg-surface-tertiary/50',
                       )}
                     >
-                      <div className="flex size-14 items-center justify-center rounded-full border border-dashed border-border bg-surface-tertiary">
-                        <ImagePlus className="size-6 text-muted-foreground" />
+                      <div className="border-border bg-surface-tertiary flex size-14 items-center justify-center rounded-full border border-dashed">
+                        <ImagePlus className="text-muted-foreground size-6" />
                       </div>
                       <div className="text-center">
-                        <p className="text-sm font-medium text-muted-foreground">
+                        <p className="text-muted-foreground text-sm font-medium">
                           Click to upload banner image
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="text-muted-foreground mt-1 text-xs">
                           PNG, JPG, WEBP &mdash; max 24&nbsp;MB
                         </p>
                       </div>

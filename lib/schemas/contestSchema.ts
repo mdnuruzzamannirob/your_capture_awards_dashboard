@@ -24,24 +24,18 @@ export const contestDetailsSchema = z
         z.custom<File>((file) => file instanceof File),
         z.string().min(1, 'Banner image is required'),
       ])
-      .refine(
-        (val) => {
-          if (val instanceof File) {
-            return ALLOWED_IMAGE_TYPES.includes(val.type);
-          }
-          return typeof val === 'string' && val.length > 0;
-        },
-        'Only JPG, PNG, WEBP images are allowed',
-      )
-      .refine(
-        (val) => {
-          if (val instanceof File) {
-            return val.size <= MAX_IMAGE_SIZE;
-          }
-          return true;
-        },
-        'Image must be under 24MB',
-      ),
+      .refine((val) => {
+        if (val instanceof File) {
+          return ALLOWED_IMAGE_TYPES.includes(val.type);
+        }
+        return typeof val === 'string' && val.length > 0;
+      }, 'Only JPG, PNG, WEBP images are allowed')
+      .refine((val) => {
+        if (val instanceof File) {
+          return val.size <= MAX_IMAGE_SIZE;
+        }
+        return true;
+      }, 'Image must be under 24MB'),
 
     maxUploads: z.coerce
       .number()

@@ -123,7 +123,7 @@ const VerifyOtp = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="w-full max-w-lg space-y-5 rounded-xl border border-border bg-surface-tertiary p-5 lg:p-10">
+      <div className="border-border bg-surface-tertiary w-full max-w-lg space-y-5 rounded-xl border p-5 lg:p-10">
         <AuthTitle
           title="Verify Code"
           description="A 6-digit verification code has been sent to your email."
@@ -173,7 +173,7 @@ const VerifyOtp = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary mt-4 flex w-full items-center justify-center rounded-sm py-[9px] text-foreground transition-all duration-300 disabled:cursor-default disabled:opacity-60"
+            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary text-foreground mt-4 flex w-full items-center justify-center rounded-sm py-[9px] transition-all duration-300 disabled:cursor-default disabled:opacity-60"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">

@@ -13,8 +13,8 @@ const PrizesStep = () => {
   const watchCoinRequirement = form.watch('prizes.coin_requirement');
 
   return (
-    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
-      <h2 className="flex items-center gap-2 border-b border-border pb-4 text-lg font-semibold">
+    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
+      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
         <Coins className="text-primary size-5" /> Money &amp; Coins
       </h2>
 
@@ -23,13 +23,15 @@ const PrizesStep = () => {
           control={form.control}
           name="prizes.isMoneyContest"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-2 space-y-0 rounded-lg border border-border p-4">
+            <FormItem className="border-border flex items-center gap-2 space-y-0 rounded-lg border p-4">
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <div className="space-y-1">
                 <FormLabel className="mt-0!">Is money contest</FormLabel>
-                <p className="text-xs text-muted-foreground">Enable this when the contest uses money.</p>
+                <p className="text-muted-foreground text-xs">
+                  Enable this when the contest uses money.
+                </p>
               </div>
               <FormMessage />
             </FormItem>
@@ -99,13 +101,15 @@ const PrizesStep = () => {
           control={form.control}
           name="prizes.coin_requirement"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-2 space-y-0 rounded-lg border border-border p-4">
+            <FormItem className="border-border flex items-center gap-2 space-y-0 rounded-lg border p-4">
               <FormControl>
                 <Checkbox checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
               <div className="space-y-1">
                 <FormLabel className="mt-0!">Coin requirement</FormLabel>
-                <p className="text-xs text-muted-foreground">Show coin input only if this is enabled.</p>
+                <p className="text-muted-foreground text-xs">
+                  Show coin input only if this is enabled.
+                </p>
               </div>
               <FormMessage />
             </FormItem>

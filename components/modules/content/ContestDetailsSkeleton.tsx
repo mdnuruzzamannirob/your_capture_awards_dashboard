@@ -2,12 +2,12 @@ import { cn } from '@/lib/utils';
 import { Info } from 'lucide-react';
 
 const SkeletonBlock = ({ className = 'h-4 w-full' }: { className?: string }) => (
-  <div className={cn('animate-pulse rounded-md bg-surface-tertiary', className)} />
+  <div className={cn('bg-surface-tertiary animate-pulse rounded-md', className)} />
 );
 
 const GridItemSkeleton = () => (
   <div className="space-y-1">
-    <SkeletonBlock className="h-4 w-24 bg-muted/50" /> {/* Title */}
+    <SkeletonBlock className="bg-muted/50 h-4 w-24" /> {/* Title */}
     <SkeletonBlock className="h-6 w-32" /> {/* Value */}
   </div>
 );
@@ -28,7 +28,7 @@ const DetailsTabSkeleton = () => {
       <div className="space-y-5 rounded-xl border p-5">
         {/* Creator Section Skeleton */}
         <div className="space-y-1 text-sm">
-          <SkeletonBlock className="h-4 w-16 bg-muted/50" /> {/* Creator Title */}
+          <SkeletonBlock className="bg-muted/50 h-4 w-16" /> {/* Creator Title */}
           <div className="flex items-center gap-2">
             <SkeletonBlock className="size-10 min-w-10 rounded-full" /> {/* Avatar */}
             <div className="">
@@ -40,11 +40,11 @@ const DetailsTabSkeleton = () => {
 
         {/* Title & Description Skeleton */}
         <div className="space-y-1 text-sm">
-          <SkeletonBlock className="h-4 w-10 bg-muted/50" /> {/* Title Label */}
+          <SkeletonBlock className="bg-muted/50 h-4 w-10" /> {/* Title Label */}
           <SkeletonBlock className="h-7 w-60" /> {/* Title Value */}
         </div>
         <div className="space-y-1 text-sm">
-          <SkeletonBlock className="h-4 w-24 bg-muted/50" /> {/* Description Label */}
+          <SkeletonBlock className="bg-muted/50 h-4 w-24" /> {/* Description Label */}
           <SkeletonBlock className="h-5 w-full" />
           <SkeletonBlock className="h-5 w-4/5" />
         </div>
@@ -73,14 +73,14 @@ export const ContestDetailsSkeleton = ({ tabs }: { tabs: { key: string; label: s
   return (
     <section className="animate-pulse">
       {/* Banner Skeleton */}
-      <div className="h-96 w-full bg-surface"></div>
+      <div className="bg-surface h-96 w-full"></div>
 
       {/* Tabs Skeleton */}
       <div className="relative flex overflow-x-auto border-b">
         {tabs.map((tab) => (
           <div key={tab.key} className="relative z-10 px-5 py-3 text-sm whitespace-nowrap">
             {/* Tab Name Placeholder */}
-            <SkeletonBlock className="h-4 w-16 bg-muted/50" />
+            <SkeletonBlock className="bg-muted/50 h-4 w-16" />
           </div>
         ))}
       </div>

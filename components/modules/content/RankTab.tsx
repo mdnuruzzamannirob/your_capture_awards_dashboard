@@ -11,7 +11,7 @@ const RankTab = ({ contest }: { contest: any }) => {
   return (
     <div className="w-full space-y-6">
       <Tabs value={activeRankTab} onValueChange={(value) => setActiveRankTab(value as any)}>
-        <TabsList className="grid grid-cols-2 rounded-md bg-background/5">
+        <TabsList className="bg-background/5 grid grid-cols-2 rounded-md">
           <TabsTrigger value="top-photo" className="">
             Top Photo
           </TabsTrigger>

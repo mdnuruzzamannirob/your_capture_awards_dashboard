@@ -247,7 +247,9 @@ const StoreProductManagement = () => {
                           {product.title}
                         </h3>
                       </div>
-                      <span className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${statusStyles[product.status]}`}>
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${statusStyles[product.status]}`}
+                      >
                         {product.status}
                       </span>
                     </div>

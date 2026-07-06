@@ -22,8 +22,8 @@ const RulesStep = () => {
   const { fields, append, remove } = useFieldArray({ name: 'rules', control: form.control });
 
   return (
-    <div className="space-y-5 rounded-xl border border-border bg-surface p-5">
-      <div className="flex items-center justify-between border-b border-border pb-4">
+    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
+      <div className="border-border flex items-center justify-between border-b pb-4">
         <h2 className="text-lg font-semibold">Rules ({fields.length})</h2>
         <Button
           type="button"
@@ -38,7 +38,7 @@ const RulesStep = () => {
 
       <div className="space-y-4">
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-3 rounded-lg border border-border p-4">
+          <div key={field.id} className="border-border space-y-3 rounded-lg border p-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Rule {index + 1}</h3>
               {fields.length > 1 && (
@@ -138,7 +138,7 @@ const RulesStep = () => {
         ))}
 
         {form.formState.errors.rules && (
-          <p className="text-sm text-destructive">{(form.formState.errors.rules as any).message}</p>
+          <p className="text-destructive text-sm">{(form.formState.errors.rules as any).message}</p>
         )}
       </div>
     </div>
