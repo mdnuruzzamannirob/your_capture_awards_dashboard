@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -53,7 +53,8 @@
 .dark {
   /* Fonts */
   --font-body: var(--font-kumbh-sans);
-  --font-mono-token: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --font-mono-token:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   --font-display: var(--font-kumbh-sans);
 
   /* Radius */
@@ -257,7 +258,7 @@
   }
 
   hr,
-  [role="separator"] {
+  [role='separator'] {
     border-color: var(--border);
   }
 
@@ -266,7 +267,7 @@
   }
 
   button:disabled,
-  [aria-disabled="true"] {
+  [aria-disabled='true'] {
     cursor: not-allowed;
   }
 

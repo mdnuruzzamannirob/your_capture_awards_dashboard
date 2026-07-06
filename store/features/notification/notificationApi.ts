@@ -13,8 +13,7 @@ export const notificationApi = createApi({
       ApiSuccessResponse<NotificationListResponse>,
       { page?: number; limit?: number }
     >({
-      query: ({ page = 1, limit = 10 }) =>
-        `/notifications/users?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10 }) => `/notifications/users?page=${page}&limit=${limit}`,
       transformResponse: (response: any) => ({
         success: response.success,
         message: response.message,
@@ -37,8 +36,7 @@ export const notificationApi = createApi({
       ApiSuccessResponse<NotificationListResponse>,
       { page?: number; limit?: number }
     >({
-      query: ({ page = 1, limit = 10 }) =>
-        `/notifications/admins?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 10 }) => `/notifications/admins?page=${page}&limit=${limit}`,
       transformResponse: (response: any) => ({
         success: response.success,
         message: response.message,
@@ -57,10 +55,7 @@ export const notificationApi = createApi({
       providesTags: [notificationTag],
     }),
 
-    markAllNotificationsRead: builder.mutation<
-      ApiSuccessResponse<{ count: number }>,
-      void
-    >({
+    markAllNotificationsRead: builder.mutation<ApiSuccessResponse<{ count: number }>, void>({
       query: () => ({
         url: '/notifications/read',
         method: 'PATCH',

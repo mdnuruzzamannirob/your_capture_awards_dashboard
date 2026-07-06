@@ -116,12 +116,12 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
     return (
       <div
         className={cn(
-          'bg-background animate-pulse overflow-hidden rounded-md border border-border',
+          'bg-background border-border animate-pulse overflow-hidden rounded-md border',
           className,
         )}
       >
         {/* Skeleton Toolbar */}
-        <div className="bg-surface/50 flex h-11 items-center gap-2 border-b border-border px-3">
+        <div className="bg-surface/50 border-border flex h-11 items-center gap-2 border-b px-3">
           <div className="bg-muted h-6 w-6 rounded" />
           <div className="bg-muted h-6 w-6 rounded" />
           <div className="bg-muted h-6 w-6 rounded" />
@@ -146,7 +146,7 @@ export const TipTapEditor: React.FC<TipTapEditorProps> = ({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-md border transition-all focus-within:ring-2 focus-within:ring-ring/20',
+        'focus-within:ring-ring/20 overflow-hidden rounded-md border transition-all focus-within:ring-2',
         className,
       )}
     >

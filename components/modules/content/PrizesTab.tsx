@@ -19,7 +19,7 @@ const PrizesTab = ({ contest }: { contest: any }) => {
           </div>
         </div>
       ) : (
-        <p className="flex h-40 items-center justify-center text-center text-muted-foreground">
+        <p className="text-muted-foreground flex h-40 items-center justify-center text-center">
           This contest is currently a non-monetary competition.
         </p>
       )}

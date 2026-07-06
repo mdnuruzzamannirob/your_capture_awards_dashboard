@@ -59,7 +59,7 @@ const DetailsTab = ({
               src={contest?.creator?.avatar}
               width={40}
               height={40}
-              className="size-10 min-w-10 overflow-hidden rounded-full bg-surface object-cover"
+              className="bg-surface size-10 min-w-10 overflow-hidden rounded-full object-cover"
             />
             <div>
               <h3 className="font-medium">{contest?.creator?.fullName}</h3>
@@ -76,9 +76,7 @@ const DetailsTab = ({
         <div className="space-y-1 text-sm">
           <h1 className="text-muted-foreground font-medium">Description</h1>
           <div className="text-base">
-
             <TipTapViewer content={contest?.description} />
-
           </div>
         </div>
 

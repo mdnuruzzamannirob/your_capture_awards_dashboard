@@ -28,8 +28,6 @@ export interface SupportTicket {
   assignedTo?: string;
 }
 
-
-
 export type TransactionType = 'withdrawal' | 'store_purchase' | 'subscription_payment' | 'refund';
 export type TransactionStatus = 'pending' | 'completed' | 'failed' | 'cancelled';
 export type PaymentGateway = 'stripe' | 'wallet' | 'paypal' | 'bank_transfer';
@@ -78,8 +76,6 @@ export interface UserWallet {
   createdAt: string;
   updatedAt: string;
 }
-
-
 
 export type StoreProductType = 'key' | 'boost' | 'swap';
 

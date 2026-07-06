@@ -92,7 +92,7 @@ export default function StorePage() {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="overflow-hidden border-border bg-surface p-0 shadow-xs">
+            <Card key={index} className="border-border bg-surface overflow-hidden p-0 shadow-xs">
               <CardContent className="flex items-center gap-4 p-4">
                 <div
                   className={`flex size-11 items-center justify-center rounded-xl ${stat.bgColor}`}
@@ -101,7 +101,7 @@ export default function StorePage() {
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-xl font-bold leading-tight sm:text-2xl">
+                  <h3 className="text-xl leading-tight font-bold sm:text-2xl">
                     {isMounted
                       ? typeof stat.value === 'number'
                         ? stat.value.toLocaleString()

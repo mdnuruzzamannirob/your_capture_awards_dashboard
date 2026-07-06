@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { Button } from '../ui/button';
 import { DialogTrigger } from '@radix-ui/react-dialog';
 
-
 const UserMenu = () => {
   const [open, setOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -95,15 +94,15 @@ const UserMenu = () => {
             <span className="text-muted-foreground truncate text-xs">{user?.email}</span>
           </div>
         </div>
-        <div className="border-t border-border"></div>
+        <div className="border-border border-t"></div>
         <div className="flex flex-col gap-1 p-1">
           <Link
             href="/settings?tab=profile"
             onClick={() => setOpen(false)}
             className={cn(
-              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
+              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
               pathname === '/settings' && (!tab || tab === 'profile')
-                ? 'bg-surface-tertiary font-medium text-foreground'
+                ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -114,9 +113,9 @@ const UserMenu = () => {
             href="/settings?tab=change-password"
             onClick={() => setOpen(false)}
             className={cn(
-              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
+              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
               pathname === '/settings' && tab === 'change-password'
-                ? 'bg-surface-tertiary font-medium text-foreground'
+                ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -127,9 +126,9 @@ const UserMenu = () => {
             href="/settings?tab=site-policy"
             onClick={() => setOpen(false)}
             className={cn(
-              'flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors hover:bg-surface-tertiary',
+              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
               pathname === '/settings' && tab === 'site-policy'
-                ? 'bg-surface-tertiary font-medium text-foreground'
+                ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
             )}
           >
@@ -137,7 +136,7 @@ const UserMenu = () => {
             Site Policy
           </Link>
         </div>
-        <div className="border-t border-border"></div>
+        <div className="border-border border-t"></div>
         <div className="flex flex-col p-1">
           <Dialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
             <DialogTrigger asChild>
@@ -150,7 +149,7 @@ const UserMenu = () => {
                 Logout
               </button>
             </DialogTrigger>
-            <DialogContent className="rounded-xl border-border bg-surface">
+            <DialogContent className="border-border bg-surface rounded-xl">
               <DialogTitle />
 
               <div className="flex flex-col items-center justify-center gap-3">

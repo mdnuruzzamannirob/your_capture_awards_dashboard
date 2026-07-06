@@ -48,8 +48,11 @@ const PolicyEditor = ({
   title: string;
   description: string;
 }) => {
-  const { data: policyData, isLoading: isPolicyLoading, isFetching: isPolicyFetching } =
-    useGetSitePolicyQuery({ type });
+  const {
+    data: policyData,
+    isLoading: isPolicyLoading,
+    isFetching: isPolicyFetching,
+  } = useGetSitePolicyQuery({ type });
   const [updateSitePolicy, { isLoading: isUpdatingPolicy }] = useUpdateSitePolicyMutation();
   const [editorContent, setEditorContent] = useState('');
 
@@ -82,8 +85,8 @@ const PolicyEditor = ({
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Skeleton Editor */}
-          <div className="overflow-hidden rounded-md border border-border bg-background">
-            <div className="bg-surface/50 flex h-11 items-center gap-2 border-b border-border px-3">
+          <div className="border-border bg-background overflow-hidden rounded-md border">
+            <div className="bg-surface/50 border-border flex h-11 items-center gap-2 border-b px-3">
               <div className="bg-muted h-6 w-6 rounded" />
               <div className="bg-muted h-6 w-6 rounded" />
               <div className="bg-muted h-6 w-6 rounded" />
@@ -109,7 +112,7 @@ const PolicyEditor = ({
     <Card className="border-border bg-surface/50 animate-fadeIn">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileText className="size-5 text-primary" />
+          <FileText className="text-primary size-5" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -248,27 +251,22 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 animate-fadeIn lg:grid-cols-3">
+    <div className="animate-fadeIn grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Left side: Avatar Manager */}
       <Card className="border-border bg-surface/50 flex flex-col justify-between">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Camera className="size-5 text-primary" />
+            <Camera className="text-primary size-5" />
             Profile Picture
           </CardTitle>
           <CardDescription>Update your profile picture.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center space-y-6 pb-6">
-          <div className="relative size-32 overflow-hidden rounded-full border-4 border-border bg-surface-tertiary">
+          <div className="border-border bg-surface-tertiary relative size-32 overflow-hidden rounded-full border-4">
             {previewUrl ? (
-              <Image
-                alt="Avatar Preview"
-                src={previewUrl}
-                fill
-                className="object-cover"
-              />
+              <Image alt="Avatar Preview" src={previewUrl} fill className="object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-4xl font-bold text-muted-foreground">
+              <div className="text-muted-foreground flex h-full w-full items-center justify-center text-4xl font-bold">
                 {firstName?.charAt(0) || 'U'}
               </div>
             )}
@@ -288,7 +286,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
             />
           </div>
 
-          <div className="flex flex-col gap-2 w-full">
+          <div className="flex w-full flex-col gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -304,7 +302,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
                 size="sm"
                 onClick={handleAvatarUpload}
                 disabled={isUploading}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 w-full"
               >
                 {isUploading ? 'Uploading...' : 'Save Avatar'}
               </Button>
@@ -317,7 +315,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
       <Card className="border-border bg-surface/50 lg:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <UserCheck className="size-5 text-primary" />
+            <UserCheck className="text-primary size-5" />
             Profile Details
           </CardTitle>
           <CardDescription>Update your personal information.</CardDescription>
@@ -407,7 +405,7 @@ const PasswordTab = () => {
     <Card className="border-border bg-surface/50 animate-fadeIn">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ShieldCheck className="size-5 text-primary" />
+          <ShieldCheck className="text-primary size-5" />
           Change Password
         </CardTitle>
         <CardDescription>Secure your account with a strong password.</CardDescription>
@@ -484,9 +482,12 @@ const SettingsContent = () => {
 
   if (isUserLoading) {
     return (
-      <section className="space-y-5 p-5 animate-pulse">
-        <Title title="Settings" description="Manage your account profile, security, and policies." />
-        <div className="flex items-center gap-2 text-sm text-muted-foreground py-10 justify-center">
+      <section className="animate-pulse space-y-5 p-5">
+        <Title
+          title="Settings"
+          description="Manage your account profile, security, and policies."
+        />
+        <div className="text-muted-foreground flex items-center justify-center gap-2 py-10 text-sm">
           <Spinner className="size-6" /> Loading settings dashboard...
         </div>
       </section>
@@ -498,7 +499,7 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full max-w-md grid-cols-3 border border-border bg-surface">
+        <TabsList className="border-border bg-surface grid w-full max-w-md grid-cols-3 border">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
@@ -522,14 +523,16 @@ const SettingsContent = () => {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={
-      <section className="space-y-5 p-5">
-        <Title title="Settings" description="Loading..." />
-        <div className="flex items-center justify-center py-10">
-          <Spinner className="size-6" />
-        </div>
-      </section>
-    }>
+    <Suspense
+      fallback={
+        <section className="space-y-5 p-5">
+          <Title title="Settings" description="Loading..." />
+          <div className="flex items-center justify-center py-10">
+            <Spinner className="size-6" />
+          </div>
+        </section>
+      }
+    >
       <SettingsContent />
     </Suspense>
   );

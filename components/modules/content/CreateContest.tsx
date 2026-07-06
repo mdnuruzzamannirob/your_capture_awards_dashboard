@@ -243,7 +243,7 @@ const CreateContest: React.FC = () => {
     <Form {...form}>
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-          <aside className="scrollbar-thin sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border border-border bg-surface p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
+          <aside className="scrollbar-thin border-border bg-surface sticky top-[77px] z-30 col-span-12 flex h-fit w-full flex-row items-start gap-10 overflow-x-auto rounded-xl border p-5 max-xl:justify-between xl:col-span-2 xl:flex-col">
             {CREATE_CONTEST_STEPS.map((step, index) => {
               const isActive = index === currentStep;
               const isCompleted = index < currentStep;
@@ -252,7 +252,7 @@ const CreateContest: React.FC = () => {
                   key={step.id}
                   type="button"
                   onClick={() => void goToStep(index)}
-                  className="group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-surface-tertiary"
+                  className="group hover:bg-surface-tertiary flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors"
                 >
                   <span
                     className={
@@ -270,8 +270,8 @@ const CreateContest: React.FC = () => {
                     {isCompleted ? <CheckCircle className="size-4 min-w-4" /> : index + 1}
                   </span>
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{step.title}</p>
-                    <p className="text-xs text-muted-foreground">Step {index + 1} of 5</p>
+                    <p className="text-foreground text-sm font-semibold">{step.title}</p>
+                    <p className="text-muted-foreground text-xs">Step {index + 1} of 5</p>
                   </div>
                 </button>
               );
@@ -281,7 +281,7 @@ const CreateContest: React.FC = () => {
           <div className="col-span-12 space-y-6 xl:col-span-10">
             {stepContent()}
 
-            <div className="flex items-center justify-between rounded-xl border border-border bg-surface p-4">
+            <div className="border-border bg-surface flex items-center justify-between rounded-xl border p-4">
               <Button
                 type="button"
                 variant="ghost"
@@ -297,12 +297,12 @@ const CreateContest: React.FC = () => {
                   type="button"
                   disabled={isLoading}
                   onClick={handleFinalSubmit}
-                  className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
                 >
                   {isLoading ? 'Submitting...' : 'Create Contest'}
                 </Button>
               ) : (
-                <Button type="button" onClick={handleNext} className="gap-2 text-foreground">
+                <Button type="button" onClick={handleNext} className="text-foreground gap-2">
                   Next Step <ArrowRight className="size-4" />
                 </Button>
               )}
