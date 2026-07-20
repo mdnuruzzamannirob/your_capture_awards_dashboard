@@ -1,12 +1,9 @@
 'use client';
 
-import { useFieldArray, useFormContext } from 'react-hook-form';
-import { Plus, Trash2 } from 'lucide-react';
+import DynamicIcon from '@/components/common/DynamicIcon';
+import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -14,132 +11,352 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CREATE_CONTEST_RULE_ICONS } from '@/lib/constants';
-import DynamicIcon from '@/components/common/DynamicIcon';
+import { Textarea } from '@/components/ui/textarea';
+import { contestRuleDefinitions } from '@/lib/constants';
+import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { SlidersHorizontal } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useFormContext, type FieldPath } from 'react-hook-form';
+
+function RuleSection({
+  ruleKey,
+  children,
+}: {
+  ruleKey: keyof typeof contestRuleDefinitions;
+  children: ReactNode;
+}) {
+  const definition = contestRuleDefinitions[ruleKey];
+
+  return (
+    <section className="border-border space-y-3 border-t pt-4 first:border-t-0 first:pt-0">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="flex items-center gap-2 text-sm font-semibold">
+          <DynamicIcon name={definition.icon} className="text-muted-foreground size-4" />
+          {definition.label}
+        </h3>
+        <span className="text-caption-foreground text-xs capitalize">
+          {definition.appliesTo.map((item) => item.toLowerCase().replace('_', ' ')).join(', ')}
+        </span>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function RuleCheckbox({ name, label }: { name: FieldPath<ContestFinalValues>; label: string }) {
+  const form = useFormContext<ContestFinalValues>();
+
+  return (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="flex items-center gap-2 space-y-0">
+          <FormControl>
+            <Checkbox checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+          </FormControl>
+          <FormLabel className="mt-0! text-sm">{label}</FormLabel>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+}
 
 const RulesStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const { fields, append, remove } = useFieldArray({ name: 'rules', control: form.control });
+  const levels = form.watch('rules.levelRequirements');
 
   return (
     <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
-      <div className="border-border flex items-center justify-between border-b pb-4">
-        <h2 className="text-lg font-semibold">Rules ({fields.length})</h2>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => append({ name: '', icon: 'Info', description: '' })}
-          className="gap-2 border-dashed"
-        >
-          <Plus className="size-4" /> Add Rule
-        </Button>
-      </div>
+      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
+        <SlidersHorizontal className="text-primary size-5" /> Rules
+      </h2>
 
       <div className="space-y-4">
-        {fields.map((field, index) => (
-          <div key={field.id} className="border-border space-y-3 rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Rule {index + 1}</h3>
-              {fields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => remove(index)}
-                  className="text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
+        <RuleSection ruleKey="SUBMISSION_RULES">
+          <FormField
+            control={form.control}
+            name="rules.submissionRules.intro"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input aria-label="Submission rules introduction" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="rules.submissionRules.disallowed"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    aria-label="Disallowed submissions"
+                    className="scrollbar-thin min-h-28"
+                    value={field.value.join('\n')}
+                    onBlur={field.onBlur}
+                    onChange={(event) =>
+                      field.onChange(
+                        event.target.value
+                          .split('\n')
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                  />
+                </FormControl>
+                <p className="text-caption-foreground text-xs">Enter one item per line.</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="rules.submissionRules.removalNotice"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input aria-label="Submission removal notice" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid items-start gap-4 md:grid-cols-2">
+            <RuleCheckbox name="rules.submissionRules.allowAiImages" label="Allow AI images" />
+            <FormField
+              control={form.control}
+              name="rules.submissionRules.duplicatePolicy"
+              render={({ field }) => (
+                <FormItem>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="h-10! w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="DISALLOW_SAME_PHOTO">Disallow same photo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
+          </div>
+        </RuleSection>
 
-            <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
-              <FormField
-                control={form.control}
-                name={`rules.${index}.icon`}
-                render={({ field }) => {
-                  const selectedOpt = CREATE_CONTEST_RULE_ICONS.find((o) => o.icon === field.value);
-                  return (
+        <RuleSection ruleKey="LEVEL_REQUIREMENTS">
+          <div className="space-y-2">
+            {levels.map((item, index) => (
+              <div key={item.level} className="grid items-center gap-3 sm:grid-cols-[90px_1fr]">
+                <span className="bg-primary-soft text-primary-soft-foreground rounded-full px-3 py-1 text-center text-xs font-medium capitalize">
+                  {item.level.toLowerCase().replace('_', ' ')}
+                </span>
+                <FormField
+                  control={form.control}
+                  name={`rules.levelRequirements.${index}.votes`}
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Icon</FormLabel>
                       <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            const namePath = `rules.${index}.name` as const;
-                            const currentName = form.getValues(namePath);
-                            if (!currentName) {
-                              const opt = CREATE_CONTEST_RULE_ICONS.find((o) => o.icon === val);
-                              if (opt?.label) {
-                                form.setValue(namePath, opt.label, { shouldValidate: true });
-                              }
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="h-11! w-full">
-                            <SelectValue placeholder="Pick an icon">
-                              {selectedOpt && (
-                                <span className="flex items-center gap-2">
-                                  <DynamicIcon name={selectedOpt.icon} className="size-4" />
-                                  {selectedOpt.label}
-                                </span>
-                              )}
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {CREATE_CONTEST_RULE_ICONS.map((opt) => (
-                              <SelectItem key={opt.icon} value={opt.icon}>
-                                <span className="flex items-center gap-2">
-                                  <DynamicIcon name={opt.icon} className="size-4" />
-                                  {opt.label}
-                                </span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          type="number"
+                          min={0}
+                          aria-label={`${item.level} required votes`}
+                          {...field}
+                          onChange={(event) => field.onChange(event.target.value)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  );
-                }}
-              />
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        </RuleSection>
 
+        <RuleSection ruleKey="SUBMISSION_FORMAT">
+          <FormField
+            control={form.control}
+            name="rules.submissionFormat.mimeTypes"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex flex-wrap gap-5">
+                  {[
+                    ['image/jpeg', 'JPEG'],
+                    ['image/png', 'PNG'],
+                  ].map(([mimeType, label]) => (
+                    <label key={mimeType} className="flex items-center gap-2 text-sm font-medium">
+                      <Checkbox
+                        checked={field.value.includes(mimeType as 'image/jpeg' | 'image/png')}
+                        onCheckedChange={(checked) => {
+                          const next = checked
+                            ? [...field.value, mimeType]
+                            : field.value.filter((item) => item !== mimeType);
+                          field.onChange(next);
+                        }}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid gap-4 md:grid-cols-3">
+            {(
+              [
+                ['minWidth', 'Min width (px)'],
+                ['minHeight', 'Min height (px)'],
+                ['maxSizeMB', 'Max size (MB)'],
+              ] as const
+            ).map(([key, label]) => (
               <FormField
+                key={key}
                 control={form.control}
-                name={`rules.${index}.name`}
+                name={`rules.submissionFormat.${key}`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{label}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Rule title" {...field} />
+                      <Input
+                        type="number"
+                        min={1}
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
+            ))}
+          </div>
+        </RuleSection>
 
+        <RuleSection ruleKey="ELIGIBILITY">
+          <div className="grid items-start gap-4 md:grid-cols-[100px_1fr]">
             <FormField
               control={form.control}
-              name={`rules.${index}.description`}
+              name="rules.eligibility.minAge"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Min age</FormLabel>
                   <FormControl>
-                    <Textarea rows={3} placeholder="Describe the rule" {...field} />
+                    <Input
+                      type="number"
+                      min={0}
+                      max={120}
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="rules.eligibility.text"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Text</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
           </div>
-        ))}
+          <RuleCheckbox name="rules.eligibility.requiresAcceptance" label="Requires acceptance" />
+        </RuleSection>
 
-        {form.formState.errors.rules && (
-          <p className="text-destructive text-sm">{(form.formState.errors.rules as any).message}</p>
-        )}
+        <RuleSection ruleKey="COPYRIGHT">
+          <FormField
+            control={form.control}
+            name="rules.copyright.text"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input aria-label="Copyright text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-wrap gap-6">
+            <RuleCheckbox name="rules.copyright.requiresOwnership" label="Requires ownership" />
+            <RuleCheckbox name="rules.copyright.requiresAcceptance" label="Requires acceptance" />
+          </div>
+        </RuleSection>
+
+        <RuleSection ruleKey="VOTING">
+          <FormField
+            control={form.control}
+            name="rules.voting.text"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input aria-label="Voting text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid gap-3 md:grid-cols-2">
+            <RuleCheckbox name="rules.voting.membersOnly" label="Members only" />
+            <RuleCheckbox name="rules.voting.blindVoting" label="Blind voting" />
+            <RuleCheckbox
+              name="rules.voting.requireContestParticipant"
+              label="Must be a participant"
+            />
+            <RuleCheckbox name="rules.voting.disallowSelfVote" label="Disallow self vote" />
+          </div>
+        </RuleSection>
+
+        <RuleSection ruleKey="PARTICIPATION">
+          <FormField
+            control={form.control}
+            name="rules.participation.text"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input aria-label="Participation text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid items-start gap-4 md:grid-cols-2">
+            <RuleCheckbox
+              name="rules.participation.requiresTermsAcceptance"
+              label="Requires terms acceptance"
+            />
+            <FormField
+              control={form.control}
+              name="rules.participation.termsUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      aria-label="Terms URL"
+                      placeholder="/terms"
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </RuleSection>
       </div>
     </div>
   );

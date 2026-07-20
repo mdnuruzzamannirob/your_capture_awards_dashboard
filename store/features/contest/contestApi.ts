@@ -1,6 +1,6 @@
 import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { ApiSuccessResponse, ContestStats } from './types';
+import { ApiSuccessResponse, Contest, ContestStats, GetContestsResponse } from './types';
 
 export const contestApi = createApi({
   reducerPath: 'contestApi',
@@ -12,11 +12,11 @@ export const contestApi = createApi({
       providesTags: [{ type: 'ContestStats', id: 'SINGLE' }],
     }),
 
-    createContest: builder.mutation<{ data: unknown }, any>({
-      query: (credentials) => ({
+    createContest: builder.mutation<ApiSuccessResponse<Contest>, FormData>({
+      query: (body) => ({
         url: '/contests',
         method: 'POST',
-        body: credentials,
+        body,
       }),
       invalidatesTags: [
         { type: 'Contests', id: 'LIST' },
@@ -25,7 +25,7 @@ export const contestApi = createApi({
       ],
     }),
 
-    updateContest: builder.mutation<{ data: unknown }, { id: string; body: any }>({
+    updateContest: builder.mutation<ApiSuccessResponse<Contest>, { id: string; body: FormData }>({
       query: ({ id, body }) => ({
         url: `/contests/${id}`,
         method: 'PUT',
@@ -39,7 +39,10 @@ export const contestApi = createApi({
       ],
     }),
 
-    getContests: builder.query<{ data: any }, { page?: number; limit?: number; search?: string }>({
+    getContests: builder.query<
+      ApiSuccessResponse<GetContestsResponse>,
+      { page?: number; limit?: number; search?: string }
+    >({
       query: ({ page = 1, limit = 20, search }) => {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
         if (search?.trim()) params.set('search', search.trim());
@@ -48,7 +51,7 @@ export const contestApi = createApi({
       providesTags: (result) =>
         result
           ? [
-              ...result.data?.contests?.map(({ id }: { id: any }) => ({
+              ...result.data.contests.map(({ id }) => ({
                 type: 'Contest' as const,
                 id,
               })),
@@ -57,7 +60,7 @@ export const contestApi = createApi({
           : [{ type: 'Contests', id: 'LIST' }],
     }),
 
-    getContest: builder.query<any, { id: string }>({
+    getContest: builder.query<ApiSuccessResponse<Contest>, { id: string }>({
       query: ({ id }) => `/contests/${id}`,
       providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
     }),

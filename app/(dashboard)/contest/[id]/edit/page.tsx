@@ -26,7 +26,7 @@ const UpdateContestPage = () => {
       </Breadcrumb>
       <Title
         title="Update Contest"
-        description="Modify details, rules, and custom rewards for the existing challenge."
+        description="Modify contest details, configurable rules, and custom awards."
       />
       <UpdateContest />
     </section>

@@ -1,10 +1,9 @@
+import { contestAwardTypes } from '@/store/features/contest/types';
 import { z } from 'zod';
 
-/* CONSTANTS */
-const MAX_IMAGE_SIZE = 24 * 1024 * 1024; // 24MB
+const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-/* STEP 1 - DETAILS */
 export const contestDetailsSchema = z
   .object({
     title: z
@@ -12,42 +11,25 @@ export const contestDetailsSchema = z
       .trim()
       .min(5, 'Title must be at least 5 characters')
       .max(100, 'Title must not exceed 100 characters'),
-
     description: z
       .string()
       .trim()
       .min(20, 'Description must be at least 20 characters')
       .max(2000, 'Description is too long'),
-
     banner: z
-      .union([
-        z.custom<File>((file) => file instanceof File),
-        z.string().min(1, 'Banner image is required'),
-      ])
-      .refine((val) => {
-        if (val instanceof File) {
-          return ALLOWED_IMAGE_TYPES.includes(val.type);
-        }
-        return typeof val === 'string' && val.length > 0;
+      .union([z.custom<File>((file) => file instanceof File), z.string()])
+      .optional()
+      .refine((value) => {
+        if (!value) return true;
+        return value instanceof File ? ALLOWED_IMAGE_TYPES.includes(value.type) : true;
       }, 'Only JPG, PNG, WEBP images are allowed')
-      .refine((val) => {
-        if (val instanceof File) {
-          return val.size <= MAX_IMAGE_SIZE;
-        }
-        return true;
-      }, 'Image must be under 24MB'),
-
-    maxUploads: z.coerce
-      .number()
-      .int()
-      .min(1, 'At least 1 upload required')
-      .max(4, 'Maximum 4 uploads allowed')
-      .default(4),
-
-    recurring: z.coerce.boolean().default(false),
-
+      .refine(
+        (value) => !(value instanceof File) || value.size <= MAX_IMAGE_SIZE,
+        'Image must be under 24MB',
+      ),
+    maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required').max(4),
+    recurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
-
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
   })
@@ -59,34 +41,27 @@ export const contestDetailsSchema = z
         message: 'End date must be after start date',
       });
     }
-
     if (data.recurring && !data.recurringType) {
       ctx.addIssue({
         path: ['recurringType'],
         code: 'custom',
-        message: 'Recurring type is required',
+        message: 'Recurring frequency is required',
       });
     }
   });
 
-/* STEP 2 - PRIZES (Coin / Money Logic) */
 export const contestPrizesSchema = z
   .object({
-    isMoneyContest: z.coerce.boolean().default(false),
+    isMoneyContest: z.boolean().default(false),
     minPrize: z.coerce.number().min(0).default(0),
     maxPrize: z.coerce.number().min(0).default(0),
-    coin_requirement: z.coerce.boolean().default(false),
+    coin_requirement: z.boolean().default(false),
     coin_required: z.coerce.number().int().min(0).default(0),
   })
   .superRefine((data, ctx) => {
     if (data.isMoneyContest && data.maxPrize <= 0) {
-      ctx.addIssue({
-        path: ['maxPrize'],
-        code: 'custom',
-        message: 'Money contest must have prize amount',
-      });
+      ctx.addIssue({ path: ['maxPrize'], code: 'custom', message: 'Prize amount is required' });
     }
-
     if (data.isMoneyContest && data.minPrize > data.maxPrize) {
       ctx.addIssue({
         path: ['minPrize'],
@@ -94,53 +69,98 @@ export const contestPrizesSchema = z
         message: 'Min prize cannot exceed max prize',
       });
     }
-
     if (data.coin_requirement && data.coin_required <= 0) {
       ctx.addIssue({
         path: ['coin_required'],
         code: 'custom',
-        message: 'Coin requirement must be greater than 0',
+        message: 'Required coins must be greater than 0',
       });
     }
   });
 
-/* STEP 3 - RULES */
-export const contestRulesSchema = z
+const requiredText = z.string().trim().min(1, 'This field is required');
+
+export const contestRulesSchema = z.object({
+  submissionRules: z.object({
+    intro: requiredText,
+    disallowed: z.array(requiredText).min(1, 'Add at least one disallowed item'),
+    removalNotice: requiredText,
+    allowAiImages: z.boolean(),
+    duplicatePolicy: requiredText,
+  }),
+  levelRequirements: z
+    .array(
+      z.object({
+        level: z.enum(['POPULAR', 'SKILLED', 'PREMIER', 'ELITE', 'ALL_STAR']),
+        votes: z.coerce.number().int().min(0, 'Votes cannot be negative'),
+      }),
+    )
+    .length(5),
+  submissionFormat: z.object({
+    mimeTypes: z.array(z.enum(['image/jpeg', 'image/png'])).min(1, 'Select a file type'),
+    minWidth: z.coerce.number().int().min(1),
+    minHeight: z.coerce.number().int().min(1),
+    maxSizeMB: z.coerce.number().min(1),
+  }),
+  eligibility: z.object({
+    minAge: z.coerce.number().int().min(0).max(120),
+    text: requiredText,
+    requiresAcceptance: z.boolean(),
+  }),
+  copyright: z.object({
+    text: requiredText,
+    requiresOwnership: z.boolean(),
+    requiresAcceptance: z.boolean(),
+  }),
+  voting: z.object({
+    text: requiredText,
+    membersOnly: z.boolean(),
+    requireContestParticipant: z.boolean(),
+    disallowSelfVote: z.boolean(),
+    blindVoting: z.boolean(),
+  }),
+  participation: z.object({
+    text: requiredText,
+    requiresTermsAcceptance: z.boolean(),
+    termsUrl: z.string().trim().nullable(),
+  }),
+});
+
+export const contestAwardsSchema = z
   .array(
     z.object({
-      name: z.string().trim().min(3, 'Rule name is required'),
-      icon: z.string().min(1, 'Rule icon required'),
-      description: z.string().trim().min(10, 'Rule description is required'),
+      type: z.enum(contestAwardTypes),
+      boost: z.coerce.number().int().min(0).default(0),
+      key: z.coerce.number().int().min(0).default(0),
+      swap: z.coerce.number().int().min(0).default(0),
+      coin: z.coerce.number().int().min(0).default(0),
     }),
   )
-  .min(1, 'At least one rule is required');
+  .min(1, 'Add at least one award')
+  .max(contestAwardTypes.length)
+  .superRefine((awards, ctx) => {
+    const seen = new Set<string>();
+    awards.forEach((award, index) => {
+      if (seen.has(award.type)) {
+        ctx.addIssue({
+          path: [index, 'type'],
+          code: 'custom',
+          message: 'Each award type can only be added once',
+        });
+      }
+      seen.add(award.type);
+    });
+  });
 
-/* STEP 4 - REWARDS (Leaderboard / Boost / Keys etc.) */
-export const contestRewardsSchema = z
-  .array(
-    z.object({
-      category: z.string().min(1, 'Category is required'),
-      icon: z.string().default('User'),
-
-      key: z.coerce.number().min(0).default(0),
-      boost: z.coerce.number().min(0).default(0),
-      swap: z.coerce.number().min(0).default(0),
-    }),
-  )
-  .min(1, 'At least one reward is required')
-  .max(2, 'Maximum of 2 rewards allowed');
-
-/* STEP 5 - FINAL PREVIEW / SUBMIT SCHEMA */
 export const contestFinalSchema = z.object({
   details: contestDetailsSchema,
   prizes: contestPrizesSchema,
   rules: contestRulesSchema,
-  rewards: contestRewardsSchema,
+  awards: contestAwardsSchema,
 });
 
-/* TYPES */
 export type ContestDetailsValues = z.infer<typeof contestDetailsSchema>;
 export type ContestPrizesValues = z.infer<typeof contestPrizesSchema>;
 export type ContestRulesValues = z.infer<typeof contestRulesSchema>;
-export type ContestRewardsValues = z.infer<typeof contestRewardsSchema>;
+export type ContestAwardsValues = z.infer<typeof contestAwardsSchema>;
 export type ContestFinalValues = z.infer<typeof contestFinalSchema>;

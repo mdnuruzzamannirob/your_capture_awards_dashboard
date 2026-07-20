@@ -8,8 +8,15 @@ interface DynamicIconProps {
   className?: string;
 }
 
+const ICON_ALIASES: Record<string, string> = {
+  'number-circle': 'CircleGauge',
+  'image-upload': 'ImageUp',
+  'level-stars': 'ListChecks',
+  'file-check': 'FileCheck2',
+};
+
 const DynamicIcon: React.FC<DynamicIconProps> = ({ name, className }) => {
-  const icon = toPascalCase(name);
+  const icon = ICON_ALIASES[name] ?? toPascalCase(name);
   const IconComponent = (LucideIcons as any)[icon];
 
   if (!IconComponent) {
