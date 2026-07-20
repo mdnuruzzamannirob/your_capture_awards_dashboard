@@ -1,7 +1,7 @@
 'use client';
 
-import { useFieldArray, useFormContext } from 'react-hook-form';
-import { Gift, Trash2, Plus } from 'lucide-react';
+import DynamicIcon from '@/components/common/DynamicIcon';
+import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,183 +11,140 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { CREATE_CONTEST_PRIZE_TYPES } from '@/lib/constants';
+import { CONTEST_AWARD_OPTIONS } from '@/lib/constants';
+import { getAwardLabel } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import DynamicIcon from '@/components/common/DynamicIcon';
+import type { ContestAwardType } from '@/store/features/contest/types';
+import { Award, Plus, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 const RewardsStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const { fields, append, remove } = useFieldArray({ name: 'rewards', control: form.control });
+  const { fields, append, remove } = useFieldArray({ name: 'awards', control: form.control });
+  const awards = form.watch('awards');
+  const [selectedAward, setSelectedAward] = useState<ContestAwardType>('SUPREME');
+
+  const availableOptions = useMemo(() => {
+    const selected = new Set(awards.map((award) => award.type));
+    return CONTEST_AWARD_OPTIONS.filter((option) => !selected.has(option.value));
+  }, [awards]);
+
+  useEffect(() => {
+    if (
+      availableOptions.length &&
+      !availableOptions.some((option) => option.value === selectedAward)
+    ) {
+      setSelectedAward(availableOptions[0].value);
+    }
+  }, [availableOptions, selectedAward]);
+
+  const addAward = () => {
+    if (!availableOptions.some((option) => option.value === selectedAward)) return;
+    append({ type: selectedAward, boost: 0, key: 0, swap: 0, coin: 0 });
+    const next = availableOptions.find((option) => option.value !== selectedAward);
+    if (next) setSelectedAward(next.value);
+  };
 
   return (
     <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
-      <div className="border-border flex items-center justify-between border-b pb-4">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <Gift className="text-primary size-5" /> Rewards ({fields.length})
-        </h2>
-        {fields.length < 2 && (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              const existing = fields.map((f) => f.category);
-              const nextCategory = existing.includes('TOP_PHOTOGRAPHER')
-                ? 'TOP_PHOTO'
-                : 'TOP_PHOTOGRAPHER';
-              const nextIcon = nextCategory === 'TOP_PHOTO' ? 'Image' : 'User';
-              append({ category: nextCategory, icon: nextIcon, key: 0, boost: 0, swap: 0 });
-            }}
-            className="gap-2 border-dashed"
+      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
+        <Award className="text-primary size-5" /> Awards
+      </h2>
+
+      {availableOptions.length > 0 && (
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <Select
+            value={selectedAward}
+            onValueChange={(value) => setSelectedAward(value as ContestAwardType)}
           >
-            <Plus className="size-4" /> Add Reward
+            <SelectTrigger className="h-11! w-full">
+              <SelectValue placeholder="Select an award" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  <span className="flex items-center gap-2">
+                    <DynamicIcon name={option.icon} className="size-4" />
+                    {option.label}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button type="button" variant="outline" onClick={addAward} className="h-11 gap-2">
+            <Plus className="size-4" /> Add award
           </Button>
-        )}
+        </div>
+      )}
+
+      <div className="grid items-start gap-4 md:grid-cols-2">
+        {fields.map((award, index) => {
+          const option = CONTEST_AWARD_OPTIONS.find((item) => item.value === award.type);
+          return (
+            <div key={award.id} className="border-border space-y-4 rounded-xl border p-4">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="flex items-center gap-2 font-semibold">
+                  <DynamicIcon name={option?.icon ?? 'Award'} className="text-primary size-4" />
+                  {option?.label ?? getAwardLabel(award.type)}
+                </h3>
+                {fields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Remove ${getAwardLabel(award.type)}`}
+                    onClick={() => remove(index)}
+                    className="text-muted-foreground hover:text-destructive size-8"
+                  >
+                    <X className="size-4" />
+                  </Button>
+                )}
+              </div>
+
+              <input type="hidden" {...form.register(`awards.${index}.type`)} />
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(
+                  [
+                    ['boost', 'Boost'],
+                    ['key', 'Key'],
+                    ['swap', 'Swap'],
+                    ['coin', 'Coin'],
+                  ] as const
+                ).map(([key, label]) => (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name={`awards.${index}.${key}`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{label}</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min={0}
+                            {...field}
+                            onChange={(event) => field.onChange(event.target.value)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
-        {fields.map((field, index) => (
-          <div key={field.id} className="border-border space-y-3 rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Reward {index + 1}</h3>
-              {fields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => remove(index)}
-                  className="text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="size-4" />
-                </Button>
-              )}
-            </div>
-
-            <FormField
-              control={form.control}
-              name={`rewards.${index}.category`}
-              render={({ field }) => {
-                const selectedType = CREATE_CONTEST_PRIZE_TYPES.find(
-                  (t) => t.value === field.value,
-                );
-                return (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        onValueChange={(val) => {
-                          field.onChange(val);
-                          const type = CREATE_CONTEST_PRIZE_TYPES.find((t) => t.value === val);
-                          if (type?.icon) {
-                            form.setValue(`rewards.${index}.icon` as const, type.icon, {
-                              shouldValidate: true,
-                            });
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="h-11! w-full">
-                          <SelectValue placeholder="Select category">
-                            {selectedType && (
-                              <span className="flex items-center gap-2">
-                                <DynamicIcon name={selectedType.icon} className="size-4" />
-                                {selectedType.label}
-                              </span>
-                            )}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CREATE_CONTEST_PRIZE_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              <span className="flex items-center gap-2">
-                                <DynamicIcon name={type.icon} className="size-4" />
-                                {type.label}
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
-            />
-
-            <div className="grid gap-3 md:grid-cols-3">
-              <FormField
-                control={form.control}
-                name={`rewards.${index}.key`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Keys</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`rewards.${index}.boost`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Boost</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name={`rewards.${index}.swap`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Swap</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </div>
-        ))}
-
-        {form.formState.errors.rewards && (
-          <p className="text-destructive text-sm">
-            {(form.formState.errors.rewards as any).message}
-          </p>
-        )}
-      </div>
+      {form.formState.errors.awards?.root?.message && (
+        <p className="text-destructive text-sm">{form.formState.errors.awards.root.message}</p>
+      )}
+      {typeof form.formState.errors.awards?.message === 'string' && (
+        <p className="text-destructive text-sm">{form.formState.errors.awards.message}</p>
+      )}
     </div>
   );
 };

@@ -2,39 +2,43 @@
 
 import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import { Button } from '@/components/ui/button';
-import { cn, formatDateToDayMonYear, formatDateWithTime } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { Contest } from '@/store/features/contest/types';
 import { Info, Pencil } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
 import { GoDotFill } from 'react-icons/go';
 
+function formatDate(value?: string) {
+  if (!value) return 'Not available';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Not available';
+  return new Intl.DateTimeFormat('en', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(date);
+}
+
+function DetailItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-muted-foreground text-sm font-medium">{label}</p>
+      <p className="font-semibold">{value}</p>
+    </div>
+  );
+}
+
 const DetailsTab = ({
-  contest: data,
+  contest,
   canEdit = true,
   onEditClick,
 }: {
-  contest: any;
+  contest: Contest;
   canEdit?: boolean;
   onEditClick?: () => void;
 }) => {
-  const [contest] = useState(data);
-
-  const {
-    day: startDay,
-    hours: startHours,
-    minutes: startMinutes,
-    month: startMonth,
-    timeZone: startTimeZone,
-    year: startYear,
-  } = formatDateWithTime(contest?.startDate);
-  const {
-    day: endDay,
-    hours: endHours,
-    minutes: endMinutes,
-    month: endMonth,
-    timeZone: endTimeZone,
-    year: endYear,
-  } = formatDateWithTime(contest?.endDate);
+  const awardCount = contest.prizes?.length ?? contest.awards?.length ?? 0;
+  const creatorName = contest.creator?.fullName ?? 'Unknown creator';
 
   return (
     <div className="space-y-5">
@@ -42,116 +46,71 @@ const DetailsTab = ({
         <h1 className="flex h-9 items-center gap-2 text-lg font-semibold">
           <Info className="size-5" /> Details
         </h1>
-
         {canEdit && (
-          <Button onClick={onEditClick} className="text-foreground">
-            <Pencil /> Edit
+          <Button onClick={onEditClick} className="text-foreground gap-2">
+            <Pencil className="size-4" /> Edit
           </Button>
         )}
       </div>
 
-      <div className="space-y-5 rounded-xl border p-5">
-        <div className="space-y-1 text-sm">
-          <h1 className="text-muted-foreground font-medium">Creator</h1>
-          <div className="flex items-center gap-2">
-            <Image
-              alt="Profile"
-              src={contest?.creator?.avatar}
-              width={40}
-              height={40}
-              className="bg-surface size-10 min-w-10 overflow-hidden rounded-full object-cover"
-            />
-            <div>
-              <h3 className="font-medium">{contest?.creator?.fullName}</h3>
-              <p className="text-muted-foreground text-sm">{contest?.creator?.email}</p>
+      <div className="border-border bg-surface space-y-6 rounded-xl border p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold">{contest.title}</h2>
+            <div className="mt-3 text-sm leading-6">
+              <TipTapViewer content={contest.description} />
             </div>
           </div>
+          <span
+            className={cn(
+              'flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium capitalize',
+              contest.status === 'ACTIVE' && 'bg-success/10 text-success',
+              contest.status === 'CLOSED' && 'bg-destructive/10 text-destructive',
+              contest.status === 'UPCOMING' && 'bg-warning/10 text-warning',
+            )}
+          >
+            <GoDotFill /> {contest.status}
+          </span>
         </div>
 
-        <div className="space-y-1 text-sm">
-          <h1 className="text-muted-foreground font-medium">Title</h1>
-          <h1 className="text-base font-semibold">{contest?.title}</h1>
-        </div>
-
-        <div className="space-y-1 text-sm">
-          <h1 className="text-muted-foreground font-medium">Description</h1>
-          <div className="text-base">
-            <TipTapViewer content={contest?.description} />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-5 text-sm md:grid-cols-3">
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Money Contest</h1>
-            <p className="text-base font-semibold">{contest?.isMoneyContest ? 'Yes' : 'No'}</p>
-          </div>
-          {contest?.isMoneyContest && (
-            <>
-              <div className="space-y-1">
-                <h1 className="text-muted-foreground font-medium">Min Prize</h1>
-                <p className="text-base font-semibold">{contest?.minPrize ?? 0}</p>
-              </div>
-              <div className="space-y-1">
-                <h1 className="text-muted-foreground font-medium">Max Prize</h1>
-                <p className="text-base font-semibold">{contest?.maxPrize ?? 0}</p>
-              </div>
-            </>
-          )}
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Coin Requirement</h1>
-            <p className="text-base font-semibold">{contest?.coin_requirement ? 'Yes' : 'No'}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Required Coins</h1>
-            <p className="text-base font-semibold">{contest?.coin_required ?? 0}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Vote</h1>
-            <p className="text-base font-semibold">{contest?.totalVotes ?? 0}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Participant</h1>
-            <p className="text-base font-semibold">N/A</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Status</h1>
-            <button
-              className={cn(
-                'text-foreground flex cursor-default items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-                contest?.status === 'ACTIVE' && 'bg-success/10 text-success',
-                contest?.status === 'CLOSED' && 'bg-destructive/10 text-destructive',
-                contest?.status === 'UPCOMING' && 'bg-warning/10 text-warning',
+        {contest.creator && (
+          <div className="border-border flex items-center gap-3 border-t pt-5">
+            {contest.creator.avatar ? (
+              <Image
+                alt={creatorName}
+                src={contest.creator.avatar}
+                width={40}
+                height={40}
+                className="bg-surface-tertiary size-10 rounded-full object-cover"
+              />
+            ) : (
+              <span className="bg-surface-tertiary flex size-10 items-center justify-center rounded-full font-semibold">
+                {creatorName.charAt(0).toUpperCase()}
+              </span>
+            )}
+            <div>
+              <p className="font-medium">{creatorName}</p>
+              {contest.creator.email && (
+                <p className="text-muted-foreground text-sm">{contest.creator.email}</p>
               )}
-            >
-              <GoDotFill /> {contest?.status}
-            </button>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Max Upload</h1>
-            <p className="text-base font-semibold">{contest?.maxUploads}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Start Date</h1>
-            <p className="text-base font-semibold">
-              {startDay} {startMonth} {startYear}, {startHours}:{startMinutes}{' '}
-              <span className="text-muted-foreground text-xs font-medium">{startTimeZone}</span>
-            </p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">End Date</h1>
-            <p className="text-base font-semibold">
-              {endDay} {endMonth} {endYear}, {endHours}:{endMinutes}{' '}
-              <span className="text-muted-foreground text-xs font-medium">{endTimeZone}</span>
-            </p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Updated At</h1>
-            <p className="text-base font-semibold">{formatDateToDayMonYear(contest.updatedAt)}</p>
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-muted-foreground font-medium">Created At</h1>
-            <p className="text-base font-semibold">{formatDateToDayMonYear(contest.createdAt)}</p>
-          </div>
+        )}
+
+        <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
+          <DetailItem label="Start date" value={formatDate(contest.startDate)} />
+          <DetailItem label="End date" value={formatDate(contest.endDate)} />
+          <DetailItem label="Max uploads" value={contest.maxUploads ?? 0} />
+          <DetailItem label="Total votes" value={contest.totalVotes ?? 0} />
+          <DetailItem
+            label="Recurring"
+            value={contest.recurring ? (contest.recurringType ?? 'Yes') : 'No'}
+          />
+          <DetailItem label="Rules" value={contest.rules?.length ?? 0} />
+          <DetailItem label="Awards" value={awardCount} />
+          <DetailItem label="Joined" value={contest.joined ? 'Yes' : 'No'} />
+          <DetailItem label="Created at" value={formatDate(contest.createdAt)} />
+          <DetailItem label="Updated at" value={formatDate(contest.updatedAt)} />
         </div>
       </div>
     </div>

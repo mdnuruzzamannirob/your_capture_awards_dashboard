@@ -26,7 +26,7 @@ const CreateContestPage = () => {
       </Breadcrumb>
       <Title
         title="Create New Contest"
-        description="Setup details, rules, and custom rewards for the new challenge."
+        description="Set up contest details, configurable rules, and custom awards."
       />
       <CreateContest />
     </section>

@@ -1,6 +1,169 @@
+export const contestRuleKeys = [
+  'SUBMISSION_LIMIT',
+  'SUBMISSION_RULES',
+  'LEVEL_REQUIREMENTS',
+  'SUBMISSION_FORMAT',
+  'ELIGIBILITY',
+  'COPYRIGHT',
+  'VOTING',
+  'PARTICIPATION',
+] as const;
+
+export type ContestRuleKey = (typeof contestRuleKeys)[number];
+
+export const contestAwardTypes = [
+  'TOP_PHOTO',
+  'TOP_PHOTOGRAPHER',
+  'AMATEUR',
+  'TALENTED',
+  'SUPREME',
+  'SUPERIOR',
+  'YC_PICK',
+  'TOP_100',
+  'TOP_50',
+  'TOP_20',
+  'TOP_10',
+  'WINNER',
+] as const;
+
+export type ContestAwardType = (typeof contestAwardTypes)[number];
+export type ContestLevel = 'POPULAR' | 'SKILLED' | 'PREMIER' | 'ELITE' | 'ALL_STAR';
+
+export interface LevelRequirement {
+  level: ContestLevel;
+  votes: number;
+}
+
+export interface SubmissionRulesValue {
+  intro: string;
+  disallowed: string[];
+  removalNotice: string;
+  allowAiImages: boolean;
+  duplicatePolicy: string;
+}
+
+export interface SubmissionFormatValue {
+  mimeTypes: string[];
+  minWidth: number;
+  minHeight: number;
+  maxSizeMB: number;
+}
+
+export interface EligibilityValue {
+  minAge: number;
+  text: string;
+  requiresAcceptance: boolean;
+}
+
+export interface CopyrightValue {
+  text: string;
+  requiresOwnership: boolean;
+  requiresAcceptance: boolean;
+}
+
+export interface VotingValue {
+  text: string;
+  membersOnly: boolean;
+  requireContestParticipant: boolean;
+  disallowSelfVote: boolean;
+  blindVoting: boolean;
+}
+
+export interface ParticipationValue {
+  text: string;
+  requiresTermsAcceptance: boolean;
+  termsUrl: string | null;
+}
+
+export type ContestRuleValue =
+  | number
+  | SubmissionRulesValue
+  | LevelRequirement[]
+  | SubmissionFormatValue
+  | EligibilityValue
+  | CopyrightValue
+  | VotingValue
+  | ParticipationValue;
+
+export interface ContestRule {
+  key: ContestRuleKey;
+  label?: string;
+  name?: string;
+  icon?: string;
+  inputType?: 'number' | 'object' | 'list';
+  appliesTo?: string[];
+  displayOnly?: boolean;
+  enabled?: boolean;
+  order?: number;
+  value: ContestRuleValue;
+  description?: string;
+}
+
+export interface ContestAwardValue {
+  boost: number;
+  key: number;
+  swap: number;
+  coin: number;
+}
+
+export interface ContestAward extends Partial<ContestAwardValue> {
+  id?: string;
+  contestId?: string;
+  prizeId?: string;
+  type?: ContestAwardType;
+  category: ContestAwardType;
+  title?: string;
+  description?: string;
+  icon?: string;
+  prize?: {
+    id?: string;
+    category?: ContestAwardType;
+    title?: string;
+    description?: string;
+    icon?: string;
+    isActive?: boolean;
+  };
+}
+
+export interface Contest {
+  id: string;
+  title: string;
+  description: string;
+  banner?: string | null;
+  status: 'ACTIVE' | 'UPCOMING' | 'CLOSED' | string;
+  startDate?: string;
+  endDate?: string;
+  recurring?: boolean;
+  recurringType?: 'DAILY' | 'WEEKLY' | 'MONTHLY' | null;
+  isMoneyContest?: boolean;
+  minPrize?: number;
+  maxPrize?: number;
+  coin_requirement?: boolean;
+  coin_required?: number;
+  maxUploads: number;
+  level_requirements?: number[];
+  rules?: ContestRule[];
+  prizes?: ContestAward[];
+  awards?: ContestAward[];
+  totalVotes?: number;
+  joined?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  creator?: {
+    id?: string;
+    fullName?: string;
+    email?: string;
+    avatar?: string | null;
+  };
+  rankPhotos?: unknown[];
+  rankPhotographers?: unknown[];
+  winners?: unknown[] | { data?: unknown[] };
+}
+
 export interface GetContestsResponse {
-  contests: any[];
-  count: number;
+  contests: Contest[];
+  total?: number;
+  count?: number;
   page: number;
   limit: number;
 }
@@ -13,6 +176,7 @@ export interface ContestStats {
 
 export interface ApiSuccessResponse<T> {
   success: boolean;
+  statusCode?: number;
   message: string;
   data: T;
 }

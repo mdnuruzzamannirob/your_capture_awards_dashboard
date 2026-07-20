@@ -1,11 +1,23 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
 import { cn, formatDateWithTime } from '@/lib/utils';
-import { ColumnDef } from '@tanstack/react-table';
+import type { Contest } from '@/store/features/contest/types';
+import type { ColumnDef } from '@tanstack/react-table';
 import Image from 'next/image';
 import { GoDotFill } from 'react-icons/go';
 
-export const columns: ColumnDef<any>[] = [
+function TableDate({ value }: { value?: string }) {
+  const { day, hours, minutes, month, year } = formatDateWithTime(value ?? '');
+  if (!day) return <span className="text-muted-foreground">—</span>;
+  return (
+    <span>
+      {day} {month} {year}, {hours}:{minutes}
+    </span>
+  );
+}
+
+export const columns: ColumnDef<Contest>[] = [
   {
     id: 'sl',
     header: 'SL',
@@ -15,88 +27,84 @@ export const columns: ColumnDef<any>[] = [
     },
   },
   {
-    id: 'title',
+    accessorKey: 'title',
     header: 'TITLE',
-    cell: ({ row }) => <div className="capitalize">{row.original.title}</div>,
+    cell: ({ row }) => <div className="max-w-56 font-medium capitalize">{row.original.title}</div>,
   },
   {
-    accessorKey: 'creator',
+    id: 'creator',
     header: 'CREATOR',
     cell: ({ row }) => {
-      const { creator } = row.original;
+      const creator = row.original.creator;
+      if (!creator) return <span className="text-muted-foreground">—</span>;
+      const name = creator.fullName ?? 'Unknown creator';
       return (
         <div className="flex items-center gap-2">
-          <Image
-            alt="Profile"
-            src={creator?.avatar}
-            width={32}
-            height={32}
-            className="bg-surface size-8 min-w-8 overflow-hidden rounded-full object-cover"
-          />
-          <div className="">
-            <h3 className="text-sm font-medium">{creator?.fullName}</h3>
-            <p className="text-muted-foreground text-xs">{creator?.email}</p>
+          {creator.avatar ? (
+            <Image
+              alt={name}
+              src={creator.avatar}
+              width={32}
+              height={32}
+              className="bg-surface size-8 rounded-full object-cover"
+            />
+          ) : (
+            <span className="bg-surface-tertiary flex size-8 items-center justify-center rounded-full text-xs font-semibold">
+              {name.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div>
+            <p className="text-sm font-medium">{name}</p>
+            {creator.email && (
+              <p className="text-muted-foreground max-w-44 truncate text-xs">{creator.email}</p>
+            )}
           </div>
         </div>
       );
     },
   },
-
   {
-    id: 'maxUpload',
+    id: 'configuration',
+    header: 'CONFIGURATION',
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1.5">
+        <Badge variant="outline">{row.original.rules?.length ?? 0} rules</Badge>
+        <Badge variant="outline">
+          {row.original.prizes?.length ?? row.original.awards?.length ?? 0} awards
+        </Badge>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'maxUploads',
     header: 'MAX UPLOAD',
-    cell: ({ row }) => <div className="capitalize">{row.original.maxUploads}</div>,
   },
   {
     id: 'startDate',
     header: 'START DATE',
-    cell: ({ row }) => {
-      const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
-        row.original.startDate,
-      );
-
-      return (
-        <div className="capitalize">
-          {day} {month} {year}, {hours}:{minutes}{' '}
-          <span className="text-muted-foreground text-xs font-medium">{timeZone}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => <TableDate value={row.original.startDate} />,
   },
   {
     id: 'endDate',
     header: 'END DATE',
-    cell: ({ row }) => {
-      const { day, hours, minutes, month, timeZone, year } = formatDateWithTime(
-        row.original.endDate,
-      );
-
-      return (
-        <div className="capitalize">
-          {day} {month} {year}, {hours}:{minutes}{' '}
-          <span className="text-muted-foreground text-xs font-medium">{timeZone}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => <TableDate value={row.original.endDate} />,
   },
-
   {
     id: 'status',
     header: 'STATUS',
     cell: ({ row }) => {
       const status = row.original.status;
-
       return (
-        <button
+        <span
           className={cn(
-            'text-foreground flex items-center justify-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
+            'flex w-fit items-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
             status === 'ACTIVE' && 'bg-success/10 text-success',
-            status === 'CLOSED' && 'bg-destructive/10 text-destructive',
+            (status === 'CLOSED' || status === 'COMPLETED') && 'bg-destructive/10 text-destructive',
             status === 'UPCOMING' && 'bg-warning/10 text-warning',
           )}
         >
           <GoDotFill /> {status}
-        </button>
+        </span>
       );
     },
   },

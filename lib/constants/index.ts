@@ -1,4 +1,9 @@
 import { ContestDetailsTabKey } from '@/types';
+import type {
+  ContestAwardType,
+  ContestRuleKey,
+  ContestRuleValue,
+} from '@/store/features/contest/types';
 
 export const DEFAULT_ERROR = {
   title: 'Something Went Wrong',
@@ -6,46 +11,166 @@ export const DEFAULT_ERROR = {
 };
 export const CONTEST_DETAILS_TABS: { key: ContestDetailsTabKey; label: string }[] = [
   { key: 'details', label: 'Details' },
-  { key: 'prizes', label: 'Prizes' },
   { key: 'rules', label: 'Rules' },
+  { key: 'prizes', label: 'Awards' },
   { key: 'rank', label: 'Rank' },
   { key: 'winners', label: 'Winners' },
 ];
-export const CREATE_CONTEST_STEPS = [
-  {
-    id: 0,
-    title: 'Details',
-    icon: 'FileText',
-    fields: [],
+
+export interface ContestRuleDefinition {
+  key: ContestRuleKey;
+  label: string;
+  icon: string;
+  inputType: 'number' | 'object' | 'list';
+  defaultValue: ContestRuleValue;
+  appliesTo: string[];
+  displayOnly: boolean;
+  order: number;
+}
+
+export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinition> = {
+  SUBMISSION_LIMIT: {
+    key: 'SUBMISSION_LIMIT',
+    label: 'Submission Limit',
+    icon: 'number-circle',
+    inputType: 'number',
+    defaultValue: 4,
+    appliesTo: ['PHOTO_UPLOAD', 'DISPLAY'],
+    displayOnly: false,
+    order: 10,
   },
-  { id: 1, title: 'Money & Coins', icon: 'Coins', fields: [] },
-  { id: 2, title: 'Rules', icon: 'Scale', fields: [] },
-  { id: 3, title: 'Rewards', icon: 'Gift', fields: [] },
-  { id: 4, title: 'Review', icon: 'ClipboardCheck', fields: [] },
-];
+  SUBMISSION_RULES: {
+    key: 'SUBMISSION_RULES',
+    label: 'Submission Rules',
+    icon: 'image-upload',
+    inputType: 'object',
+    defaultValue: {
+      intro: 'Do not post:',
+      disallowed: [
+        'Non-relevant images',
+        'Similar images: Images with the same combination of subject, background, foreground and location are not allowed. Images must be distinct',
+        'Same image multiple times (cropped, angle change or tone changes)',
+        'AI images',
+      ],
+      removalNotice: "Images that don't comply may be removed from the challenge.",
+      allowAiImages: false,
+      duplicatePolicy: 'DISALLOW_SAME_PHOTO',
+    },
+    appliesTo: ['PHOTO_UPLOAD', 'DISPLAY'],
+    displayOnly: false,
+    order: 20,
+  },
+  LEVEL_REQUIREMENTS: {
+    key: 'LEVEL_REQUIREMENTS',
+    label: 'Level Requirements',
+    icon: 'level-stars',
+    inputType: 'list',
+    defaultValue: [
+      { level: 'POPULAR', votes: 50 },
+      { level: 'SKILLED', votes: 250 },
+      { level: 'PREMIER', votes: 900 },
+      { level: 'ELITE', votes: 1900 },
+      { level: 'ALL_STAR', votes: 5000 },
+    ],
+    appliesTo: ['RANKING', 'DISPLAY'],
+    displayOnly: false,
+    order: 30,
+  },
+  SUBMISSION_FORMAT: {
+    key: 'SUBMISSION_FORMAT',
+    label: 'Submission Format',
+    icon: 'image-plus',
+    inputType: 'object',
+    defaultValue: {
+      mimeTypes: ['image/jpeg'],
+      minWidth: 700,
+      minHeight: 700,
+      maxSizeMB: 25,
+    },
+    appliesTo: ['PHOTO_UPLOAD', 'DISPLAY'],
+    displayOnly: false,
+    order: 40,
+  },
+  ELIGIBILITY: {
+    key: 'ELIGIBILITY',
+    label: 'Eligibility',
+    icon: 'file-check',
+    inputType: 'object',
+    defaultValue: {
+      minAge: 18,
+      text: 'Open to all photographers ages 18 and above. Photos must not contain obscene, provocative, defamatory, sexually explicit, or otherwise objectionable or inappropriate content. Photos deemed inappropriate will be disqualified. Challenge void where prohibited.',
+      requiresAcceptance: true,
+    },
+    appliesTo: ['JOIN', 'DISPLAY'],
+    displayOnly: false,
+    order: 50,
+  },
+  COPYRIGHT: {
+    key: 'COPYRIGHT',
+    label: 'Copyright',
+    icon: 'copyright',
+    inputType: 'object',
+    defaultValue: {
+      text: 'You maintain the copyrights to all photos you submit. You must own all submitted images.',
+      requiresOwnership: true,
+      requiresAcceptance: true,
+    },
+    appliesTo: ['JOIN', 'PHOTO_UPLOAD', 'DISPLAY'],
+    displayOnly: false,
+    order: 60,
+  },
+  VOTING: {
+    key: 'VOTING',
+    label: 'Voting',
+    icon: 'vote',
+    inputType: 'object',
+    defaultValue: {
+      text: 'Voting is done by members of the site only. The voting system uses a blind voting method which is designed to keep the voting as fair as possible.',
+      membersOnly: true,
+      requireContestParticipant: true,
+      disallowSelfVote: true,
+      blindVoting: true,
+    },
+    appliesTo: ['VOTING', 'DISPLAY'],
+    displayOnly: false,
+    order: 70,
+  },
+  PARTICIPATION: {
+    key: 'PARTICIPATION',
+    label: 'Participation',
+    icon: 'user',
+    inputType: 'object',
+    defaultValue: {
+      text: 'By entering this challenge you accept the standard Terms of Use.',
+      requiresTermsAcceptance: true,
+      termsUrl: null,
+    },
+    appliesTo: ['JOIN', 'DISPLAY'],
+    displayOnly: false,
+    order: 80,
+  },
+};
 
-export const CREATE_CONTEST_RULE_ICONS = [
-  { value: 'info', label: 'General', icon: 'Info' },
-  { value: 'alert', label: 'Warning', icon: 'AlertCircle' },
-  { value: 'star', label: 'Important', icon: 'TrendingUp' },
-  { value: 'editing_limit', label: 'Editing Limit', icon: 'Scissors' },
-  { value: 'money', label: 'Financial', icon: 'DollarSign' },
-  { value: 'boost', label: 'Boost Use', icon: 'Zap' },
-  { value: 'swap', label: 'Swap Use', icon: 'RotateCw' },
-  { value: 'idea', label: 'Theme/Concept', icon: 'Lightbulb' },
-  { value: 'theme', label: 'Follow Theme', icon: 'Palette' },
-  { value: 'original', label: 'Original Work Only', icon: 'BadgeCheck' },
-  { value: 'no_ai', label: 'No AI/Plagiarism', icon: 'ShieldBan' },
-  { value: 'no_watermark', label: 'No Watermarks/Logos', icon: 'BadgeX' },
-  { value: 'content_guidelines', label: 'No NSFW Content', icon: 'EyeOff' },
-  { value: 'format', label: 'Format & Size', icon: 'Image' },
-  { value: 'submission_window', label: 'Submission Window', icon: 'CalendarClock' },
-];
+export const CONTEST_LEVELS = ['POPULAR', 'SKILLED', 'PREMIER', 'ELITE', 'ALL_STAR'] as const;
 
-export const CREATE_CONTEST_PRIZE_TYPES = [
+export const CONTEST_AWARD_OPTIONS: Array<{
+  value: ContestAwardType;
+  label: string;
+  icon: string;
+}> = [
   { value: 'TOP_PHOTO', label: 'Top Photo', icon: 'Image' },
-  { value: 'TOP_PHOTOGRAPHER', label: 'Top Photographer', icon: 'User' },
-  // { value: 'yc_top_winner', label: 'YC Top Choice', icon: 'Crown' },
+  { value: 'TOP_PHOTOGRAPHER', label: 'Top Photographer', icon: 'UserRound' },
+  { value: 'AMATEUR', label: 'Amateur', icon: 'Camera' },
+  { value: 'TALENTED', label: 'Talented', icon: 'Sparkles' },
+  { value: 'SUPREME', label: 'Supreme', icon: 'Crown' },
+  { value: 'SUPERIOR', label: 'Superior', icon: 'Gem' },
+  { value: 'YC_PICK', label: 'YC Pick', icon: 'BadgeCheck' },
+  { value: 'TOP_100', label: 'Top 100', icon: 'Medal' },
+  { value: 'TOP_50', label: 'Top 50', icon: 'Medal' },
+  { value: 'TOP_20', label: 'Top 20', icon: 'Medal' },
+  { value: 'TOP_10', label: 'Top 10', icon: 'Trophy' },
+  { value: 'WINNER', label: 'Winner', icon: 'Trophy' },
 ];
+
 export const RECURRING_TYPES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
 export type RecurringType = (typeof RECURRING_TYPES)[number];

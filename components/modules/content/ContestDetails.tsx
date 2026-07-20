@@ -9,6 +9,7 @@ import WinnerTab from '@/components/modules/content/WinnerTab';
 import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useGetContestQuery } from '@/store/features/contest/contestApi';
+import type { Contest } from '@/store/features/contest/types';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -27,7 +28,7 @@ const ContestDetails = () => {
   });
 
   const { data, isLoading, isFetching } = useGetContestQuery({ id: params?.id as string });
-  const contest = data?.data ?? {};
+  const contest = data?.data as Contest | undefined;
 
   const isUpcoming = contest?.status === 'UPCOMING';
   const activeIndex = CONTEST_DETAILS_TABS.findIndex((t) => t.key === activeTab);
@@ -47,24 +48,24 @@ const ContestDetails = () => {
     });
   }, [activeIndex, isLoading]);
 
-  const renderTabContent = () => {
+  const renderTabContent = (currentContest: Contest) => {
     switch (activeTab) {
       case 'details':
         return (
           <DetailsTab
-            contest={contest}
+            contest={currentContest}
             canEdit={isUpcoming}
             onEditClick={() => router.push(`/contest/${params?.id}/edit`)}
           />
         );
       case 'prizes':
-        return <PrizesTab contest={contest} />;
+        return <PrizesTab contest={currentContest} />;
       case 'rules':
-        return <RulesTab contest={contest} />;
+        return <RulesTab contest={currentContest} />;
       case 'rank':
-        return <RankTab contest={contest} />;
+        return <RankTab contest={currentContest} />;
       case 'winners':
-        return <WinnerTab contest={contest} />;
+        return <WinnerTab contest={currentContest} />;
       default:
         return null;
     }
@@ -74,7 +75,7 @@ const ContestDetails = () => {
     return <ContestDetailsSkeleton tabs={CONTEST_DETAILS_TABS} />;
   }
 
-  if (!contest?.banner) {
+  if (!contest?.id) {
     return <div className="text-muted-foreground p-5 text-sm">Contest not found.</div>;
   }
 
@@ -84,14 +85,23 @@ const ContestDetails = () => {
 
   return (
     <section>
-      <div className="h-96 w-full">
-        <Image
-          alt="banner"
-          src={contest.banner}
-          width={1920}
-          height={500}
-          className="bg-surface size-full object-cover"
-        />
+      <div className="bg-surface-tertiary relative h-72 w-full overflow-hidden lg:h-96">
+        {contest.banner ? (
+          <Image
+            alt={`${contest.title} banner`}
+            src={contest.banner}
+            width={1920}
+            height={500}
+            className="size-full object-cover"
+          />
+        ) : (
+          <div className="flex size-full items-center justify-center p-5 text-center">
+            <div>
+              <p className="text-muted-foreground text-sm">No banner uploaded</p>
+              <h1 className="mt-2 text-2xl font-semibold">{contest.title}</h1>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="relative flex overflow-x-auto border-b">
@@ -122,7 +132,7 @@ const ContestDetails = () => {
         />
       </div>
 
-      <div className="w-full p-5">{renderTabContent()}</div>
+      <div className="w-full p-5">{renderTabContent(contest)}</div>
     </section>
   );
 };
