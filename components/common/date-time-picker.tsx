@@ -56,12 +56,14 @@ export const DateTimePicker = ({ date, setDate, label }: DateTimePickerProps) =>
             mode="single"
             selected={date}
             onSelect={setDate}
-            initialFocus
+            autoFocus
             className="text-muted-foreground"
             styles={{
-              head_cell: { color: 'gray' },
-              day: { color: 'white' },
-              day_selected: { backgroundColor: 'white', color: 'black' },
+              weekday: { color: 'gray' },
+              day_button: { color: 'white' },
+            }}
+            modifiersStyles={{
+              selected: { backgroundColor: 'white', color: 'black' },
             }}
           />
         </PopoverContent>
