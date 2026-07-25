@@ -132,7 +132,7 @@ const UserTable = () => {
           onChange={(event) => {
             setSelectedRole(event.target.value as 'all' | 'USER' | 'ADMIN');
           }}
-          className="border-input bg-background h-11 rounded-md border px-3 py-2 text-sm"
+          className="border-input bg-surface text-foreground hover:border-border-strong focus:border-primary h-8 rounded-md border px-2.5 text-[13px] transition-[border-color,box-shadow] duration-150 outline-none focus:shadow-[0_0_0_3px_var(--brand-subtle)]"
         >
           <option value="all">All Roles</option>
           <option value="USER">User</option>
@@ -212,10 +212,10 @@ const UserTable = () => {
                       <button
                         key={index}
                         className={cn(
-                          'text-foreground mx-3 flex items-center justify-center gap-0.5 rounded px-1.5 py-1 text-[10px] font-medium capitalize',
-                          item.value === 'Active' && 'bg-success/10 text-success',
-                          item.value === 'Blocked' && 'bg-destructive/10 text-destructive',
-                          item.value === 'Deleted' && 'bg-muted/10 text-muted-foreground',
+                          'text-foreground mx-3 flex items-center justify-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
+                          item.value === 'Active' && 'bg-success-subtle text-success',
+                          item.value === 'Blocked' && 'bg-error-subtle text-destructive',
+                          item.value === 'Deleted' && 'bg-surface-tertiary text-muted-foreground',
                         )}
                       >
                         <GoDotFill className="mb-0.5 size-2" /> {item.value}

@@ -49,7 +49,7 @@ const Signin = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="border-border bg-surface-tertiary w-full max-w-lg space-y-5 rounded-xl border p-5 lg:p-10">
+      <div className="border-border-default bg-surface-secondary w-full max-w-[420px] space-y-5 rounded-xl border p-5 shadow-[var(--shadow-xl)] sm:p-8">
         <AuthTitle
           title="Sign In"
           description="Please enter your email and password to continue."
@@ -87,7 +87,7 @@ const Signin = () => {
                   input?.setSelectionRange(start, end);
                 }, 0);
               }}
-              className="absolute top-10 right-5 size-3"
+              className="text-muted-foreground hover:bg-surface-tertiary hover:text-foreground absolute top-[31px] right-2.5 flex size-7 items-center justify-center rounded-sm transition-colors"
             >
               {showPass ? (
                 <AiOutlineEye className="size-5" />
@@ -102,20 +102,20 @@ const Signin = () => {
               type="button"
               onClick={() => setRememberMe(!rememberMe)}
               className={cn(
-                'flex items-center gap-2 text-sm font-medium select-none',
+                'flex items-center gap-1.5 text-xs font-medium select-none',
                 rememberMe ? 'text-primary' : 'text-foreground',
               )}
             >
               {rememberMe ? (
-                <IoCheckbox className="size-6" />
+                <IoCheckbox className="size-4" />
               ) : (
-                <IoCheckboxOutline className="size-6" />
+                <IoCheckboxOutline className="size-4" />
               )}
               Remember Me
             </button>
             <Link
               href="/forgot-password"
-              className="text-primary text-sm font-medium hover:underline"
+              className="text-primary hover:text-primary-hover text-xs font-medium hover:underline"
             >
               Forgot Password?
             </Link>
@@ -124,7 +124,7 @@ const Signin = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary text-foreground mt-4 flex w-full items-center justify-center rounded-sm py-[9px] transition-all duration-300 disabled:cursor-default disabled:opacity-60"
+            className="border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover mt-3 flex h-9.5 w-full items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-[var(--shadow-brand)] transition-[background-color,border-color,box-shadow] duration-150 focus-visible:shadow-[var(--focus-shadow)] disabled:cursor-default disabled:opacity-50"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">

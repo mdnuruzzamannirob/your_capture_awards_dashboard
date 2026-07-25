@@ -17,7 +17,7 @@ const AuthLayout = async ({
     redirect('/dashboard');
   }
 
-  return <main>{children}</main>;
+  return <main className="auth-shell">{children}</main>;
 };
 
 export default AuthLayout;

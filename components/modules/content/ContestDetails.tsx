@@ -84,7 +84,7 @@ const ContestDetails = () => {
   }
 
   return (
-    <section>
+    <section className="border-border-subtle bg-surface overflow-hidden rounded-lg border">
       <div className="bg-surface-tertiary relative h-72 w-full overflow-hidden lg:h-96">
         {contest.banner ? (
           <Image
@@ -104,7 +104,7 @@ const ContestDetails = () => {
         )}
       </div>
 
-      <div className="relative flex overflow-x-auto border-b">
+      <div className="border-border-subtle relative flex overflow-x-auto border-b bg-[var(--bg-inset)]">
         {CONTEST_DETAILS_TABS.map((tab, index) => (
           <button
             key={tab.key}
@@ -113,10 +113,10 @@ const ContestDetails = () => {
             }}
             onClick={() => setActiveTab(tab.key)}
             className={cn(
-              'relative z-10 px-5 py-3 text-sm whitespace-nowrap transition',
+              'relative z-10 px-3 py-2 text-[13px] whitespace-nowrap transition-colors duration-150',
               activeTab === tab.key
-                ? 'text-primary font-medium'
-                : 'text-muted-foreground hover:bg-surface-tertiary',
+                ? 'text-foreground font-medium'
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {tab.label}
@@ -124,7 +124,7 @@ const ContestDetails = () => {
         ))}
 
         <span
-          className="bg-primary absolute bottom-0 h-0.5 transition-all duration-300"
+          className="bg-primary absolute bottom-0 h-px transition-all duration-240"
           style={{
             width: indicatorStyle.width,
             transform: `translateX(${indicatorStyle.left}px)`,

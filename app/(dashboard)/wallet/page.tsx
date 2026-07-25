@@ -1,6 +1,7 @@
 'use client';
 
 import Title from '@/components/common/Title';
+import MetricCard from '@/components/common/MetricCard';
 import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -38,22 +39,16 @@ const Wallet = () => {
       title: 'Total Successful Payments',
       value: statsData?.totalSuccessfulPayments ?? 0,
       icon: WalletIcon,
-      color: 'text-success',
-      bgColor: 'bg-success/10',
     },
     {
       title: 'This Month Revenue',
       value: currency.format(statsData?.thisMonthTotalRevenue ?? 0),
       icon: DollarSign,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
     },
     {
       title: 'Store Revenue',
       value: currency.format(statsData?.totalStoreRevenue ?? 0),
       icon: ShoppingCart,
-      color: 'text-info',
-      bgColor: 'bg-info/10',
     },
   ];
 
@@ -76,26 +71,14 @@ const Wallet = () => {
       )}
 
       <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="p-0">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div
-                  className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
-                >
-                  <Icon className={`size-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">
-                    {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
-                  </h3>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {stats.map((stat) => (
+          <MetricCard
+            key={stat.title}
+            label={stat.title}
+            value={typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
+            icon={stat.icon}
+          />
+        ))}
       </div>
 
       <WalletManagement />

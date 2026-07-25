@@ -2,13 +2,20 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
-import { Kumbh_Sans } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import ReduxProvider from '../providers/ReduxProviders';
 
-const kumbhSans = Kumbh_Sans({
-  variable: '--font-kumbh-sans',
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin'],
+  display: 'swap',
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -23,7 +30,10 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={cn('antialiased', kumbhSans.className)} suppressHydrationWarning>
+      <body
+        className={cn('antialiased', inter.variable, jetBrainsMono.variable)}
+        suppressHydrationWarning
+      >
         <ReduxProvider>
           <TooltipProvider>
             <Toaster
@@ -31,8 +41,18 @@ export default async function RootLayout({
               position="top-center"
               theme="dark"
               swipeDirections={['bottom', 'left', 'top', 'right']}
-              richColors
               expand
+              toastOptions={{
+                classNames: {
+                  toast:
+                    'border-border-default! bg-elevated! text-foreground! rounded-lg! shadow-[var(--shadow-lg)]!',
+                  title: 'text-[13px]! font-medium!',
+                  description: 'text-xs! text-muted-foreground!',
+                  actionButton: 'bg-primary! text-primary-foreground! rounded-md!',
+                  cancelButton: 'bg-surface-tertiary! text-foreground! rounded-md!',
+                  closeButton: 'border-border-default! bg-surface-tertiary! text-muted-foreground!',
+                },
+              }}
             />
             {children}
           </TooltipProvider>

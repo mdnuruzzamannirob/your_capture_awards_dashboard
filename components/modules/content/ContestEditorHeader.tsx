@@ -9,15 +9,15 @@ const ContestEditorHeader = ({ mode }: ContestEditorHeaderProps) => {
   const isCreate = mode === 'create';
 
   return (
-    <header className="mb-7 w-full">
+    <header className="border-border-subtle mb-7 w-full border-b pb-5">
       <Link
         href="/contest"
-        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 border-0 bg-transparent p-0 text-[11px] font-bold transition-colors"
+        className="font-token text-caption-foreground hover:text-foreground inline-flex items-center gap-1 border-0 bg-transparent p-0 text-[10px] font-medium tracking-[0.04em] uppercase transition-colors"
       >
         <ArrowLeft className="size-4" />
         All contests
       </Link>
-      <h1 className="text-heading mt-[13px] mb-2 font-serif text-[clamp(28px,3vw,40px)] leading-[1.05] font-medium tracking-[-0.04em]">
+      <h1 className="text-heading mt-3 mb-1.5 text-[clamp(1.5rem,2.5vw,2rem)] leading-tight font-semibold tracking-[-0.035em]">
         {isCreate ? 'Create contest' : 'Update contest'}
       </h1>
       <p className="text-muted-foreground max-w-[570px] text-[13px] leading-[1.5]">

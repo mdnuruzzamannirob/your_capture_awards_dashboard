@@ -39,7 +39,7 @@ const ForgotPassword = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="border-border bg-surface-tertiary w-full max-w-lg space-y-5 rounded-xl border p-5 lg:p-10">
+      <div className="border-border-default bg-surface-secondary w-full max-w-[420px] space-y-5 rounded-xl border p-5 shadow-[var(--shadow-xl)] sm:p-8">
         <AuthTitle
           title="Forgot Password"
           description="Enter your registered email address to receive a verification code."
@@ -61,7 +61,7 @@ const ForgotPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="bg-primary hover:bg-primary/90 disabled:hover:bg-primary text-foreground mt-4 flex w-full items-center justify-center rounded-sm py-[9px] transition-all duration-300 disabled:cursor-default disabled:opacity-60"
+            className="border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover mt-3 flex h-9.5 w-full items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-[var(--shadow-brand)] transition-[background-color,border-color,box-shadow] duration-150 focus-visible:shadow-[var(--focus-shadow)] disabled:cursor-default disabled:opacity-50"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">

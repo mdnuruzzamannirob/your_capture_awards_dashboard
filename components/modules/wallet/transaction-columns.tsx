@@ -50,14 +50,14 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
       return (
         <button
           className={cn(
-            'flex items-center justify-center gap-0.5 rounded-full px-2 py-1.5 text-xs font-medium',
-            status === 'SUCCEEDED' && 'bg-success/10 text-success',
-            status === 'PENDING' && 'bg-warning/10 text-warning',
-            status === 'FAILED' && 'bg-destructive/10 text-destructive',
-            status === 'EXPIRED' && 'bg-muted/20 text-muted-foreground',
+            'flex items-center justify-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium',
+            status === 'SUCCEEDED' && 'bg-success-subtle text-success',
+            status === 'PENDING' && 'bg-warning-subtle text-warning',
+            status === 'FAILED' && 'bg-error-subtle text-destructive',
+            status === 'EXPIRED' && 'bg-surface-tertiary text-muted-foreground',
           )}
         >
-          <GoDotFill /> {status}
+          <GoDotFill className="size-2" /> {status}
         </button>
       );
     },

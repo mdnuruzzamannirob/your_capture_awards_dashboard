@@ -97,19 +97,13 @@ const ContestForm = ({
             <RewardsStep />
 
             <div className="mt-2 flex flex-wrap items-center justify-end gap-2.5 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isSubmitting}
-                className="border-input bg-surface text-body hover:border-border-strong hover:bg-surface-secondary h-10 rounded-[10px] px-[15px] text-[13px] font-bold shadow-none transition-transform hover:-translate-y-px"
-              >
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitDisabled}
-                className="h-10 min-w-36 rounded-[10px] px-[15px] text-[13px] font-bold shadow-[0_8px_20px_color-mix(in_oklab,var(--primary)_22%,transparent)] transition-transform hover:-translate-y-px"
+                className="min-w-36"
                 title={
                   mode === 'update' && !form.formState.isDirty ? 'No changes to save' : undefined
                 }

@@ -19,7 +19,9 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
+import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 
 // FilterableColumn interface
 export interface FilterableColumn {
@@ -107,25 +109,30 @@ export function DataTable<TData, TValue>({
   const skeletonRowCount = Math.min(pageSize, 10);
 
   return (
-    <div className="w-full">
-      <div className="mb-3 flex items-center gap-3">
-        {!hideSearch && (
-          <Input
-            placeholder={searchPlaceholder ?? firstFilterableColumn?.placeholder ?? 'Search...'}
-            disabled={isLoading}
-            value={globalFilter}
-            onChange={(event) => setGlobalFilter(event.target.value)}
-            className="max-w-sm"
-          />
-        )}
-        {!hideViewOptions && (
-          <div className="ml-auto">
-            <DataTableViewOptions table={table} />
-          </div>
-        )}
-      </div>
+    <div className="border-border-subtle bg-surface w-full overflow-hidden rounded-lg border">
+      {(!hideSearch || !hideViewOptions) && (
+        <div className="border-border-subtle flex min-h-13 items-center gap-3 border-b bg-[var(--bg-inset)] px-3.5 py-2.5">
+          {!hideSearch && (
+            <div className="relative w-full max-w-sm">
+              <Search className="text-caption-foreground pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+              <Input
+                placeholder={searchPlaceholder ?? firstFilterableColumn?.placeholder ?? 'Search...'}
+                disabled={isLoading}
+                value={globalFilter}
+                onChange={(event) => setGlobalFilter(event.target.value)}
+                className="bg-surface pl-8"
+              />
+            </div>
+          )}
+          {!hideViewOptions && (
+            <div className="ml-auto">
+              <DataTableViewOptions table={table} />
+            </div>
+          )}
+        </div>
+      )}
 
-      <div className="my-3 overflow-hidden rounded-md border">
+      <div className="overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((group) => (
@@ -170,7 +177,12 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className={isLoading ? 'pointer-events-none opacity-50' : ''}>
+      <div
+        className={cn(
+          'border-border-subtle border-t bg-[var(--bg-inset)] px-3.5 py-2.5',
+          isLoading && 'pointer-events-none opacity-50',
+        )}
+      >
         <DataTablePagination table={table} />
       </div>
     </div>

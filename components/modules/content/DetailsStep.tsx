@@ -11,12 +11,11 @@ import { useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
 
 const inputClass =
-  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-sm leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
+  'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
 const selectClass = `${inputClass} scheme-dark w-full appearance-none pr-9 text-foreground outline-none`;
 const fieldClass = 'gap-1.5';
-const labelClass =
-  'text-xs font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
-const messageClass = 'text-[9px] leading-tight';
+const labelClass = 'text-xs font-medium text-label-foreground data-[error=true]:text-destructive';
+const messageClass = 'text-[11px] leading-tight';
 
 function toDateTimeInputValue(value?: Date) {
   if (!value || Number.isNaN(value.getTime())) return '';
@@ -37,10 +36,10 @@ const DetailsStep = () => {
 
   return (
     <section
-      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border"
       aria-labelledby="contest-details-title"
     >
-      <header className="border-border flex min-h-[62px] items-center border-b px-[18px] py-3">
+      <header className="border-border-subtle flex min-h-13 items-center border-b bg-[var(--bg-inset)] px-[18px] py-3">
         <h2 id="contest-details-title" className="text-heading text-sm font-extrabold">
           Details
         </h2>

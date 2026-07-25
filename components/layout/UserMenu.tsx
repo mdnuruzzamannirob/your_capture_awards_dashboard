@@ -50,14 +50,14 @@ const UserMenu = () => {
           <Image
             alt="User Avatar"
             src={user?.avatar}
-            width={32}
-            height={32}
-            className="size-8 cursor-pointer overflow-hidden rounded-full object-cover"
+            width={28}
+            height={28}
+            className="border-border-subtle size-7 cursor-pointer overflow-hidden rounded-full border object-cover"
           />
         ) : (
           <button
             className={cn(
-              'hidden size-8 overflow-hidden rounded-full border text-xs leading-none font-medium lg:block',
+              'border-border-default bg-surface-tertiary text-muted-foreground hover:border-border-strong hover:text-foreground hidden size-7 overflow-hidden rounded-full border text-[10px] leading-none font-medium transition-colors focus-visible:shadow-[var(--focus-shadow)] lg:block',
               !user || !token ? 'hidden' : 'lg:block',
             )}
           >
@@ -72,14 +72,14 @@ const UserMenu = () => {
             <Image
               alt="User Avatar"
               src={user?.avatar}
-              width={32}
-              height={32}
-              className="size-8 min-w-8 cursor-pointer overflow-hidden rounded-full object-cover"
+              width={28}
+              height={28}
+              className="border-border-subtle size-7 min-w-7 cursor-pointer overflow-hidden rounded-full border object-cover"
             />
           ) : (
             <button
               className={cn(
-                'hidden size-8 overflow-hidden rounded-full border text-xs leading-none font-medium lg:block',
+                'border-border-default bg-surface-tertiary text-muted-foreground hidden size-7 overflow-hidden rounded-full border text-[10px] leading-none font-medium lg:block',
                 !user || !token ? 'hidden' : 'lg:block',
               )}
             >
@@ -88,7 +88,7 @@ const UserMenu = () => {
             </button>
           )}
           <div className="flex min-w-0 flex-col">
-            <span className="truncate font-medium">
+            <span className="truncate text-[13px] font-medium">
               {user?.firstName} {user?.lastName}
             </span>
             <span className="text-muted-foreground truncate text-xs">{user?.email}</span>
@@ -100,7 +100,7 @@ const UserMenu = () => {
             href="/settings?tab=profile"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
+              'hover:bg-surface-tertiary flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] transition-colors duration-[80ms]',
               pathname === '/settings' && (!tab || tab === 'profile')
                 ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
@@ -113,7 +113,7 @@ const UserMenu = () => {
             href="/settings?tab=change-password"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
+              'hover:bg-surface-tertiary flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] transition-colors duration-[80ms]',
               pathname === '/settings' && tab === 'change-password'
                 ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
@@ -126,7 +126,7 @@ const UserMenu = () => {
             href="/settings?tab=site-policy"
             onClick={() => setOpen(false)}
             className={cn(
-              'hover:bg-surface-tertiary flex h-10 items-center gap-2 rounded-sm p-2 text-sm transition-colors',
+              'hover:bg-surface-tertiary flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] transition-colors duration-[80ms]',
               pathname === '/settings' && tab === 'site-policy'
                 ? 'bg-surface-tertiary text-foreground font-medium'
                 : 'text-muted-foreground hover:text-foreground',
@@ -142,23 +142,25 @@ const UserMenu = () => {
             <DialogTrigger asChild>
               <button
                 className={cn(
-                  'text-destructive hover:bg-destructive/10 flex h-10 items-center gap-2 rounded-sm px-2 text-sm outline-none',
+                  'text-destructive hover:bg-error-subtle flex h-8 items-center gap-2 rounded-sm px-2 text-[13px] transition-colors duration-[80ms] outline-none',
                 )}
               >
                 <LogOut className="size-4" />
                 Logout
               </button>
             </DialogTrigger>
-            <DialogContent className="border-border bg-surface rounded-xl">
+            <DialogContent>
               <DialogTitle />
 
               <div className="flex flex-col items-center justify-center gap-3">
-                <div className="bg-destructive/10 text-destructive rounded-full p-5">
-                  <LogOut />
+                <div className="bg-error-subtle text-destructive flex size-10 items-center justify-center rounded-full">
+                  <LogOut className="size-4" />
                 </div>
 
-                <h1 className="text-2xl font-semibold">Logout</h1>
-                <p>Are you sure you want to logout?</p>
+                <h1 className="text-[15px] font-semibold">Sign out?</h1>
+                <p className="text-muted-foreground text-[13px]">
+                  You&apos;ll need to sign in again to access the dashboard.
+                </p>
               </div>
               <div className="my-5 flex items-center justify-center gap-5">
                 <Button
@@ -169,7 +171,7 @@ const UserMenu = () => {
                   Cancel
                 </Button>
                 <Button variant="destructive" onClick={handleLogout} className="rounded-sm">
-                  Yes, Logout
+                  Sign out
                 </Button>
               </div>
             </DialogContent>

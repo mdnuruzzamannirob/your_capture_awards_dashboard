@@ -170,7 +170,10 @@ const RulesTab = ({ contest }: { contest: Contest }) => {
         rules.map((rule) => {
           const definition = contestRuleDefinitions[rule.key];
           return (
-            <article key={rule.key} className="border-border bg-surface rounded-xl border p-5">
+            <article
+              key={rule.key}
+              className="border-border-subtle bg-surface-secondary rounded-lg border p-5"
+            >
               <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <DynamicIcon
@@ -199,7 +202,7 @@ const RulesTab = ({ contest }: { contest: Contest }) => {
           );
         })
       ) : (
-        <p className="text-muted-foreground rounded-xl border p-5 text-sm">
+        <p className="border-border-subtle text-muted-foreground rounded-lg border p-5 text-sm">
           No rules available for this contest.
         </p>
       )}

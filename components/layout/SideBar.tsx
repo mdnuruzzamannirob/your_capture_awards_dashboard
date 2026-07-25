@@ -71,7 +71,7 @@ const SideBar = () => {
 
       <aside
         className={cn(
-          'bg-background border-border fixed z-50 h-dvh overflow-hidden border-r transition-all duration-300',
+          'border-sidebar-border bg-sidebar fixed z-50 h-dvh overflow-hidden border-r transition-[width] duration-240 ease-[cubic-bezier(0.2,0,0,1)]',
           isMobile ? (isMobileOpen ? 'w-60' : 'w-0') : realExpand ? 'w-60' : 'w-16',
         )}
         onMouseEnter={() => !isPinned && !isMobile && setIsHovered(true)}
@@ -80,7 +80,7 @@ const SideBar = () => {
         {/* Logo */}
         <Link
           href="/dashboard"
-          className="flex h-[57px] items-center justify-center border-b px-4 max-lg:justify-center"
+          className="border-border-subtle flex h-14 items-center justify-center border-b px-4 max-lg:justify-center"
         >
           {showLogo ? (
             <Image
@@ -88,7 +88,7 @@ const SideBar = () => {
               alt="Logo"
               width={142}
               height={54}
-              className="mt-1 ml-px h-[35.1px] w-auto"
+              className="h-8 w-auto"
             />
           ) : (
             <Image
@@ -102,7 +102,15 @@ const SideBar = () => {
         </Link>
 
         {/* Menu */}
-        <div className="flex flex-col gap-3 p-3">
+        <div className="flex flex-col gap-0.5 p-3">
+          <div
+            className={cn(
+              'font-token text-caption-foreground mb-1 overflow-hidden px-2 py-1 text-[10px] font-medium tracking-[0.08em] whitespace-nowrap uppercase transition-opacity duration-150',
+              realExpand ? 'opacity-100' : 'opacity-0',
+            )}
+          >
+            Workspace
+          </div>
           {sideMenus.map((item) => {
             const hasChildren = !!item.children?.length;
             const isOpen = openGroups[item.name];
@@ -114,16 +122,20 @@ const SideBar = () => {
                   <button
                     onClick={() => toggleGroup(item.name)}
                     className={cn(
-                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize transition-colors',
+                      'relative flex h-8 min-w-8 items-center gap-2 rounded-sm px-2 text-left capitalize transition-colors duration-[80ms]',
                       isActive
-                        ? 'bg-surface-tertiary text-foreground font-medium'
-                        : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
+                        ? 'bg-primary-soft text-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-surface-secondary hover:text-foreground',
                     )}
                   >
-                    <span className="size-6 min-w-6 transition-all duration-300">{item.icon}</span>
+                    <span
+                      className={cn('size-4 min-w-4 transition-colors', isActive && 'text-primary')}
+                    >
+                      {item.icon}
+                    </span>
                     <span
                       className={cn(
-                        'flex-1 text-sm font-medium whitespace-nowrap transition-all duration-300',
+                        'flex-1 text-[13px] font-medium whitespace-nowrap transition-all duration-240',
                         realExpand ? 'w-full opacity-100' : 'w-0 opacity-0',
                       )}
                     >
@@ -141,16 +153,20 @@ const SideBar = () => {
                     href={item.href}
                     onClick={closeMobileMenu}
                     className={cn(
-                      'flex h-10 min-w-10 items-center gap-3 rounded-sm p-2 text-left capitalize transition-colors',
+                      'relative flex h-8 min-w-8 items-center gap-2 rounded-sm px-2 text-left capitalize transition-colors duration-[80ms]',
                       isActive
-                        ? 'bg-surface-tertiary text-foreground font-medium'
-                        : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
+                        ? 'bg-primary-soft text-foreground font-medium'
+                        : 'text-muted-foreground hover:bg-surface-secondary hover:text-foreground',
                     )}
                   >
-                    <span className="size-6 min-w-6 transition-all duration-300">{item.icon}</span>
+                    <span
+                      className={cn('size-4 min-w-4 transition-colors', isActive && 'text-primary')}
+                    >
+                      {item.icon}
+                    </span>
                     <span
                       className={cn(
-                        'flex-1 text-sm font-medium whitespace-nowrap transition-all duration-300',
+                        'flex-1 text-[13px] font-medium whitespace-nowrap transition-all duration-240',
                         realExpand ? 'w-full opacity-100' : 'w-0 opacity-0',
                       )}
                     >
@@ -161,7 +177,7 @@ const SideBar = () => {
 
                 {/* Nested children */}
                 {hasChildren && isOpen && realExpand && (
-                  <div className="mt-1 ml-5 flex flex-col gap-1">
+                  <div className="border-border-subtle mt-1 ml-4 flex flex-col gap-0.5 border-l pl-2">
                     {item.children!.map((child) => {
                       const childActive = pathname.startsWith(child.href);
                       return (
@@ -170,10 +186,10 @@ const SideBar = () => {
                           href={child.href}
                           onClick={closeMobileMenu}
                           className={cn(
-                            'rounded-md px-3 py-1.5 text-sm transition-colors',
+                            'rounded-sm px-2 py-1.5 text-xs transition-colors duration-[80ms]',
                             childActive
-                              ? 'bg-surface-tertiary text-foreground font-medium'
-                              : 'text-muted-foreground hover:bg-surface-tertiary hover:text-foreground',
+                              ? 'bg-primary-soft text-foreground font-medium'
+                              : 'text-muted-foreground hover:bg-surface-secondary hover:text-foreground',
                           )}
                         >
                           {child.name}
@@ -191,19 +207,19 @@ const SideBar = () => {
         {!isMobile && (
           <button
             onClick={() => setIsPinned(!isPinned)}
-            className="group border-border bg-surface absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t p-3 transition-all duration-300"
+            className="group border-border-subtle bg-sidebar text-muted-foreground hover:bg-surface hover:text-foreground absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t p-3 transition-colors duration-[80ms]"
           >
-            <span className="flex size-10 min-w-10 items-center justify-center">
+            <span className="flex size-8 min-w-8 items-center justify-center">
               <TbLayoutSidebarLeftCollapse
                 className={cn(
-                  'size-6 transition-transform duration-300',
+                  'size-4 transition-transform duration-240',
                   isPinned ? 'rotate-180' : 'rotate-0',
                 )}
               />
             </span>
             <span
               className={cn(
-                'text-muted-foreground overflow-hidden text-left text-sm font-medium whitespace-nowrap transition-all duration-300 group-hover:text-inherit',
+                'overflow-hidden text-left text-xs font-medium whitespace-nowrap transition-all duration-240',
                 realExpand ? 'w-32 opacity-100' : 'w-0 opacity-0',
               )}
             >
@@ -216,12 +232,12 @@ const SideBar = () => {
         {isMobile && isMobileOpen && (
           <button
             onClick={closeMobileMenu}
-            className="group border-border bg-surface absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t p-3 transition-all duration-300"
+            className="group border-border-subtle bg-sidebar text-muted-foreground hover:bg-surface hover:text-foreground absolute right-0 bottom-0 left-0 flex items-center gap-1 border-t p-3 transition-colors duration-[80ms]"
           >
-            <span className="flex size-10 min-w-10 items-center justify-center">
-              <X className="size-6" />
+            <span className="flex size-8 min-w-8 items-center justify-center">
+              <X className="size-4" />
             </span>
-            <span className="text-muted-foreground overflow-hidden text-left text-sm font-medium whitespace-nowrap">
+            <span className="overflow-hidden text-left text-xs font-medium whitespace-nowrap">
               Close Menu
             </span>
           </button>

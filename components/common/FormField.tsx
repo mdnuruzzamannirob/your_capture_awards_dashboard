@@ -23,10 +23,13 @@ function FormField<TFormValues extends FieldValues>({
   error,
 }: InputProps<TFormValues>) {
   return (
-    <div className="mb-4">
+    <div className="mb-3">
       <label
         htmlFor={id as string}
-        className={cn('mb-1 block text-sm font-medium', error && 'text-destructive')}
+        className={cn(
+          'text-label-foreground mb-1.5 block text-xs font-medium',
+          error && 'text-destructive',
+        )}
       >
         {label}
       </label>
@@ -37,11 +40,12 @@ function FormField<TFormValues extends FieldValues>({
         required={required}
         {...(register ? register(id) : {})}
         className={cn(
-          'focus:ring-primary h-[50px] w-full rounded-sm border px-3 text-sm shadow-2xs outline-none focus:border-transparent focus:ring-2',
-          error && 'border-destructive focus:ring-destructive',
+          'border-input bg-surface text-foreground placeholder:text-placeholder-foreground hover:border-border-strong focus:border-primary h-8 w-full rounded-md border px-2.5 text-[13px] transition-[background-color,border-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0,1)] outline-none focus:shadow-[0_0_0_3px_var(--brand-subtle)]',
+          error &&
+            'border-destructive focus:border-destructive focus:shadow-[0_0_0_3px_var(--error-subtle)]',
         )}
       />
-      {error && <p className="text-destructive mt-1 text-xs">{error}</p>}
+      {error && <p className="text-destructive mt-1 text-[11px]">{error}</p>}
     </div>
   );
 }
