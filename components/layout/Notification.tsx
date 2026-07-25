@@ -98,7 +98,7 @@ const Notification = () => {
         <button
           type="button"
           aria-label="Open notifications"
-          className="group border-border-default bg-surface-secondary text-muted-foreground hover:border-border-strong hover:bg-surface-tertiary hover:text-foreground inline-flex size-8 items-center justify-center rounded-sm border transition-colors duration-[80ms] focus-visible:shadow-[var(--focus-shadow)]"
+          className="group border-border-default bg-surface-secondary text-muted-foreground hover:border-border-strong hover:text-foreground inline-flex size-8 items-center justify-center rounded-sm border transition-colors duration-80 focus-visible:shadow-(--focus-shadow)"
         >
           <span className="relative flex items-center justify-center">
             <RiNotification3Line className="group-hover:text-foreground size-4 transition-colors" />
@@ -124,7 +124,7 @@ const Notification = () => {
           </button>
         </div>
 
-        <div className="max-h-[420px] space-y-2 overflow-y-auto p-3">
+        <div className="max-h-105 space-y-2 overflow-y-auto p-3">
           {isLoading || isFetching ? (
             <div className="text-muted-foreground p-4 text-center text-sm">Loading...</div>
           ) : notifications.length > 0 ? (

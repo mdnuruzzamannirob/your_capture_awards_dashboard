@@ -1,7 +1,7 @@
 'use client';
 
-import Title from '@/components/common/Title';
 import MetricCard from '@/components/common/MetricCard';
+import Title from '@/components/common/Title';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGetDashboardOverviewQuery } from '@/store/features/dashboard/dashboardApi';
@@ -108,7 +108,7 @@ const DashboardSkeleton = () => (
             <div className="bg-muted h-3 w-56 animate-pulse rounded" />
           </CardHeader>
           <CardContent>
-            <div className="bg-muted h-[300px] w-full animate-pulse rounded-lg" />
+            <div className="bg-muted h-75 w-full animate-pulse rounded-lg" />
           </CardContent>
         </Card>
       ))}
@@ -186,18 +186,6 @@ const Dashboard = () => {
     [overview],
   );
 
-  // const revenueData = useMemo(
-  //   () =>
-  //     MONTH_LABELS.map((month, index) => ({
-  //       month,
-  //       store: overview?.revenueByType?.[index]?.store ?? 0,
-  //       contest: overview?.revenueByType?.[index]?.contest ?? 0,
-  //       subscription: overview?.revenueByType?.[index]?.subscription ?? 0,
-  //       total: overview?.revenueByType?.[index]?.total ?? 0,
-  //     })),
-  //   [overview],
-  // );
-
   const growthData = useMemo(
     () =>
       MONTH_LABELS.map((month, index) => ({
@@ -229,7 +217,7 @@ const Dashboard = () => {
   );
 
   return (
-    <section className="space-y-5 p-5">
+    <section className="space-y-5">
       <Title
         title="Dashboard Overview"
         description="Live platform metrics, revenue, user growth, and latest contests"
@@ -255,35 +243,6 @@ const Dashboard = () => {
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Revenue by Type</CardTitle>
-                <CardDescription>Monthly subscription, store, and contest revenue</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={revenueData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip
-                      formatter={(value: any) => {
-                        if (Array.isArray(value)) {
-                          return value.map((v) => currency.format(Number(v))).join(', ');
-                        }
-                        return value !== undefined && value !== null
-                          ? currency.format(Number(value))
-                          : '';
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="subscription" fill="var(--color-brand-400)" name="Subscription" />
-                    <Bar dataKey="store" fill="var(--color-brand-500)" name="Store" />
-                    <Bar dataKey="contest" fill="var(--color-brand-600)" name="Contest" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card> */}
-
             <Card>
               <CardHeader>
                 <CardTitle>User Growth</CardTitle>
@@ -353,36 +312,6 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* <div className="grid gap-5 lg:grid-cols-3">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Member Ratio (Pro vs Premium)</CardTitle>
-                <CardDescription>Month-wise membership split</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={memberRatioData}>
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip
-                      formatter={(value: any) => {
-                        if (Array.isArray(value)) {
-                          return value.map((v) => numberFormatter.format(Number(v))).join(', ');
-                        }
-                        return value !== undefined && value !== null
-                          ? numberFormatter.format(Number(value))
-                          : '';
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="premium" fill="var(--color-brand-400)" name="Premium" />
-                    <Bar dataKey="pro" fill="var(--color-brand-600)" name="Pro" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div> */}
 
           <Card>
             <CardHeader>

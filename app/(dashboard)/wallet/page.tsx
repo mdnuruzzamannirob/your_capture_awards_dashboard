@@ -53,7 +53,7 @@ const Wallet = () => {
   ];
 
   return (
-    <section className="space-y-5 p-5">
+    <section className="space-y-8">
       <Title
         title="Payment Transactions"
         description="Monitor store and subscription transactions with live wallet stats"

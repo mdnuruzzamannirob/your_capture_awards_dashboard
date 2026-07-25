@@ -29,7 +29,7 @@ const UsersPage = () => {
   ];
 
   return (
-    <section className="space-y-5 p-5">
+    <section className="space-y-8">
       <Title
         title="User Management"
         description="Monitor and manage all users, activity, and verification status"
