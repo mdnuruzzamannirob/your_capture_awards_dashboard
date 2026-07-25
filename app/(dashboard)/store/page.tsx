@@ -1,7 +1,7 @@
 'use client';
 
-import Title from '@/components/common/Title';
 import MetricCard from '@/components/common/MetricCard';
+import Title from '@/components/common/Title';
 import StoreProductManagement from '@/components/modules/store/StoreProductManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -64,7 +64,7 @@ export default function StorePage() {
   ];
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-5">
       <Title
         title="Store Management"
         description="Create and manage store items with live product and revenue stats."
@@ -81,7 +81,7 @@ export default function StorePage() {
         </Card>
       )}
 
-      <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-5 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <MetricCard
             key={stat.title}

@@ -1,7 +1,7 @@
 'use client';
 
-import Title from '@/components/common/Title';
 import MetricCard from '@/components/common/MetricCard';
+import Title from '@/components/common/Title';
 import ContestTable from '@/components/modules/content/ContestTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,7 +53,7 @@ const ContestPage = () => {
   ];
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <Title
           title="Contest Management"
@@ -76,7 +76,7 @@ const ContestPage = () => {
         </Card>
       )}
 
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mb-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {stats.map((stat) => (
           <MetricCard
             key={stat.title}

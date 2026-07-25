@@ -1,7 +1,7 @@
 'use client';
 
-import Title from '@/components/common/Title';
 import MetricCard from '@/components/common/MetricCard';
+import Title from '@/components/common/Title';
 import WalletManagement from '@/components/modules/wallet/WalletManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -53,7 +53,7 @@ const Wallet = () => {
   ];
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-5">
       <Title
         title="Payment Transactions"
         description="Monitor store and subscription transactions with live wallet stats"
@@ -70,7 +70,7 @@ const Wallet = () => {
         </Card>
       )}
 
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+      <div className="mb-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {stats.map((stat) => (
           <MetricCard
             key={stat.title}

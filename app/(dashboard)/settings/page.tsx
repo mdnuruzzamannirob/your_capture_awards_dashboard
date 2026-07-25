@@ -1,26 +1,26 @@
 'use client';
 
+import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
 import Title from '@/components/common/Title';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Spinner } from '@/components/ui/spinner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetMeQuery } from '@/store/features/auth/authApi';
 import {
-  useUpdateProfileMutation,
-  useUploadAvatarMutation,
   useChangePasswordMutation,
   useGetSitePolicyQuery,
+  useUpdateProfileMutation,
   useUpdateSitePolicyMutation,
+  useUploadAvatarMutation,
 } from '@/store/features/settings/settingsApi';
-import { useEffect, useState, useTransition, Suspense } from 'react';
-import { toast } from 'sonner';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { Camera, ShieldCheck, UserCheck, FileText } from 'lucide-react';
-import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
+import { Camera, FileText, ShieldCheck, UserCheck } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState, useTransition } from 'react';
+import { toast } from 'sonner';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
@@ -95,7 +95,7 @@ const PolicyEditor = ({
               <div className="bg-muted h-6 w-6 rounded" />
               <div className="bg-muted h-6 w-6 rounded" />
             </div>
-            <div className="bg-background min-h-[120px] space-y-3 p-4">
+            <div className="bg-background min-h-30 space-y-3 p-4">
               <div className="bg-muted h-4 w-2/3 rounded" />
               <div className="bg-muted h-4 w-4/5 rounded" />
             </div>
@@ -494,7 +494,7 @@ const SettingsContent = () => {
 
   if (isUserLoading) {
     return (
-      <section className="animate-pulse space-y-8">
+      <section className="animate-pulse space-y-5">
         <Title
           title="Settings"
           description="Manage your account profile, security, and policies."
@@ -507,7 +507,7 @@ const SettingsContent = () => {
   }
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-5">
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
@@ -537,7 +537,7 @@ export default function SettingsPage() {
   return (
     <Suspense
       fallback={
-        <section className="space-y-8">
+        <section className="space-y-5">
           <Title title="Settings" description="Loading..." />
           <div className="flex items-center justify-center py-10">
             <Spinner className="size-6" />

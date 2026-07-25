@@ -29,14 +29,14 @@ const UsersPage = () => {
   ];
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-5">
       <Title
         title="User Management"
         description="Monitor and manage all users, activity, and verification status"
       />
 
       {/* Stats Grid */}
-      <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mb-5 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <MetricCard
             key={stat.title}
