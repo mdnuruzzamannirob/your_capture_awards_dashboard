@@ -97,13 +97,13 @@ export const columns: ColumnDef<Contest>[] = [
       return (
         <span
           className={cn(
-            'flex w-fit items-center gap-0.5 rounded-sm px-2 py-1.5 text-xs font-medium capitalize',
-            status === 'ACTIVE' && 'bg-success/10 text-success',
-            (status === 'CLOSED' || status === 'COMPLETED') && 'bg-destructive/10 text-destructive',
-            status === 'UPCOMING' && 'bg-warning/10 text-warning',
+            'flex w-fit items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
+            status === 'ACTIVE' && 'bg-success-subtle text-success',
+            (status === 'CLOSED' || status === 'COMPLETED') && 'bg-error-subtle text-destructive',
+            status === 'UPCOMING' && 'bg-warning-subtle text-warning',
           )}
         >
-          <GoDotFill /> {status}
+          <GoDotFill className="size-2" /> {status}
         </span>
       );
     },

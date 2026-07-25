@@ -52,7 +52,7 @@ const UpdateContest = () => {
 
   if (isError || !contest?.id) {
     return (
-      <div className="border-border bg-surface text-muted-foreground rounded-xl border p-8 text-center">
+      <div className="border-border-subtle bg-surface-secondary text-muted-foreground rounded-lg border p-8 text-center">
         <p>Contest not found or could not be loaded.</p>
         <Button type="button" onClick={() => router.push('/contest')} className="mt-4">
           Back to contests

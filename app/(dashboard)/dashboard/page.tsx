@@ -1,6 +1,7 @@
 'use client';
 
 import Title from '@/components/common/Title';
+import MetricCard from '@/components/common/MetricCard';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGetDashboardOverviewQuery } from '@/store/features/dashboard/dashboardApi';
@@ -155,43 +156,31 @@ const Dashboard = () => {
         title: 'Total Revenue',
         value: currency.format(overview?.totalRevenue ?? 0),
         icon: DollarSign,
-        color: 'text-success',
-        bgColor: 'bg-success/10',
       },
       {
         title: 'Total Users',
         value: numberFormatter.format(overview?.totalUsers ?? 0),
         icon: Users,
-        color: 'text-info',
-        bgColor: 'bg-info/10',
       },
       {
         title: 'Active Contests',
         value: numberFormatter.format(overview?.totalActiveContests ?? 0),
         icon: Trophy,
-        color: 'text-warning',
-        bgColor: 'bg-warning/10',
       },
       {
         title: 'Store Revenue',
         value: currency.format(overview?.totalStoreSalesRevenue ?? 0),
         icon: ShoppingCart,
-        color: 'text-primary',
-        bgColor: 'bg-primary-soft',
       },
       {
         title: 'Paid Members',
         value: numberFormatter.format(overview?.paid_members_count ?? 0),
         icon: UserCheck,
-        color: 'text-success',
-        bgColor: 'bg-success/10',
       },
       {
         title: 'Total Payments',
         value: numberFormatter.format(overview?.totalPayments ?? 0),
         icon: CreditCard,
-        color: 'text-primary',
-        bgColor: 'bg-primary-soft',
       },
     ],
     [overview],
@@ -247,8 +236,8 @@ const Dashboard = () => {
       />
 
       {isError && (
-        <Card className="border-destructive/40">
-          <CardContent className="text-destructive p-6 text-sm">
+        <Card className="border-destructive/40 gap-0 py-0">
+          <CardContent className="text-destructive p-4 text-[13px]">
             {getErrorMessage(error)}
           </CardContent>
         </Card>
@@ -260,24 +249,9 @@ const Dashboard = () => {
         <>
           {/* Stats Grid */}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={stat.title} className="py-4">
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <div
-                      className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
-                    >
-                      <Icon className={`size-6 ${stat.color}`} />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                      <h3 className="text-2xl font-bold">{stat.value}</h3>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+            {stats.map((stat) => (
+              <MetricCard key={stat.title} label={stat.title} value={stat.value} icon={stat.icon} />
+            ))}
           </div>
 
           <div className="grid gap-5 lg:grid-cols-2">

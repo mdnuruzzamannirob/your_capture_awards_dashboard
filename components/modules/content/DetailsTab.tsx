@@ -53,7 +53,7 @@ const DetailsTab = ({
         )}
       </div>
 
-      <div className="border-border bg-surface space-y-6 rounded-xl border p-5">
+      <div className="border-border-subtle bg-surface-secondary space-y-6 rounded-lg border p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">{contest.title}</h2>

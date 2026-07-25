@@ -10,7 +10,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
 
   return (
     <div className="space-y-5">
-      <div className="border-border bg-surface grid gap-4 rounded-xl border p-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="border-border-subtle bg-surface-secondary grid gap-4 rounded-lg border p-5 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="text-muted-foreground text-sm">Money contest</p>
           <p className="mt-1 font-semibold">{contest.isMoneyContest ? 'Yes' : 'No'}</p>
@@ -42,7 +42,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
           return (
             <article
               key={award.id ?? `${category}-${index}`}
-              className="border-border bg-surface rounded-xl border p-5"
+              className="border-border-subtle bg-surface-secondary rounded-lg border p-5"
             >
               <div className="flex items-start gap-3">
                 <div className="bg-primary-soft flex size-10 shrink-0 items-center justify-center rounded-lg">

@@ -7,9 +7,8 @@ import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import { useFormContext } from 'react-hook-form';
 
 const inputClass =
-  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-xs leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
-const labelClass =
-  'text-[9px] font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
+  'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
+const labelClass = 'text-xs font-medium text-label-foreground data-[error=true]:text-destructive';
 
 function FormSwitch({
   name,
@@ -28,11 +27,7 @@ function FormSwitch({
         <FormItem className="flex flex-row items-center gap-[9px] space-y-0">
           <FormLabel className="text-body order-1 mt-0! text-[11px] font-medium">{label}</FormLabel>
           <FormControl>
-            <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              className="data-[state=checked]:bg-primary order-2 h-5! w-[34px]!"
-            />
+            <Switch checked={field.value} onCheckedChange={field.onChange} className="order-2" />
           </FormControl>
           <FormMessage className="text-[9px]" />
         </FormItem>
@@ -48,10 +43,10 @@ const PrizesStep = () => {
 
   return (
     <section
-      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border"
       aria-labelledby="contest-prizes-title"
     >
-      <header className="border-border flex min-h-[62px] items-center border-b px-[18px] py-3">
+      <header className="border-border-subtle flex min-h-13 items-center border-b bg-[var(--bg-inset)] px-[18px] py-3">
         <h2 id="contest-prizes-title" className="text-heading text-sm font-extrabold">
           Money &amp; Coins
         </h2>

@@ -9,17 +9,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const { isSidebarVisible } = useDashboard();
 
   return (
-    <div className="min-h-dvh">
+    <div className="bg-background min-h-dvh">
       <TopBar />
       <SideBar />
       <main
         className={cn(
-          'size-full pt-[57px] pb-5 transition-all duration-300 ease-in-out',
+          'size-full min-h-dvh pt-14 transition-[padding] duration-240 ease-[cubic-bezier(0.2,0,0,1)]',
           'lg:block lg:pl-60',
           !isSidebarVisible && 'lg:pl-16',
         )}
       >
-        {children}
+        <div className="dashboard-page">{children}</div>
       </main>
     </div>
   );

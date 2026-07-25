@@ -8,10 +8,10 @@ import { Eye } from 'lucide-react';
 import { GoDotFill } from 'react-icons/go';
 
 const statusStyles: Record<SupportTicket['status'], string> = {
-  pending: 'bg-warning/10 text-warning',
-  in_progress: 'bg-info/10 text-info',
-  resolved: 'bg-success/10 text-success',
-  closed: 'bg-destructive/10 text-destructive',
+  pending: 'bg-warning-subtle text-warning',
+  in_progress: 'bg-info-subtle text-info',
+  resolved: 'bg-success-subtle text-success',
+  closed: 'bg-error-subtle text-destructive',
 };
 
 export const createSupportColumns = (
@@ -60,11 +60,11 @@ export const createSupportColumns = (
       return (
         <span
           className={cn(
-            'inline-flex w-fit items-center justify-center gap-1 rounded px-2 py-1 text-xs font-medium capitalize',
+            'inline-flex w-fit items-center justify-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
             statusStyles[status],
           )}
         >
-          <GoDotFill /> {status.replace('_', ' ')}
+          <GoDotFill className="size-2" /> {status.replace('_', ' ')}
         </span>
       );
     },

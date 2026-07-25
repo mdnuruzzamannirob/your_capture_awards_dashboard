@@ -49,17 +49,6 @@ const categoryMeta: Record<StoreProductCategory, { label: string; icon: typeof C
   BUNDLES: { label: 'Bundles', icon: Package },
 };
 
-const categoryStyles: Record<StoreProductCategory, { tab: string; badge: string }> = {
-  COINS: {
-    tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
-    badge: 'border-primary/20 bg-primary/10 text-primary',
-  },
-  BUNDLES: {
-    tab: 'data-[state=active]:bg-primary data-[state=active]:text-primary-foreground',
-    badge: 'border-primary/20 bg-primary/10 text-primary',
-  },
-};
-
 const statusStyles: Record<StoreProduct['status'], string> = {
   ACTIVE: 'border-store-active-border bg-store-active-soft text-store-active',
   INACTIVE: 'border-store-inactive-border bg-store-inactive-soft text-store-inactive',
@@ -67,9 +56,9 @@ const statusStyles: Record<StoreProduct['status'], string> = {
 };
 
 const bundleItemStyles: Record<string, string> = {
-  KEY: ' bg-amber-500 text-white',
-  BOOST: ' bg-sky-500 text-white',
-  SWAP: ' bg-fuchsia-500 text-white',
+  KEY: 'bg-warning-subtle text-warning',
+  BOOST: 'bg-info-subtle text-info',
+  SWAP: 'bg-[rgba(139,108,196,0.14)] text-[#8B6CC4]',
 };
 
 const StoreProductManagement = () => {
@@ -137,7 +126,7 @@ const StoreProductManagement = () => {
     <div className="space-y-5">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
-          <Card key={index} className="border-border/10 bg-surface overflow-hidden p-0 shadow-xs">
+          <Card key={index} className="overflow-hidden p-0">
             <CardContent className="space-y-3 p-4 text-sm">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">
@@ -185,12 +174,10 @@ const StoreProductManagement = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="border-border/10 bg-background inline-flex w-auto flex-wrap rounded-xl border p-1">
+        <div className="border-border-subtle inline-flex w-auto flex-wrap border-b">
           {Object.entries(categoryMeta).map(([value, meta]) => {
             const Icon = meta.icon;
             const isActive = category === value;
-            const styles = categoryStyles[value as StoreProductCategory];
-
             return (
               <button
                 key={value}
@@ -200,7 +187,11 @@ const StoreProductManagement = () => {
                   setCategory(value as StoreProductCategory);
                   setPage(1);
                 }}
-                className={`text-muted-foreground flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-transparent px-4 whitespace-nowrap transition-colors ${isActive ? '' : 'hover:bg-primary/10 hover:text-primary'} data-[state=inactive]:hover:border-primary/15 data-[state=active]:shadow-sm ${styles.tab}`}
+                className={`flex h-9 flex-1 items-center justify-center gap-1.5 border-b px-3 text-[13px] whitespace-nowrap transition-colors duration-150 ${
+                  isActive
+                    ? 'border-primary text-foreground -mb-px'
+                    : 'text-muted-foreground hover:text-foreground border-transparent'
+                }`}
               >
                 <Icon className="size-4" />
                 {meta.label}
@@ -219,7 +210,7 @@ const StoreProductManagement = () => {
       {!isMounted || isLoading || isFetching ? renderSkeleton() : null}
 
       {isMounted && isError && (
-        <Card className="border-border/10 bg-surface">
+        <Card>
           <CardContent className="flex items-center justify-between gap-3 p-4 max-sm:flex-col max-sm:items-start">
             <p className="text-destructive text-sm">
               {getErrorMessage(error, 'Failed to load store products.')}
@@ -236,10 +227,7 @@ const StoreProductManagement = () => {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => {
               return (
-                <Card
-                  key={product.id}
-                  className="border-border/10 bg-surface overflow-hidden p-0 shadow-xs"
-                >
+                <Card key={product.id} className="overflow-hidden p-0">
                   <CardContent className="space-y-3 p-4 text-sm">
                     <div className="flex items-start justify-between gap-3">
                       <div className="space-y-1">
@@ -248,13 +236,13 @@ const StoreProductManagement = () => {
                         </h3>
                       </div>
                       <span
-                        className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${statusStyles[product.status]}`}
+                        className={`rounded-sm border px-[7px] py-0.5 text-[11px] font-medium ${statusStyles[product.status]}`}
                       >
                         {product.status}
                       </span>
                     </div>
 
-                    <div className="border-border/10 bg-background/40 grid grid-cols-2 gap-3 rounded-lg border p-3">
+                    <div className="border-border-subtle grid grid-cols-2 gap-3 rounded-md border bg-[var(--bg-inset)] p-3">
                       <div className="space-y-0.5">
                         <p className="text-muted-foreground text-xs">Price</p>
                         <p className="leading-tight font-semibold">
@@ -279,7 +267,7 @@ const StoreProductManagement = () => {
                             product.items.map((item) => (
                               <span
                                 key={`${product.id}-${item.type}`}
-                                className={`rounded-full px-2.5 py-1 text-xs ${bundleItemStyles[item.type] ?? 'bg-background/60 text-foreground'}`}
+                                className={`rounded-sm px-[7px] py-0.5 text-[11px] ${bundleItemStyles[item.type] ?? 'bg-surface-tertiary text-foreground'}`}
                               >
                                 {item.type} x {item.quantity}
                               </span>
@@ -321,7 +309,7 @@ const StoreProductManagement = () => {
           </div>
 
           {!products.length && (
-            <Card className="border-border/10 bg-surface">
+            <Card>
               <CardContent className="text-muted-foreground py-10 text-center text-sm">
                 No products found for {categoryLabel}.
               </CardContent>

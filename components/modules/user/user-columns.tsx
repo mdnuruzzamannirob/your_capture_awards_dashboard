@@ -57,19 +57,19 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
     cell: ({ row }) => {
       const status = getUserStatus(row.original);
       const statusStyles = {
-        Active: 'bg-success/10 text-success ring-1 ring-success/20',
-        Blocked: 'bg-destructive/10 text-destructive ring-1 ring-destructive/20',
-        Deleted: 'bg-muted/10 text-muted-foreground ring-1 ring-muted/20',
+        Active: 'bg-success-subtle text-success',
+        Blocked: 'bg-error-subtle text-destructive',
+        Deleted: 'bg-surface-tertiary text-muted-foreground',
       } as const;
 
       return (
         <span
           className={cn(
-            'flex w-fit items-center gap-0.5 rounded px-2 py-1 text-xs font-medium whitespace-nowrap capitalize',
+            'flex w-fit items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium whitespace-nowrap capitalize',
             statusStyles[status as keyof typeof statusStyles],
           )}
         >
-          <GoDotFill /> {status}
+          <GoDotFill className="size-2" /> {status}
         </span>
       );
     },
@@ -93,8 +93,8 @@ export const getUserColumns = ({ onToggleBlock }: UserColumnsOptions): ColumnDef
             isDisabled
               ? 'border-muted/20 bg-muted/10 text-muted-foreground cursor-not-allowed'
               : isBlocked
-                ? 'border-success/20 bg-success/10 text-success hover:bg-success/20 hover:text-success'
-                : 'border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive',
+                ? 'border-success/20 bg-success-subtle text-success hover:bg-success-subtle hover:text-success'
+                : 'border-destructive/20 bg-error-subtle text-destructive hover:bg-error-subtle hover:text-destructive',
           )}
           disabled={isDisabled}
           onClick={(event) => {

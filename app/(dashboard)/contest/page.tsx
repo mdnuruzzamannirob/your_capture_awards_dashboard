@@ -1,6 +1,7 @@
 'use client';
 
 import Title from '@/components/common/Title';
+import MetricCard from '@/components/common/MetricCard';
 import ContestTable from '@/components/modules/content/ContestTable';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,41 +34,34 @@ const ContestPage = () => {
       title: 'Total Contests',
       value: (statsData?.running ?? 0) + (statsData?.upcoming ?? 0) + (statsData?.completed ?? 0),
       icon: Trophy,
-      color: 'text-info',
-      bgColor: 'bg-info/10',
     },
     {
       title: 'Active Contests',
       value: statsData?.running ?? 0,
       icon: CheckCircle2,
-      color: 'text-success',
-      bgColor: 'bg-success/10',
     },
     {
       title: 'Upcoming Contests',
       value: statsData?.upcoming ?? 0,
       icon: Clock,
-      color: 'text-warning',
-      bgColor: 'bg-warning/10',
     },
     {
       title: 'Closed Contests',
       value: statsData?.completed ?? 0,
       icon: XCircle,
-      color: 'text-muted-foreground',
-      bgColor: 'bg-muted/10',
     },
   ];
 
   return (
     <section className="space-y-5 p-5">
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <Title
           title="Contest Management"
           description="Monitor and manage all contests, participants, and results"
+          className="flex-1"
         />
         <Link href="/contest/create-contest">
-          <Button className="text-foreground">Create Contest</Button>
+          <Button>Create Contest</Button>
         </Link>
       </div>
 
@@ -83,24 +77,14 @@ const ContestPage = () => {
       )}
 
       <div className="mb-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="p-0">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div
-                  className={`flex size-12 items-center justify-center rounded-lg ${stat.bgColor}`}
-                >
-                  <Icon className={`size-6 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-2xl font-bold">{stat.value.toLocaleString()}</h3>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {stats.map((stat) => (
+          <MetricCard
+            key={stat.title}
+            label={stat.title}
+            value={stat.value.toLocaleString()}
+            icon={stat.icon}
+          />
+        ))}
       </div>
 
       <ContestTable />

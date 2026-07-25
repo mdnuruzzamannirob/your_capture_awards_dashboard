@@ -22,11 +22,14 @@ const RankTab = ({ contest }: { contest: any }) => {
       </Tabs>
 
       {activeRankTab === 'top-photo' ? (
-        <div className="rounded-2xl border p-5">
+        <div className="border-border-subtle bg-surface-secondary rounded-lg border p-5">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {rankPhotos.length ? (
               rankPhotos.map((photo: any, index: number) => (
-                <div key={photo?.id ?? index} className="rounded-xl border p-4">
+                <div
+                  key={photo?.id ?? index}
+                  className="border-border-subtle rounded-lg border p-4"
+                >
                   <p className="text-muted-foreground text-sm">#{index + 1}</p>
                   <p className="mt-1 font-medium">{photo?.user?.fullName ?? 'Unknown user'}</p>
                   <p className="text-muted-foreground text-sm">{photo?.voteCount ?? 0} votes</p>
@@ -38,11 +41,11 @@ const RankTab = ({ contest }: { contest: any }) => {
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl border p-5">
+        <div className="border-border-subtle bg-surface-secondary rounded-lg border p-5">
           <div className="space-y-4">
             {rankPhotographers.length ? (
               rankPhotographers.map((item: any, index: number) => (
-                <div key={item?.id ?? index} className="rounded-xl border p-4">
+                <div key={item?.id ?? index} className="border-border-subtle rounded-lg border p-4">
                   <p className="font-medium">
                     #{index + 1} {item?.user?.fullName ?? 'Unknown user'}
                   </p>

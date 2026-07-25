@@ -57,14 +57,18 @@ const Notification = () => {
     <div
       key={notification.id}
       className={cn(
-        'relative flex items-start gap-3 rounded-xl border p-3 transition',
-        notification.isRead ? 'border-border bg-background' : 'border-primary/20 bg-primary/5',
+        'relative flex items-start gap-2.5 rounded-lg border p-3 transition-colors duration-150',
+        notification.isRead
+          ? 'border-border-subtle bg-surface-secondary'
+          : 'bg-primary-soft border-transparent',
       )}
     >
       <div
         className={cn(
-          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
-          notification.isRead ? 'bg-surface-secondary text-foreground' : 'bg-primary text-white',
+          'border-border-subtle flex size-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-medium',
+          notification.isRead
+            ? 'bg-surface-tertiary text-muted-foreground'
+            : 'bg-primary-soft text-primary',
         )}
       >
         {typeLabel[notification.type].slice(0, 1)}
@@ -73,7 +77,7 @@ const Notification = () => {
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{notification.title}</p>
+            <p className="truncate text-[13px] font-medium">{notification.title}</p>
             <p className="text-muted-foreground mt-0.5 text-xs">{notification.message}</p>
           </div>
           {!notification.isRead && (
@@ -94,7 +98,7 @@ const Notification = () => {
         <button
           type="button"
           aria-label="Open notifications"
-          className="group bg-surface-secondary text-muted-foreground hover:bg-surface-tertiary inline-flex h-8.5 items-center justify-center rounded-md px-3 transition"
+          className="group border-border-default bg-surface-secondary text-muted-foreground hover:border-border-strong hover:bg-surface-tertiary hover:text-foreground inline-flex size-8 items-center justify-center rounded-sm border transition-colors duration-[80ms] focus-visible:shadow-[var(--focus-shadow)]"
         >
           <span className="relative flex items-center justify-center">
             <RiNotification3Line className="group-hover:text-foreground size-4 transition-colors" />
@@ -107,13 +111,13 @@ const Notification = () => {
 
       <PopoverContent align="end" side="bottom" sideOffset={8} className="w-96 p-0">
         <div className="border-border flex items-center justify-between border-b px-4 py-3">
-          <p className="text-sm font-semibold">Notifications</p>
+          <p className="text-[13px] font-semibold">Notifications</p>
 
           <button
             type="button"
             onClick={handleMarkAllRead}
             disabled={!unreadCount || isMarking}
-            className="text-primary inline-flex items-center gap-1 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className="text-primary hover:text-primary-hover inline-flex items-center gap-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             <IoCheckmarkDone className="size-4" />
             Mark all read

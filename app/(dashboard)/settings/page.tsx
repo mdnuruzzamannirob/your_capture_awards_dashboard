@@ -78,7 +78,7 @@ const PolicyEditor = ({
 
   if (isPolicyLoading || isPolicyFetching) {
     return (
-      <Card className="border-border bg-surface/50 animate-pulse">
+      <Card className="animate-pulse">
         <CardHeader className="space-y-2">
           <div className="bg-muted h-6 w-32 rounded" />
           <div className="bg-muted h-4 w-64 rounded" />
@@ -109,7 +109,7 @@ const PolicyEditor = ({
   }
 
   return (
-    <Card className="border-border bg-surface/50 animate-fadeIn">
+    <Card className="animate-fade-in">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="text-primary size-5" />
@@ -135,28 +135,40 @@ const SitePolicyTab = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2">
+      <div className="border-border-subtle flex gap-0.5 border-b">
         <Button
-          variant={selectedSubTab === 'ABOUT' ? 'default' : 'outline'}
+          variant="ghost"
           size="sm"
           onClick={() => setSelectedSubTab('ABOUT')}
-          className="rounded-full"
+          className={`-mb-px rounded-none border-b ${
+            selectedSubTab === 'ABOUT'
+              ? 'border-primary text-foreground'
+              : 'text-muted-foreground border-transparent'
+          }`}
         >
           About Us
         </Button>
         <Button
-          variant={selectedSubTab === 'TERMS' ? 'default' : 'outline'}
+          variant="ghost"
           size="sm"
           onClick={() => setSelectedSubTab('TERMS')}
-          className="rounded-full"
+          className={`-mb-px rounded-none border-b ${
+            selectedSubTab === 'TERMS'
+              ? 'border-primary text-foreground'
+              : 'text-muted-foreground border-transparent'
+          }`}
         >
           Terms & Conditions
         </Button>
         <Button
-          variant={selectedSubTab === 'POLICY' ? 'default' : 'outline'}
+          variant="ghost"
           size="sm"
           onClick={() => setSelectedSubTab('POLICY')}
-          className="rounded-full"
+          className={`-mb-px rounded-none border-b ${
+            selectedSubTab === 'POLICY'
+              ? 'border-primary text-foreground'
+              : 'text-muted-foreground border-transparent'
+          }`}
         >
           Privacy Policy
         </Button>
@@ -253,7 +265,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
   return (
     <div className="animate-fadeIn grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Left side: Avatar Manager */}
-      <Card className="border-border bg-surface/50 flex flex-col justify-between">
+      <Card className="flex flex-col justify-between">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Camera className="text-primary size-5" />
@@ -312,7 +324,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
       </Card>
 
       {/* Right side: profile info form */}
-      <Card className="border-border bg-surface/50 lg:col-span-2">
+      <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserCheck className="text-primary size-5" />
@@ -402,7 +414,7 @@ const PasswordTab = () => {
   };
 
   return (
-    <Card className="border-border bg-surface/50 animate-fadeIn">
+    <Card className="animate-fade-in">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldCheck className="text-primary size-5" />
@@ -499,7 +511,7 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="border-border bg-surface grid w-full max-w-md grid-cols-3 border">
+        <TabsList className="grid w-full max-w-md grid-cols-3">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>

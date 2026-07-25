@@ -28,9 +28,8 @@ const awardLabels: Record<(typeof awardTypes)[number], string> = {
   TOP_10: 'Top 10',
 };
 const inputClass =
-  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-sm leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
-const labelClass =
-  'text-xs font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
+  'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
+const labelClass = 'text-xs font-medium text-label-foreground data-[error=true]:text-destructive';
 
 function isTierAward(type: ContestAwardType) {
   return tierAwardTypes.includes(type as (typeof tierAwardTypes)[number]);
@@ -87,10 +86,10 @@ const RewardsStep = () => {
 
   return (
     <section
-      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border"
       aria-labelledby="contest-awards-title"
     >
-      <header className="border-border flex min-h-[62px] items-center justify-between gap-4 border-b px-[18px] py-3">
+      <header className="border-border-subtle flex min-h-13 items-center justify-between gap-4 border-b bg-[var(--bg-inset)] px-[18px] py-3">
         <h2 id="contest-awards-title" className="text-heading text-sm font-extrabold">
           Awards
         </h2>
@@ -187,7 +186,7 @@ const RewardsStep = () => {
           showCloseButton={false}
           aria-describedby={undefined}
           overlayClassName="bg-overlay/80 backdrop-blur-[5px]"
-          className="border-border-strong bg-surface data-[state=open]:slide-in-from-bottom-3 max-h-[calc(100dvh-56px)] w-[min(500px,calc(100%-32px))] max-w-none gap-0 overflow-y-auto rounded-[20px] border p-0 shadow-[var(--shadow-modal)] max-[520px]:top-auto max-[520px]:bottom-0 max-[520px]:w-full max-[520px]:max-w-none max-[520px]:translate-y-0 max-[520px]:rounded-b-none"
+          className="border-border-default bg-surface-secondary data-[state=open]:slide-in-from-bottom-3 max-h-[calc(100dvh-56px)] w-[min(500px,calc(100%-32px))] max-w-none gap-0 overflow-y-auto rounded-xl p-0 shadow-[var(--shadow-xl)] max-[520px]:top-auto max-[520px]:bottom-0 max-[520px]:w-full max-[520px]:max-w-none max-[520px]:translate-y-0 max-[520px]:rounded-b-none"
         >
           <div className="border-border flex items-start justify-between gap-4 border-b px-[18px] py-4">
             <DialogTitle className="text-heading text-base font-extrabold">Add award</DialogTitle>

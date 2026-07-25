@@ -7,7 +7,10 @@ const WinnerTab = ({ contest }: { contest: any }) => {
     <div className="w-full space-y-6">
       {winners.length ? (
         winners.map((winner: any, index: number) => (
-          <div key={winner?.id ?? index} className="rounded-2xl border p-5">
+          <div
+            key={winner?.id ?? index}
+            className="border-border-subtle bg-surface-secondary rounded-lg border p-5"
+          >
             <h3 className="text-xl font-semibold">
               {winner?.category === 'TOP_PHOTOGRAPHER'
                 ? 'Top Photographer Winner'

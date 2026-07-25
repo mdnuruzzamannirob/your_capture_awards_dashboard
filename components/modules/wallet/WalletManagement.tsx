@@ -63,35 +63,7 @@ const WalletManagement = () => {
 
   return (
     <>
-      <div className="mb-4 rounded-lg border p-4">
-        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-sm font-semibold">Latest Successful Payments</h3>
-          {isPaymentsLoading && <Spinner className="size-4" />}
-        </div>
 
-        {isPaymentsError ? (
-          <p className="text-destructive text-sm">
-            {getErrorMessage(paymentsError, 'Failed to load latest payments.')}
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {(paymentsResponse?.data ?? []).slice(0, 5).map((payment) => (
-              <div
-                key={payment.id}
-                className="bg-card flex items-center justify-between rounded-md border p-2 text-sm"
-              >
-                <p className="truncate pr-3">{payment.user.fullName || payment.user.email}</p>
-                <p className="font-medium">
-                  {payment.currency} {payment.amount.toFixed(2)}
-                </p>
-              </div>
-            ))}
-            {!paymentsResponse?.data?.length && !isPaymentsLoading && (
-              <p className="text-muted-foreground text-sm">No successful payments found.</p>
-            )}
-          </div>
-        )}
-      </div>
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex-1">

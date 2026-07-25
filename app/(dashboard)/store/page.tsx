@@ -1,6 +1,7 @@
 'use client';
 
 import Title from '@/components/common/Title';
+import MetricCard from '@/components/common/MetricCard';
 import StoreProductManagement from '@/components/modules/store/StoreProductManagement';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,29 +45,21 @@ export default function StorePage() {
       title: 'Total Products',
       value: statsData?.totalProducts ?? 0,
       icon: Package,
-      color: 'text-primary',
-      bgColor: 'bg-primary/10',
     },
     {
       title: 'Total Purchases',
       value: statsData?.totalPurchases ?? 0,
       icon: ShoppingCart,
-      color: 'text-success',
-      bgColor: 'bg-success/10',
     },
     {
       title: 'Total Revenue',
       value: currency.format(statsData?.totalRevenue ?? 0),
       icon: DollarSign,
-      color: 'text-primary',
-      bgColor: 'bg-primary-soft',
     },
     {
       title: 'Active Products',
       value: statsData?.totalActiveProducts ?? 0,
       icon: TrendingUp,
-      color: 'text-success',
-      bgColor: 'bg-success/10',
     },
   ];
 
@@ -89,30 +82,20 @@ export default function StorePage() {
       )}
 
       <div className="mb-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={index} className="border-border bg-surface overflow-hidden p-0 shadow-xs">
-              <CardContent className="flex items-center gap-4 p-4">
-                <div
-                  className={`flex size-11 items-center justify-center rounded-xl ${stat.bgColor}`}
-                >
-                  <Icon className={`size-5 ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs font-medium">{stat.title}</p>
-                  <h3 className="text-xl leading-tight font-bold sm:text-2xl">
-                    {isMounted
-                      ? typeof stat.value === 'number'
-                        ? stat.value.toLocaleString()
-                        : stat.value
-                      : '—'}
-                  </h3>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+        {stats.map((stat) => (
+          <MetricCard
+            key={stat.title}
+            label={stat.title}
+            value={
+              isMounted
+                ? typeof stat.value === 'number'
+                  ? stat.value.toLocaleString()
+                  : stat.value
+                : '—'
+            }
+            icon={stat.icon}
+          />
+        ))}
       </div>
 
       {isMounted ? <StoreProductManagement /> : null}

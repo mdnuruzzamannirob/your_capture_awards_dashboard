@@ -5,13 +5,19 @@ import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Notification from './Notification';
 import UserMenu from './UserMenu';
+import { sideMenus } from '@/lib/constants/menus';
 
 const TopBar = () => {
   const { isSidebarVisible } = useDashboard();
   const [isMobile, setIsMobile] = useState(false);
+  const pathname = usePathname();
+  const currentSection =
+    sideMenus.find((item) => pathname.startsWith(item.href))?.name ??
+    (pathname.startsWith('/settings') ? 'Settings' : 'Administration');
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,7 +35,7 @@ const TopBar = () => {
   return (
     <header
       className={cn(
-        'bg-background fixed top-0 right-0 left-0 z-50 flex h-[57px] items-center justify-between border-b px-4 transition-all duration-300 ease-in-out',
+        'border-border-subtle bg-surface fixed top-0 right-0 left-0 z-40 flex h-14 items-center justify-between border-b px-4 transition-[padding] duration-240 ease-[cubic-bezier(0.2,0,0,1)]',
         isMobile ? 'pl-4' : isSidebarVisible ? 'pl-[260px]' : 'pl-20',
       )}
     >
@@ -37,7 +43,7 @@ const TopBar = () => {
       <div className="flex flex-1 items-center lg:hidden">
         <button
           onClick={toggleMobileMenu}
-          className="hover:bg-surface-tertiary flex size-10 items-center justify-center rounded-md transition-colors"
+          className="text-muted-foreground hover:bg-surface-tertiary hover:text-foreground flex size-8 items-center justify-center rounded-sm transition-colors duration-[80ms] focus-visible:shadow-[var(--focus-shadow)]"
           aria-label="Toggle menu"
         >
           <Menu className="size-5" />
@@ -57,11 +63,19 @@ const TopBar = () => {
         </Link>
       </div>
 
-      {/* 3. Placeholder for Desktop Left Spacing */}
-      {!isMobile && <div className="hidden lg:block" />}
+      {/* 3. Current workspace context */}
+      {!isMobile && (
+        <div className="hidden items-center gap-2 lg:flex">
+          <span className="font-token text-caption-foreground text-[10px] tracking-[0.08em] uppercase">
+            Workspace
+          </span>
+          <span className="bg-border-default h-3 w-px" />
+          <span className="text-foreground text-[13px] font-medium">{currentSection}</span>
+        </div>
+      )}
 
       {/* 4. Right Section: Notification & UserMenu */}
-      <div className="flex flex-1 items-center justify-end gap-3 md:gap-5">
+      <div className="flex flex-1 items-center justify-end gap-2">
         <Notification />
         <UserMenu />
       </div>
