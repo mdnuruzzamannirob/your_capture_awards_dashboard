@@ -11,6 +11,7 @@ export const contestDetailsSchema = z
       .trim()
       .min(5, 'Title must be at least 5 characters')
       .max(100, 'Title must not exceed 100 characters'),
+    category: z.string().trim().max(100, 'Category must not exceed 100 characters').default(''),
     description: z
       .string()
       .trim()
@@ -27,7 +28,7 @@ export const contestDetailsSchema = z
         (value) => !(value instanceof File) || value.size <= MAX_IMAGE_SIZE,
         'Image must be under 24MB',
       ),
-    maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required').max(4),
+    maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required'),
     recurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
     startDate: z.coerce.date(),
@@ -97,13 +98,17 @@ export const contestRulesSchema = z.object({
     )
     .length(5),
   submissionFormat: z.object({
-    mimeTypes: z.array(z.enum(['image/jpeg', 'image/png'])).min(1, 'Select a file type'),
+    mimeTypes: z
+      .array(
+        z.enum(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/tiff']),
+      )
+      .min(1, 'Select a file type'),
     minWidth: z.coerce.number().int().min(1),
     minHeight: z.coerce.number().int().min(1),
     maxSizeMB: z.coerce.number().min(1),
   }),
   eligibility: z.object({
-    minAge: z.coerce.number().int().min(0).max(120),
+    minAge: z.coerce.number().int().min(0).max(200),
     text: requiredText,
     requiresAcceptance: z.boolean(),
   }),
@@ -130,6 +135,7 @@ export const contestAwardsSchema = z
   .array(
     z.object({
       type: z.enum(contestAwardTypes),
+      recipient: z.enum(['Photo', 'Photographer']).optional(),
       boost: z.coerce.number().int().min(0).default(0),
       key: z.coerce.number().int().min(0).default(0),
       swap: z.coerce.number().int().min(0).default(0),
@@ -141,14 +147,34 @@ export const contestAwardsSchema = z
   .superRefine((awards, ctx) => {
     const seen = new Set<string>();
     awards.forEach((award, index) => {
-      if (seen.has(award.type)) {
+      const key = `${award.type}:${award.recipient ?? ''}`;
+      if (seen.has(key)) {
         ctx.addIssue({
           path: [index, 'type'],
           code: 'custom',
           message: 'Each award type can only be added once',
         });
       }
-      seen.add(award.type);
+      seen.add(key);
+    });
+
+    contestAwardTypes.forEach((type) => {
+      const matching = awards.filter((award) => award.type === type);
+      const isTier = ['TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'].includes(type);
+      if (
+        matching.length > 1 &&
+        (!isTier ||
+          matching.length !== 2 ||
+          matching.some((award) => !award.recipient) ||
+          new Set(matching.map((award) => award.recipient)).size !== 2)
+      ) {
+        const index = awards.findIndex((award) => award.type === type);
+        ctx.addIssue({
+          path: [index, 'type'],
+          code: 'custom',
+          message: 'This award type cannot be added more than once',
+        });
+      }
     });
   });
 

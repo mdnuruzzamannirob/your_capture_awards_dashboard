@@ -5,10 +5,11 @@ import { Form } from '@/components/ui/form';
 import { getDefaultContestValues } from '@/lib/contest';
 import { contestFinalSchema, type ContestFinalValues } from '@/lib/schemas/contestSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { type FieldErrors, type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import ContestEditorHeader from './ContestEditorHeader';
 import DetailsStep from './DetailsStep';
 import PrizesStep from './PrizesStep';
 import RewardsStep from './RewardsStep';
@@ -80,40 +81,52 @@ const ContestForm = ({
 
   return (
     <Form {...form}>
-      <form
-        className="mx-auto max-w-5xl space-y-5"
-        onSubmit={form.handleSubmit(onSubmit, (errors) => {
-          toast.error(findFirstError(errors) ?? 'Please check the highlighted fields.');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        })}
-      >
-        <DetailsStep />
-        <PrizesStep />
-        <RulesStep />
-        <RewardsStep />
-
-        <div className="border-border bg-surface sticky bottom-4 z-20 flex flex-wrap items-center justify-end gap-3 rounded-xl border p-4 shadow-xl">
-          <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitDisabled}
-            className="text-foreground min-w-36 gap-2"
-            title={mode === 'update' && !form.formState.isDirty ? 'No changes to save' : undefined}
+      <div className="mx-auto w-full max-w-[1380px]">
+        <ContestEditorHeader mode={mode === 'create' ? 'create' : 'edit'} />
+        <div className="grid items-start gap-[clamp(20px,2.4vw,36px)] min-[1280px]:grid-cols-[minmax(480px,1.08fr)_minmax(390px,0.92fr)]">
+          <form
+            className="grid min-w-0 gap-3"
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              toast.error(findFirstError(errors) ?? 'Please check the highlighted fields.');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            })}
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="size-4 animate-spin" /> Saving...
-              </>
-            ) : (
-              <>
-                <Save className="size-4" /> {submitLabel}
-              </>
-            )}
-          </Button>
+            <DetailsStep />
+            <PrizesStep />
+            <RulesStep />
+            <RewardsStep />
+
+            <div className="mt-2 flex flex-wrap items-center justify-end gap-2.5 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isSubmitting}
+                className="border-input bg-surface text-body hover:border-border-strong hover:bg-surface-secondary h-10 rounded-[10px] px-[15px] text-[13px] font-bold shadow-none transition-transform hover:-translate-y-px"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitDisabled}
+                className="h-10 min-w-36 rounded-[10px] px-[15px] text-[13px] font-bold shadow-[0_8px_20px_color-mix(in_oklab,var(--primary)_22%,transparent)] transition-transform hover:-translate-y-px"
+                title={
+                  mode === 'update' && !form.formState.isDirty ? 'No changes to save' : undefined
+                }
+              >
+                {isSubmitting ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin" /> Saving...
+                  </span>
+                ) : (
+                  submitLabel
+                )}
+              </Button>
+            </div>
+          </form>
+          <div className="hidden min-[1280px]:block" aria-hidden="true" />
         </div>
-      </form>
+      </div>
     </Form>
   );
 };

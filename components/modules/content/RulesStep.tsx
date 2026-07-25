@@ -1,49 +1,81 @@
 'use client';
 
-import DynamicIcon from '@/components/common/DynamicIcon';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { contestRuleDefinitions } from '@/lib/constants';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { SlidersHorizontal } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useFormContext, type FieldPath } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
+import ContestRichTextEditor from './ContestRichTextEditor';
 
-function RuleSection({
-  ruleKey,
-  children,
-}: {
-  ruleKey: keyof typeof contestRuleDefinitions;
-  children: ReactNode;
-}) {
-  const definition = contestRuleDefinitions[ruleKey];
+const inputClass =
+  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-sm leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
+const selectClass = `${inputClass} scheme-dark w-full appearance-none pr-9 text-foreground outline-none`;
+const labelClass =
+  'text-xs font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
+const tierName: Record<string, string> = {
+  POPULAR: 'Popular',
+  SKILLED: 'Skilled',
+  PREMIER: 'Premier',
+  ELITE: 'Elite',
+  ALL_STAR: 'All Star',
+};
 
+const submissionOptions = [
+  {
+    id: 'non-relevant',
+    label: 'Non-relevant images',
+    value: 'Non-relevant images',
+    matches: (item: string) => item.toLowerCase().includes('non-relevant'),
+  },
+  {
+    id: 'similar-images',
+    label:
+      'Similar images — images with the same subject, background, foreground, and location must be distinct',
+    value:
+      'Similar images: Images with the same combination of subject, background, foreground and location are not allowed. Images must be distinct',
+    matches: (item: string) => item.toLowerCase().includes('similar images'),
+  },
+  {
+    id: 'duplicate-image',
+    label: 'The same image multiple times, including crops, angle changes, or tone changes',
+    value: 'Same image multiple times (cropped, angle change or tone changes)',
+    matches: (item: string) => item.toLowerCase().includes('same image multiple'),
+  },
+  {
+    id: 'ai-generated',
+    label: 'AI-generated images',
+    value: 'AI images',
+    matches: (item: string) => item.toLowerCase().includes('ai'),
+  },
+] as const;
+
+const fileFormatOptions = [
+  { value: 'image/jpeg', label: 'JPEG' },
+  { value: 'image/jpg', label: 'JPG' },
+  { value: 'image/png', label: 'PNG' },
+  { value: 'image/webp', label: 'WEBP' },
+  { value: 'image/heic', label: 'HEIC' },
+  { value: 'image/tiff', label: 'TIFF' },
+] as const;
+
+function RuleEditor({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="border-border space-y-3 border-t pt-4 first:border-t-0 first:pt-0">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="flex items-center gap-2 text-sm font-semibold">
-          <DynamicIcon name={definition.icon} className="text-muted-foreground size-4" />
-          {definition.label}
-        </h3>
-        <span className="text-caption-foreground text-xs capitalize">
-          {definition.appliesTo.map((item) => item.toLowerCase().replace('_', ' ')).join(', ')}
-        </span>
-      </div>
-      {children}
-    </section>
+    <article className="border-border border-b p-[18px] last:border-b-0">
+      <h3 className="text-heading mb-3 text-xs font-extrabold">{title}</h3>
+      <div className="grid gap-[11px]">{children}</div>
+    </article>
   );
 }
 
-function RuleCheckbox({ name, label }: { name: FieldPath<ContestFinalValues>; label: string }) {
+function SystemTextField({
+  name,
+  label,
+}: {
+  name: 'rules.copyright.text' | 'rules.voting.text' | 'rules.participation.text';
+  label: string;
+}) {
   const form = useFormContext<ContestFinalValues>();
 
   return (
@@ -51,12 +83,21 @@ function RuleCheckbox({ name, label }: { name: FieldPath<ContestFinalValues>; la
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem className="flex items-center gap-2 space-y-0">
+        <FormItem className="gap-1.5">
+          <FormLabel className={labelClass}>{label}</FormLabel>
           <FormControl>
-            <Checkbox checked={Boolean(field.value)} onCheckedChange={field.onChange} />
+            <ContestRichTextEditor
+              value={field.value}
+              onChange={field.onChange}
+              placeholder={`Write ${label.toLowerCase()}...`}
+            />
           </FormControl>
-          <FormLabel className="mt-0! text-sm">{label}</FormLabel>
-          <FormMessage />
+          <div className="flex items-start justify-between gap-3">
+            <FormMessage className="text-[9px]" />
+            <small className="text-caption-foreground ml-auto text-[8px]">
+              {field.value.length}/800
+            </small>
+          </div>
         </FormItem>
       )}
     />
@@ -68,297 +109,281 @@ const RulesStep = () => {
   const levels = form.watch('rules.levelRequirements');
 
   return (
-    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
-      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
-        <SlidersHorizontal className="text-primary size-5" /> Rules
-      </h2>
+    <section
+      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      aria-labelledby="contest-rules-title"
+    >
+      <header className="border-border flex min-h-[62px] items-center border-b px-[18px] py-3">
+        <h2 id="contest-rules-title" className="text-heading text-sm font-extrabold">
+          Rules
+        </h2>
+      </header>
 
-      <div className="space-y-4">
-        <RuleSection ruleKey="SUBMISSION_RULES">
-          <FormField
-            control={form.control}
-            name="rules.submissionRules.intro"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input aria-label="Submission rules introduction" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="rules.submissionRules.disallowed"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea
-                    aria-label="Disallowed submissions"
-                    className="scrollbar-thin min-h-28"
-                    value={field.value.join('\n')}
-                    onBlur={field.onBlur}
-                    onChange={(event) =>
-                      field.onChange(
-                        event.target.value
-                          .split('\n')
-                          .map((item) => item.trim())
-                          .filter(Boolean),
-                      )
-                    }
-                  />
-                </FormControl>
-                <p className="text-caption-foreground text-xs">Enter one item per line.</p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="rules.submissionRules.removalNotice"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input aria-label="Submission removal notice" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid items-start gap-4 md:grid-cols-2">
-            <RuleCheckbox name="rules.submissionRules.allowAiImages" label="Allow AI images" />
-            <FormField
-              control={form.control}
-              name="rules.submissionRules.duplicatePolicy"
-              render={({ field }) => (
-                <FormItem>
-                  <Select value={field.value} onValueChange={field.onChange}>
+      <RuleEditor title="Submission limit">
+        <FormField
+          control={form.control}
+          name="details.maxUploads"
+          render={({ field }) => (
+            <FormItem className="gap-1.5">
+              <FormLabel className={labelClass}>Maximum submissions</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={1}
+                  className={inputClass}
+                  {...field}
+                  onChange={(event) => field.onChange(event.target.value)}
+                />
+              </FormControl>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
+      </RuleEditor>
+
+      <RuleEditor title="Submission rules">
+        <FormField
+          control={form.control}
+          name="rules.submissionRules.disallowed"
+          render={({ field }) => (
+            <FormItem className="gap-0">
+              <FormLabel className={`${labelClass} mb-[7px]`}>Select rules</FormLabel>
+              <div className="grid gap-0.5">
+                {submissionOptions.map((option) => {
+                  const checked = field.value.some(option.matches);
+                  return (
+                    <label
+                      key={option.id}
+                      className="text-body hover:bg-surface-tertiary flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[7px] px-1 py-1.5 text-[10px] transition-colors"
+                    >
+                      <Checkbox
+                        checked={checked}
+                        className="size-[19px] rounded-md"
+                        onCheckedChange={(nextChecked) => {
+                          const withoutCurrent = field.value.filter(
+                            (item) => !option.matches(item),
+                          );
+                          field.onChange(
+                            nextChecked ? [...withoutCurrent, option.value] : withoutCurrent,
+                          );
+                          if (option.id === 'ai-generated') {
+                            form.setValue('rules.submissionRules.allowAiImages', !nextChecked, {
+                              shouldDirty: true,
+                            });
+                          }
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              <FormMessage className="mt-1 text-[9px]" />
+            </FormItem>
+          )}
+        />
+      </RuleEditor>
+
+      <RuleEditor title="Level requirements">
+        <div className="text-caption-foreground grid grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] gap-2.5 pb-1 text-xs font-bold">
+          <span>Level</span>
+          <span>Votes</span>
+        </div>
+        <div className="grid gap-[3px]">
+          {levels.map((item, index) => (
+            <div
+              key={item.level}
+              className="grid min-h-[43px] grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] items-center gap-2.5 py-[3px]"
+            >
+              <span className="text-body text-sm font-semibold">
+                {tierName[item.level] ?? item.level}
+              </span>
+              <FormField
+                control={form.control}
+                name={`rules.levelRequirements.${index}.votes`}
+                render={({ field }) => (
+                  <FormItem className="gap-1">
                     <FormControl>
-                      <SelectTrigger className="h-10! w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="DISALLOW_SAME_PHOTO">Disallow same photo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </RuleSection>
-
-        <RuleSection ruleKey="LEVEL_REQUIREMENTS">
-          <div className="space-y-2">
-            {levels.map((item, index) => (
-              <div key={item.level} className="grid items-center gap-3 sm:grid-cols-[90px_1fr]">
-                <span className="bg-primary-soft text-primary-soft-foreground rounded-full px-3 py-1 text-center text-xs font-medium capitalize">
-                  {item.level.toLowerCase().replace('_', ' ')}
-                </span>
-                <FormField
-                  control={form.control}
-                  name={`rules.levelRequirements.${index}.votes`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
+                      <div className="relative">
                         <Input
                           type="number"
                           min={0}
-                          aria-label={`${item.level} required votes`}
+                          aria-label={`Required votes for ${tierName[item.level] ?? item.level}`}
+                          className={`${inputClass} pr-[43px]`}
                           {...field}
                           onChange={(event) => field.onChange(event.target.value)}
                         />
+                        <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
+                          votes
+                        </span>
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[9px]" />
+                  </FormItem>
+                )}
+              />
+            </div>
+          ))}
+        </div>
+      </RuleEditor>
+
+      <RuleEditor title="Submission format">
+        <FormField
+          control={form.control}
+          name="rules.submissionFormat.mimeTypes"
+          render={({ field }) => (
+            <FormItem className="gap-[7px]">
+              <FormLabel className={labelClass}>Accepted file formats</FormLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {fileFormatOptions.map((format) => {
+                  const checked = field.value.includes(format.value);
+                  return (
+                    <label key={format.value} className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        className="sr-only"
+                        onChange={() =>
+                          field.onChange(
+                            checked
+                              ? field.value.filter((item) => item !== format.value)
+                              : [...field.value, format.value],
+                          )
+                        }
+                      />
+                      <span
+                        className={`inline-flex h-8 min-w-[61px] items-center justify-center gap-1 rounded-lg border px-2 text-[9px] font-extrabold transition-colors ${
+                          checked
+                            ? 'border-primary/60 bg-primary-soft text-primary-soft-foreground'
+                            : 'border-input bg-surface-secondary text-muted-foreground'
+                        }`}
+                      >
+                        {checked && <Check size={12} />}
+                        {format.label}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid gap-[7px]">
+          <div className="flex items-center justify-between pb-[7px]">
+            <span className={labelClass}>Minimum resolution</span>
+            <small className="text-caption-foreground text-[8px]">Pixels</small>
+          </div>
+          <div className="grid grid-cols-[minmax(0,1fr)_15px_minmax(0,1fr)] items-end gap-[7px]">
+            {(
+              [
+                ['minWidth', 'Width'],
+                ['minHeight', 'Height'],
+              ] as const
+            ).map(([key, label], index) => (
+              <div className="contents" key={key}>
+                {index === 1 && (
+                  <b className="text-caption-foreground pb-[11px] text-center text-xs font-medium">
+                    ×
+                  </b>
+                )}
+                <FormField
+                  control={form.control}
+                  name={`rules.submissionFormat.${key}`}
+                  render={({ field }) => (
+                    <FormItem className="gap-1.5">
+                      <FormLabel className={labelClass}>{label}</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type="number"
+                            min={1}
+                            className={`${inputClass} pr-12`}
+                            {...field}
+                            onChange={(event) => field.onChange(event.target.value)}
+                          />
+                          <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
+                            px
+                          </i>
+                        </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-[9px]" />
                     </FormItem>
                   )}
                 />
               </div>
             ))}
           </div>
-        </RuleSection>
+        </div>
 
-        <RuleSection ruleKey="SUBMISSION_FORMAT">
-          <FormField
-            control={form.control}
-            name="rules.submissionFormat.mimeTypes"
-            render={({ field }) => (
-              <FormItem>
-                <div className="flex flex-wrap gap-5">
-                  {[
-                    ['image/jpeg', 'JPEG'],
-                    ['image/png', 'PNG'],
-                  ].map(([mimeType, label]) => (
-                    <label key={mimeType} className="flex items-center gap-2 text-sm font-medium">
-                      <Checkbox
-                        checked={field.value.includes(mimeType as 'image/jpeg' | 'image/png')}
-                        onCheckedChange={(checked) => {
-                          const next = checked
-                            ? [...field.value, mimeType]
-                            : field.value.filter((item) => item !== mimeType);
-                          field.onChange(next);
-                        }}
-                      />
-                      {label}
-                    </label>
-                  ))}
+        <FormField
+          control={form.control}
+          name="rules.submissionFormat.maxSizeMB"
+          render={({ field }) => (
+            <FormItem className="gap-1.5">
+              <FormLabel className={labelClass}>Maximum image size</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input
+                    type="number"
+                    min={1}
+                    className={`${inputClass} pr-12`}
+                    {...field}
+                    onChange={(event) => field.onChange(event.target.value)}
+                  />
+                  <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
+                    MB
+                  </i>
                 </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid gap-4 md:grid-cols-3">
-            {(
-              [
-                ['minWidth', 'Min width (px)'],
-                ['minHeight', 'Min height (px)'],
-                ['maxSizeMB', 'Max size (MB)'],
-              ] as const
-            ).map(([key, label]) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={`rules.submissionFormat.${key}`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={1}
-                        {...field}
-                        onChange={(event) => field.onChange(event.target.value)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
-        </RuleSection>
+              </FormControl>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
+      </RuleEditor>
 
-        <RuleSection ruleKey="ELIGIBILITY">
-          <div className="grid items-start gap-4 md:grid-cols-[100px_1fr]">
-            <FormField
-              control={form.control}
-              name="rules.eligibility.minAge"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Min age</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={120}
-                      {...field}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="rules.eligibility.text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Text</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <RuleCheckbox name="rules.eligibility.requiresAcceptance" label="Requires acceptance" />
-        </RuleSection>
+      <RuleEditor title="Eligibility">
+        <FormField
+          control={form.control}
+          name="rules.eligibility.minAge"
+          render={({ field }) => (
+            <FormItem className="gap-1.5">
+              <FormLabel className={labelClass}>Minimum participant age</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <select
+                    className={selectClass}
+                    value={field.value}
+                    onChange={(event) => field.onChange(event.target.value)}
+                  >
+                    {Array.from({ length: 201 }, (_, age) => (
+                      <option value={age} key={age}>
+                        {age} {age === 1 ? 'year' : 'years'}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+                </div>
+              </FormControl>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
+      </RuleEditor>
 
-        <RuleSection ruleKey="COPYRIGHT">
-          <FormField
-            control={form.control}
-            name="rules.copyright.text"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input aria-label="Copyright text" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex flex-wrap gap-6">
-            <RuleCheckbox name="rules.copyright.requiresOwnership" label="Requires ownership" />
-            <RuleCheckbox name="rules.copyright.requiresAcceptance" label="Requires acceptance" />
-          </div>
-        </RuleSection>
+      <RuleEditor title="Copyright">
+        <SystemTextField name="rules.copyright.text" label="Copyright text" />
+      </RuleEditor>
 
-        <RuleSection ruleKey="VOTING">
-          <FormField
-            control={form.control}
-            name="rules.voting.text"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input aria-label="Voting text" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid gap-3 md:grid-cols-2">
-            <RuleCheckbox name="rules.voting.membersOnly" label="Members only" />
-            <RuleCheckbox name="rules.voting.blindVoting" label="Blind voting" />
-            <RuleCheckbox
-              name="rules.voting.requireContestParticipant"
-              label="Must be a participant"
-            />
-            <RuleCheckbox name="rules.voting.disallowSelfVote" label="Disallow self vote" />
-          </div>
-        </RuleSection>
+      <RuleEditor title="Voting">
+        <SystemTextField name="rules.voting.text" label="Voting text" />
+      </RuleEditor>
 
-        <RuleSection ruleKey="PARTICIPATION">
-          <FormField
-            control={form.control}
-            name="rules.participation.text"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input aria-label="Participation text" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid items-start gap-4 md:grid-cols-2">
-            <RuleCheckbox
-              name="rules.participation.requiresTermsAcceptance"
-              label="Requires terms acceptance"
-            />
-            <FormField
-              control={form.control}
-              name="rules.participation.termsUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      aria-label="Terms URL"
-                      placeholder="/terms"
-                      value={field.value ?? ''}
-                      onChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </RuleSection>
-      </div>
-    </div>
+      <RuleEditor title="Participation">
+        <SystemTextField name="rules.participation.text" label="Participation text" />
+      </RuleEditor>
+    </section>
   );
 };
 

@@ -111,6 +111,7 @@ export interface ContestAward extends Partial<ContestAwardValue> {
   contestId?: string;
   prizeId?: string;
   type?: ContestAwardType;
+  recipient?: 'Photo' | 'Photographer';
   category: ContestAwardType;
   title?: string;
   description?: string;
@@ -128,6 +129,7 @@ export interface ContestAward extends Partial<ContestAwardValue> {
 export interface Contest {
   id: string;
   title: string;
+  category?: string;
   description: string;
   banner?: string | null;
   status: 'ACTIVE' | 'UPCOMING' | 'CLOSED' | string;
