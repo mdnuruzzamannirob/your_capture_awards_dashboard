@@ -111,7 +111,7 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'copyright',
     inputType: 'object',
     defaultValue: {
-      text: 'You maintain the copyrights to all photos you submit. You must own all submitted images.',
+      text: 'You maintain the copyright to all photos you submit. You must own every submitted image. If you submit images that do not belong to you, your account may be permanently removed.',
       requiresOwnership: true,
       requiresAcceptance: true,
     },
@@ -125,7 +125,7 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'vote',
     inputType: 'object',
     defaultValue: {
-      text: 'Voting is done by members of the site only. The voting system uses a blind voting method which is designed to keep the voting as fair as possible.',
+      text: 'Voting is done by members of the site only. The voting system uses a "blind voting" method designed to keep voting as fair as possible.',
       membersOnly: true,
       requireContestParticipant: true,
       disallowSelfVote: true,
@@ -141,7 +141,7 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'user',
     inputType: 'object',
     defaultValue: {
-      text: 'By entering this challenge you accept the standard Terms of Use.',
+      text: 'By entering this challenge, you accept the standard Terms of Use.',
       requiresTermsAcceptance: true,
       termsUrl: null,
     },

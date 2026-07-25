@@ -1,151 +1,133 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
-import { Coins } from 'lucide-react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { useFormContext } from 'react-hook-form';
+
+const inputClass =
+  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-xs leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
+const labelClass =
+  'text-[9px] font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
+
+function FormSwitch({
+  name,
+  label,
+}: {
+  name: 'prizes.isMoneyContest' | 'prizes.coin_requirement';
+  label: string;
+}) {
+  const form = useFormContext<ContestFinalValues>();
+
+  return (
+    <FormField
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className="flex flex-row items-center gap-[9px] space-y-0">
+          <FormLabel className="text-body order-1 mt-0! text-[11px] font-medium">{label}</FormLabel>
+          <FormControl>
+            <Switch
+              checked={field.value}
+              onCheckedChange={field.onChange}
+              className="data-[state=checked]:bg-primary order-2 h-5! w-[34px]!"
+            />
+          </FormControl>
+          <FormMessage className="text-[9px]" />
+        </FormItem>
+      )}
+    />
+  );
+}
 
 const PrizesStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const watchIsMoney = form.watch('prizes.isMoneyContest');
-  const watchCoinRequirement = form.watch('prizes.coin_requirement');
+  const isMoneyContest = form.watch('prizes.isMoneyContest');
+  const coinRequirement = form.watch('prizes.coin_requirement');
 
   return (
-    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
-      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
-        <Coins className="text-primary size-5" /> Money &amp; Coins
-      </h2>
+    <section
+      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      aria-labelledby="contest-prizes-title"
+    >
+      <header className="border-border flex min-h-[62px] items-center border-b px-[18px] py-3">
+        <h2 id="contest-prizes-title" className="text-heading text-sm font-extrabold">
+          Money &amp; Coins
+        </h2>
+      </header>
 
-      <div className="space-y-4">
-        <FormField
-          control={form.control}
-          name="prizes.isMoneyContest"
-          render={({ field }) => (
-            <FormItem className="border-border flex items-center gap-2 space-y-0 rounded-lg border p-4">
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-              <div className="space-y-1">
-                <FormLabel className="mt-0!">Is money contest</FormLabel>
-                <p className="text-muted-foreground text-xs">
-                  Enable this when the contest uses money.
-                </p>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="grid gap-[14px] p-[18px]">
+        <FormSwitch name="prizes.isMoneyContest" label="Is money contest" />
 
-        {watchIsMoney && (
-          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+        {isMoneyContest && (
+          <div className="grid gap-[14px] sm:grid-cols-2">
             <FormField
               control={form.control}
               name="prizes.minPrize"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Min prize</FormLabel>
+                <FormItem className="gap-1.5">
+                  <FormLabel className={labelClass}>Min prize</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min={0}
-                      placeholder="Enter minimum prize"
-                      name={field.name}
-                      ref={field.ref}
-                      value={field.value ?? ''}
-                      onChange={(e) =>
-                        field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                      }
-                      onBlur={() => form.trigger('prizes.minPrize')}
+                      className={inputClass}
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
                     />
                   </FormControl>
-                  {/* Reserve space so layout doesn't jump */}
-                  <div className="min-h-5">
-                    <FormMessage />
-                  </div>
+                  <FormMessage className="text-[9px]" />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="prizes.maxPrize"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max prize</FormLabel>
+                <FormItem className="gap-1.5">
+                  <FormLabel className={labelClass}>Max prize</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
                       min={0}
-                      placeholder="Enter maximum prize"
-                      name={field.name}
-                      ref={field.ref}
-                      value={field.value ?? ''}
-                      onChange={(e) =>
-                        field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                      }
-                      onBlur={() => form.trigger('prizes.maxPrize')}
+                      className={inputClass}
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
                     />
                   </FormControl>
-                  <div className="min-h-5">
-                    <FormMessage />
-                  </div>
+                  <FormMessage className="text-[9px]" />
                 </FormItem>
               )}
             />
           </div>
         )}
 
-        <FormField
-          control={form.control}
-          name="prizes.coin_requirement"
-          render={({ field }) => (
-            <FormItem className="border-border flex items-center gap-2 space-y-0 rounded-lg border p-4">
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-              <div className="space-y-1">
-                <FormLabel className="mt-0!">Coin requirement</FormLabel>
-                <p className="text-muted-foreground text-xs">
-                  Show coin input only if this is enabled.
-                </p>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormSwitch name="prizes.coin_requirement" label="Coin requirement" />
 
-        {watchCoinRequirement && (
+        {coinRequirement && (
           <FormField
             control={form.control}
             name="prizes.coin_required"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Required coins</FormLabel>
+              <FormItem className="gap-1.5">
+                <FormLabel className={labelClass}>Required coins</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min={0}
-                    placeholder="Enter required coins"
-                    name={field.name}
-                    ref={field.ref}
-                    value={field.value ?? ''}
-                    onChange={(e) =>
-                      field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                    }
-                    onBlur={() => form.trigger('prizes.coin_required')}
+                    className={inputClass}
+                    {...field}
+                    onChange={(event) => field.onChange(event.target.value)}
                   />
                 </FormControl>
-                <div className="min-h-5">
-                  <FormMessage />
-                </div>
+                <FormMessage className="text-[9px]" />
               </FormItem>
             )}
           />
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

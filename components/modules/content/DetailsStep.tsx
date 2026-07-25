@@ -1,134 +1,99 @@
 'use client';
 
-import { useCallback, useMemo, useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
-import { FileText, ImagePlus, Trash2, Upload } from 'lucide-react';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { DateTimePicker } from '@/components/common/date-time-picker';
-import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
-import Image from 'next/image';
-import { cn } from '@/lib/utils';
-import { RECURRING_TYPES } from '@/lib/constants';
+import { Switch } from '@/components/ui/switch';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { ChevronDown } from 'lucide-react';
+import Image from 'next/image';
+import { useMemo, useRef } from 'react';
+import { useFormContext } from 'react-hook-form';
+import ContestRichTextEditor from './ContestRichTextEditor';
 
-/** Truncate a long filename to max `maxLen` chars with ellipsis in the middle */
-function truncateFilename(name: string, maxLen = 36): string {
-  if (name.length <= maxLen) return name;
-  const ext = name.includes('.') ? name.slice(name.lastIndexOf('.')) : '';
-  const base = name.slice(0, name.lastIndexOf('.') === -1 ? name.length : name.lastIndexOf('.'));
-  const keep = maxLen - ext.length - 3;
-  return base.slice(0, Math.ceil(keep / 2)) + '…' + base.slice(-Math.floor(keep / 2)) + ext;
-}
+const inputClass =
+  'h-[39px] rounded-[9px] border-input bg-surface-secondary px-[11px] text-sm leading-[1.55] shadow-none focus-visible:border-primary focus-visible:ring-primary/20';
+const selectClass = `${inputClass} scheme-dark w-full appearance-none pr-9 text-foreground outline-none`;
+const fieldClass = 'gap-1.5';
+const labelClass =
+  'text-xs font-extrabold tracking-[0.02em] text-label-foreground data-[error=true]:text-destructive';
+const messageClass = 'text-[9px] leading-tight';
 
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return bytes + ' B';
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+function toDateTimeInputValue(value?: Date) {
+  if (!value || Number.isNaN(value.getTime())) return '';
+  const localDate = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 16);
 }
 
 const DetailsStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const watchRecurring = form.watch('details.recurring');
-  const bannerFile = form.watch('details.banner') as File | string | undefined;
-  const inputRef = useRef<HTMLInputElement>(null);
+  const recurring = form.watch('details.recurring');
+  const banner = form.watch('details.banner') as File | string | undefined;
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const preview = useMemo(() => {
-    if (!bannerFile) return null;
-    if (bannerFile instanceof File) return URL.createObjectURL(bannerFile);
-    if (typeof bannerFile === 'string' && bannerFile.length > 0) return bannerFile;
-    return null;
-  }, [bannerFile]);
-
-  const fileInfo = useMemo(() => {
-    if (bannerFile instanceof File) {
-      return { name: truncateFilename(bannerFile.name), size: formatBytes(bannerFile.size) };
-    }
-    if (typeof bannerFile === 'string' && bannerFile.length > 0) {
-      const parts = bannerFile.split('/');
-      return { name: truncateFilename(decodeURIComponent(parts[parts.length - 1])), size: null };
-    }
-    return null;
-  }, [bannerFile]);
-
-  const handleClearBanner = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      form.setValue('details.banner', undefined as unknown as File, { shouldDirty: true });
-      if (inputRef.current) inputRef.current.value = '';
-    },
-    [form],
-  );
+    if (banner instanceof File) return URL.createObjectURL(banner);
+    return typeof banner === 'string' && banner ? banner : null;
+  }, [banner]);
 
   return (
-    <div className="border-border bg-surface space-y-5 rounded-xl border p-5">
-      <h2 className="border-border flex items-center gap-2 border-b pb-4 text-lg font-semibold">
-        <FileText className="text-primary size-5" /> Details
-      </h2>
+    <section
+      className="border-border bg-surface overflow-hidden rounded-[14px] border"
+      aria-labelledby="contest-details-title"
+    >
+      <header className="border-border flex min-h-[62px] items-center border-b px-[18px] py-3">
+        <h2 id="contest-details-title" className="text-heading text-sm font-extrabold">
+          Details
+        </h2>
+      </header>
 
-      <div className="grid grid-cols-1 items-start gap-4 space-y-4 md:grid-cols-2">
-        <FormField
-          control={form.control}
-          name="details.title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contest Title</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g. Neon Nights 2025" {...field} />
-              </FormControl>
-              <div className="min-h-5">
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
+      <div className="grid gap-[14px] p-[18px]">
+        <div className="grid gap-[14px] sm:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="details.title"
+            render={({ field }) => (
+              <FormItem className={fieldClass}>
+                <FormLabel className={labelClass}>Contest title</FormLabel>
+                <FormControl>
+                  <Input className={inputClass} placeholder="Contest title" {...field} />
+                </FormControl>
+                <FormMessage className={messageClass} />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="details.maxUploads"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Max uploads per participant</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  max={4}
-                  {...field}
-                  onChange={(e) =>
-                    field.onChange(e.target.value === '' ? '' : Number(e.target.value))
-                  }
-                />
-              </FormControl>
-              <div className="min-h-5">
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="details.category"
+            render={({ field }) => (
+              <FormItem className={fieldClass}>
+                <FormLabel className={labelClass}>Category</FormLabel>
+                <FormControl>
+                  <Input className={inputClass} placeholder="e.g. Street photography" {...field} />
+                </FormControl>
+                <FormMessage className={messageClass} />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <div className="col-span-full grid gap-4 md:grid-cols-2">
+        <div className="grid gap-[14px] sm:grid-cols-2">
           <FormField
             control={form.control}
             name="details.startDate"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Start date</FormLabel>
+              <FormItem className={fieldClass}>
+                <FormLabel className={labelClass}>Start date &amp; time</FormLabel>
                 <FormControl>
-                  <DateTimePicker date={field.value} setDate={field.onChange} label="Start date" />
+                  <Input
+                    type="datetime-local"
+                    className={`${inputClass} scheme-dark`}
+                    value={toDateTimeInputValue(field.value)}
+                    onBlur={field.onBlur}
+                    onChange={(event) => field.onChange(new Date(event.target.value))}
+                  />
                 </FormControl>
-                <div className="min-h-5">
-                  <FormMessage />
-                </div>
+                <FormMessage className={messageClass} />
               </FormItem>
             )}
           />
@@ -137,14 +102,18 @@ const DetailsStep = () => {
             control={form.control}
             name="details.endDate"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>End date</FormLabel>
+              <FormItem className={fieldClass}>
+                <FormLabel className={labelClass}>End date &amp; time</FormLabel>
                 <FormControl>
-                  <DateTimePicker date={field.value} setDate={field.onChange} label="End date" />
+                  <Input
+                    type="datetime-local"
+                    className={`${inputClass} scheme-dark`}
+                    value={toDateTimeInputValue(field.value)}
+                    onBlur={field.onBlur}
+                    onChange={(event) => field.onChange(new Date(event.target.value))}
+                  />
                 </FormControl>
-                <div className="min-h-5">
-                  <FormMessage />
-                </div>
+                <FormMessage className={messageClass} />
               </FormItem>
             )}
           />
@@ -152,141 +121,54 @@ const DetailsStep = () => {
 
         <FormField
           control={form.control}
-          name="details.recurring"
-          render={({ field }) => (
-            <FormItem className="col-span-1 flex items-center gap-2 space-y-0">
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-              <FormLabel className="mt-0!">Make this a recurring contest</FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {watchRecurring && (
-          <FormField
-            control={form.control}
-            name="details.recurringType"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>Recurring frequency</FormLabel>
-                <Select value={field.value || ''} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger className="h-11! w-full">
-                      <SelectValue placeholder="Select frequency" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {RECURRING_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="min-h-5">
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-        )}
-
-        {/* ── Modern Banner Upload ── */}
-        <FormField
-          control={form.control}
           name="details.banner"
           render={({ field }) => (
-            <FormItem className="col-span-full">
-              <FormLabel>Banner Image</FormLabel>
+            <FormItem className={fieldClass}>
+              <FormLabel className={labelClass}>Banner image</FormLabel>
               <input
-                ref={inputRef}
-                id="banner-upload"
+                ref={bannerInputRef}
+                id="contest-banner-upload"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
                   if (file) field.onChange(file);
                 }}
               />
-
               <FormControl>
-                <div className="border-border bg-background relative overflow-hidden rounded-xl border">
-                  {/* Full preview */}
+                <div className="border-border-strong bg-surface-secondary relative grid min-h-[170px] place-items-center overflow-hidden rounded-[10px] border border-dashed">
                   {preview ? (
-                    <div className="relative h-56 w-full">
-                      <Image
-                        src={preview}
-                        alt="Banner preview"
-                        fill
-                        className="object-cover"
-                        sizes="100vw"
-                      />
-                      {/* Dark gradient overlay at bottom */}
-                      <div className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
-
-                      {/* File info bar */}
-                      <div className="absolute right-0 bottom-0 left-0 flex items-center justify-between gap-3 px-4 py-3">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <Upload className="text-primary size-4 shrink-0" />
-                          <span className="text-foreground truncate text-sm font-medium">
-                            {fileInfo?.name}
-                          </span>
-                          {fileInfo?.size && (
-                            <span className="bg-background/10 text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
-                              {fileInfo.size}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex shrink-0 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => inputRef.current?.click()}
-                            className="bg-background/10 text-foreground hover:bg-background/20 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium backdrop-blur transition"
-                          >
-                            <ImagePlus className="size-3.5" />
-                            Change
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleClearBanner}
-                            className="bg-destructive/10 text-destructive hover:bg-destructive/20 flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium backdrop-blur transition"
-                          >
-                            <Trash2 className="size-3.5" />
-                            Remove
-                          </button>
-                        </div>
+                    <>
+                      <div className="relative h-[210px] w-full">
+                        <Image
+                          src={preview}
+                          alt="Contest banner preview"
+                          fill
+                          unoptimized
+                          sizes="(max-width: 880px) 100vw, 880px"
+                          className="object-cover"
+                        />
                       </div>
-                    </div>
+                      <button
+                        type="button"
+                        onClick={() => bannerInputRef.current?.click()}
+                        className="bg-background/75 text-foreground absolute right-[10px] bottom-[10px] inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-[9px] text-[10px] font-bold backdrop-blur-lg"
+                      >
+                        Change image
+                      </button>
+                    </>
                   ) : (
-                    /* Empty upload area */
                     <label
-                      htmlFor="banner-upload"
-                      className={cn(
-                        'flex h-48 cursor-pointer flex-col items-center justify-center gap-3 transition',
-                        'hover:bg-surface-tertiary/50',
-                      )}
+                      htmlFor="contest-banner-upload"
+                      className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-[9px] text-[10px] font-bold transition-colors"
                     >
-                      <div className="border-border bg-surface-tertiary flex size-14 items-center justify-center rounded-full border border-dashed">
-                        <ImagePlus className="text-muted-foreground size-6" />
-                      </div>
-                      <div className="text-center">
-                        <p className="text-muted-foreground text-sm font-medium">
-                          Click to upload banner image
-                        </p>
-                        <p className="text-muted-foreground mt-1 text-xs">
-                          PNG, JPG, WEBP &mdash; max 24&nbsp;MB
-                        </p>
-                      </div>
+                      Upload a banner image
                     </label>
                   )}
                 </div>
               </FormControl>
-              <div className="min-h-5">
-                <FormMessage />
-              </div>
+              <FormMessage className={messageClass} />
             </FormItem>
           )}
         />
@@ -295,19 +177,68 @@ const DetailsStep = () => {
           control={form.control}
           name="details.description"
           render={({ field }) => (
-            <FormItem className="col-span-full">
-              <FormLabel>Description</FormLabel>
+            <FormItem className={fieldClass}>
+              <FormLabel className={labelClass}>Description</FormLabel>
               <FormControl>
-                <TipTapEditor value={field.value} onChange={field.onChange} />
+                <ContestRichTextEditor
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Write something..."
+                />
               </FormControl>
-              <div className="min-h-5">
-                <FormMessage />
-              </div>
+              <FormMessage className={messageClass} />
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="details.recurring"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center gap-[9px] space-y-0">
+              <FormLabel className="text-body order-1 mt-0! text-[11px] font-medium">
+                Make this a recurring contest
+              </FormLabel>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  className="data-[state=checked]:bg-primary order-2 h-5! w-[34px]!"
+                />
+              </FormControl>
+              <FormMessage className={messageClass} />
+            </FormItem>
+          )}
+        />
+
+        {recurring && (
+          <FormField
+            control={form.control}
+            name="details.recurringType"
+            render={({ field }) => (
+              <FormItem className={fieldClass}>
+                <FormLabel className={labelClass}>Recurring frequency</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <select
+                      className={selectClass}
+                      value={field.value ?? 'DAILY'}
+                      onChange={field.onChange}
+                    >
+                      <option value="DAILY">Daily</option>
+                      <option value="WEEKLY">Weekly</option>
+                      <option value="MONTHLY">Monthly</option>
+                    </select>
+                    <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+                  </div>
+                </FormControl>
+                <FormMessage className={messageClass} />
+              </FormItem>
+            )}
+          />
+        )}
       </div>
-    </div>
+    </section>
   );
 };
 

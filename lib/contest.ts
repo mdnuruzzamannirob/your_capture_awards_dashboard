@@ -13,6 +13,7 @@ export function getDefaultContestValues(): ContestFinalValues {
   return {
     details: {
       title: '',
+      category: '',
       description: '',
       banner: undefined,
       maxUploads: contestRuleDefinitions.SUBMISSION_LIMIT.defaultValue as number,
@@ -84,6 +85,7 @@ function normalizeAward(award: ContestAward): ContestFinalValues['awards'][numbe
 
   return {
     type,
+    recipient: award.recipient,
     boost: Number(award.boost ?? 0),
     key: Number(award.key ?? 0),
     swap: Number(award.swap ?? 0),
@@ -115,6 +117,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   return {
     details: {
       title: contest.title ?? '',
+      category: contest.category ?? '',
       description: contest.description ?? '',
       banner: contest.banner ?? undefined,
       maxUploads: Number(submissionLimit),
@@ -148,6 +151,7 @@ export function buildContestFormData(values: ContestFinalValues): FormData {
   const formData = new FormData();
 
   formData.append('title', details.title);
+  formData.append('category', details.category);
   formData.append('description', details.description);
   formData.append('startDate', details.startDate.toISOString());
   formData.append('endDate', details.endDate.toISOString());
@@ -188,8 +192,9 @@ export function buildContestFormData(values: ContestFinalValues): FormData {
   formData.append(
     'awards',
     JSON.stringify(
-      awards.map(({ type, boost, key, swap, coin }) => ({
+      awards.map(({ type, recipient, boost, key, swap, coin }) => ({
         type,
+        ...(recipient ? { recipient } : {}),
         value: { boost, key, swap, coin },
       })),
     ),
