@@ -49,7 +49,7 @@ const Signin = () => {
 
   return (
     <section className="flex min-h-dvh items-center justify-center p-5">
-      <div className="border-border-default bg-surface-secondary w-full max-w-[420px] space-y-5 rounded-xl border p-5 shadow-[var(--shadow-xl)] sm:p-8">
+      <div className="border-border-default bg-surface-secondary w-full max-w-105 space-y-5 rounded-xl border p-5 shadow-(--shadow-xl) sm:p-8">
         <AuthTitle
           title="Sign In"
           description="Please enter your email and password to continue."
@@ -87,12 +87,12 @@ const Signin = () => {
                   input?.setSelectionRange(start, end);
                 }, 0);
               }}
-              className="text-muted-foreground hover:bg-surface-tertiary hover:text-foreground absolute top-[31px] right-2.5 flex size-7 items-center justify-center rounded-sm transition-colors"
+              className="text-muted-foreground hover:bg-surface-tertiary hover:text-foreground absolute top-7 right-2.5 flex size-5 items-center justify-center rounded-sm transition-colors"
             >
               {showPass ? (
-                <AiOutlineEye className="size-5" />
+                <AiOutlineEye className="size-4" />
               ) : (
-                <AiOutlineEyeInvisible className="size-5" />
+                <AiOutlineEyeInvisible className="size-4" />
               )}
             </button>
           </div>
@@ -124,7 +124,7 @@ const Signin = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover mt-3 flex h-9.5 w-full items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-[var(--shadow-brand)] transition-[background-color,border-color,box-shadow] duration-150 focus-visible:shadow-[var(--focus-shadow)] disabled:cursor-default disabled:opacity-50"
+            className="border-primary bg-primary text-primary-foreground hover:border-primary-hover hover:bg-primary-hover mt-3 flex h-9.5 w-full items-center justify-center rounded-md border px-4 text-sm font-semibold shadow-(--shadow-brand) transition-[background-color,border-color,box-shadow] duration-150 focus-visible:shadow-(--focus-shadow) disabled:cursor-default disabled:opacity-50"
           >
             {isLoading && (
               <span className="animate-[floatUp_1s_ease-in-out_infinite_alternate]">

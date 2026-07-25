@@ -23,10 +23,8 @@ const AuthTitle = ({ title, description, className }: AuthTitleProps) => {
           className="h-9 w-auto"
         />
       </Link>
-      <p className="font-token text-primary mb-2 text-[10px] tracking-[0.1em] uppercase">
-        Secure administration
-      </p>
-      <h1 className="text-2xl leading-tight font-semibold tracking-[-0.035em] md:text-[28px]">
+
+      <h1 className="text-lg leading-tight font-semibold  md:text-xl">
         {title}
       </h1>
       <p className="text-muted-foreground mt-2 max-w-sm text-[13px]">{description}</p>
