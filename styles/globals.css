@@ -309,8 +309,6 @@
 @layer components {
   .dashboard-page {
     width: 100%;
-    max-width: 90rem;
-    margin-inline: auto;
     padding: 2rem clamp(1rem, 3vw, 2.5rem) 5rem;
   }
 

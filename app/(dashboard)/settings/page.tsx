@@ -494,7 +494,7 @@ const SettingsContent = () => {
 
   if (isUserLoading) {
     return (
-      <section className="animate-pulse space-y-5 p-5">
+      <section className="animate-pulse space-y-8">
         <Title
           title="Settings"
           description="Manage your account profile, security, and policies."
@@ -507,7 +507,7 @@ const SettingsContent = () => {
   }
 
   return (
-    <section className="space-y-5 p-5">
+    <section className="space-y-8">
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
@@ -537,7 +537,7 @@ export default function SettingsPage() {
   return (
     <Suspense
       fallback={
-        <section className="space-y-5 p-5">
+        <section className="space-y-8">
           <Title title="Settings" description="Loading..." />
           <div className="flex items-center justify-center py-10">
             <Spinner className="size-6" />

@@ -3,7 +3,7 @@ import SupportManagement from '@/components/modules/support/SupportManagement';
 
 const ContactSupport = () => {
   return (
-    <section className="space-y-5 p-5">
+    <section className="space-y-8">
       <Title
         title="Support Management"
         description="Manage and track all support tickets from your users"

@@ -1,6 +1,6 @@
 import { SideMenu } from '@/types';
 import { HiOutlineWallet } from 'react-icons/hi2';
-import { IoStorefrontOutline } from 'react-icons/io5';
+import { IoSettingsOutline, IoStorefrontOutline } from 'react-icons/io5';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
 import { TbUsers } from 'react-icons/tb';
@@ -35,5 +35,10 @@ export const sideMenus: SideMenu[] = [
     name: 'Support',
     href: '/support',
     icon: <MdOutlineContactSupport className="size-full" />,
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: <IoSettingsOutline className="size-full" />,
   },
 ];

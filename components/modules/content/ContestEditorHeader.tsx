@@ -9,7 +9,7 @@ const ContestEditorHeader = ({ mode }: ContestEditorHeaderProps) => {
   const isCreate = mode === 'create';
 
   return (
-    <header className="border-border-subtle mb-7 w-full border-b pb-5">
+    <header className="mb-7 w-full pb-5">
       <Link
         href="/contest"
         className="font-token text-caption-foreground hover:text-foreground inline-flex items-center gap-1 border-0 bg-transparent p-0 text-[10px] font-medium tracking-[0.04em] uppercase transition-colors"
