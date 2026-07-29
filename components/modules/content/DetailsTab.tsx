@@ -108,7 +108,6 @@ const DetailsTab = ({
           />
           <DetailItem label="Rules" value={contest.rules?.length ?? 0} />
           <DetailItem label="Awards" value={awardCount} />
-          <DetailItem label="Joined" value={contest.joined ? 'Yes' : 'No'} />
           <DetailItem label="Created at" value={formatDate(contest.createdAt)} />
           <DetailItem label="Updated at" value={formatDate(contest.updatedAt)} />
         </div>
@@ -118,3 +117,4 @@ const DetailsTab = ({
 };
 
 export default DetailsTab;
+

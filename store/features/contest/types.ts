@@ -27,7 +27,7 @@ export const contestAwardTypes = [
 ] as const;
 
 export type ContestAwardType = (typeof contestAwardTypes)[number];
-export type ContestLevel = 'POPULAR' | 'SKILLED' | 'PREMIER' | 'ELITE' | 'ALL_STAR';
+export type ContestLevel = 'AMATEUR' | 'TALENTED' | 'SUPREME' | 'SUPERIOR' | 'TOP_NOTCH';
 
 export interface LevelRequirement {
   level: ContestLevel;
@@ -129,7 +129,7 @@ export interface ContestAward extends Partial<ContestAwardValue> {
 export interface Contest {
   id: string;
   title: string;
-  category?: string;
+  category?: string | { id?: string; name?: string };
   description: string;
   banner?: string | null;
   status: 'ACTIVE' | 'UPCOMING' | 'CLOSED' | string;
@@ -170,6 +170,36 @@ export interface GetContestsResponse {
   limit: number;
 }
 
+export interface ContestCreationOptions {
+  categories: Array<{ id: string; name: string; slug?: string }>;
+  ruleDefinitions: ContestOptionRule[];
+  prizeDefinitions: ContestPrizeDefinition[];
+  rules: ContestOptionRule[];
+  prizes: ContestPrizeDefinition[];
+  supportedImageMimeTypes: string[];
+}
+
+export interface ContestOptionRule {
+  key: ContestRuleKey;
+  label: string;
+  description?: string;
+  inputType: 'number' | 'object' | 'list';
+  value: unknown;
+  payload?: Partial<Record<ContestRuleKey, unknown>>;
+}
+
+export interface ContestPrizeDefinition {
+  prizeId: string;
+  title: string;
+  description?: string;
+  type: 'TOP_PHOTO' | 'TOP_PHOTOGRAPHER' | 'WINNER' | 'YC_PICK' | 'TOP_RANK';
+  target: 'PHOTO' | 'PHOTOGRAPHER';
+  rankLimit: number | null;
+  rewards: ContestAwardValue;
+  isDefault: boolean;
+  payload: { prizeId: string } & ContestAwardValue;
+}
+
 export interface ContestStats {
   running: number;
   upcoming: number;
@@ -182,3 +212,5 @@ export interface ApiSuccessResponse<T> {
   message: string;
   data: T;
 }
+
+

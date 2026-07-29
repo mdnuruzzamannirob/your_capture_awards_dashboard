@@ -1,12 +1,16 @@
 import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { ApiSuccessResponse, Contest, ContestStats, GetContestsResponse } from './types';
+import { ApiSuccessResponse, Contest, ContestCreationOptions, ContestStats, GetContestsResponse } from './types';
 
 export const contestApi = createApi({
   reducerPath: 'contestApi',
   baseQuery,
   tagTypes: ['Contests', 'Contest', 'ContestStats', 'DashboardOverview'],
   endpoints: (builder) => ({
+    getContestCreationOptions: builder.query<ApiSuccessResponse<ContestCreationOptions>, void>({
+      query: () => '/contests/create-options',
+      keepUnusedDataFor: 60 * 60,
+    }),
     getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
       query: () => '/dashboard/contest/stats',
       providesTags: [{ type: 'ContestStats', id: 'SINGLE' }],
@@ -69,6 +73,7 @@ export const contestApi = createApi({
 
 export const {
   useGetContestStatsQuery,
+  useGetContestCreationOptionsQuery,
   useCreateContestMutation,
   useUpdateContestMutation,
   useGetContestsQuery,
@@ -76,3 +81,6 @@ export const {
   useGetContestQuery,
   useLazyGetContestQuery,
 } = contestApi;
+
+
+

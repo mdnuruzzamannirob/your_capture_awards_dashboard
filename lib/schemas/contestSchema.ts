@@ -92,7 +92,7 @@ export const contestRulesSchema = z.object({
   levelRequirements: z
     .array(
       z.object({
-        level: z.enum(['POPULAR', 'SKILLED', 'PREMIER', 'ELITE', 'ALL_STAR']),
+        level: z.enum(['AMATEUR', 'TALENTED', 'SUPREME', 'SUPERIOR', 'TOP_NOTCH']),
         votes: z.coerce.number().int().min(0, 'Votes cannot be negative'),
       }),
     )
@@ -190,3 +190,4 @@ export type ContestPrizesValues = z.infer<typeof contestPrizesSchema>;
 export type ContestRulesValues = z.infer<typeof contestRulesSchema>;
 export type ContestAwardsValues = z.infer<typeof contestAwardsSchema>;
 export type ContestFinalValues = z.infer<typeof contestFinalSchema>;
+

@@ -66,11 +66,11 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'level-stars',
     inputType: 'list',
     defaultValue: [
-      { level: 'POPULAR', votes: 50 },
-      { level: 'SKILLED', votes: 250 },
-      { level: 'PREMIER', votes: 900 },
-      { level: 'ELITE', votes: 1900 },
-      { level: 'ALL_STAR', votes: 5000 },
+      { level: 'AMATEUR', votes: 50 },
+      { level: 'TALENTED', votes: 250 },
+      { level: 'SUPREME', votes: 900 },
+      { level: 'SUPERIOR', votes: 1900 },
+      { level: 'TOP_NOTCH', votes: 5000 },
     ],
     appliesTo: ['RANKING', 'DISPLAY'],
     displayOnly: false,
@@ -151,7 +151,7 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
   },
 };
 
-export const CONTEST_LEVELS = ['POPULAR', 'SKILLED', 'PREMIER', 'ELITE', 'ALL_STAR'] as const;
+export const CONTEST_LEVELS = ['AMATEUR', 'TALENTED', 'SUPREME', 'SUPERIOR', 'TOP_NOTCH'] as const;
 
 export const CONTEST_AWARD_OPTIONS: Array<{
   value: ContestAwardType;
@@ -174,3 +174,4 @@ export const CONTEST_AWARD_OPTIONS: Array<{
 
 export const RECURRING_TYPES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
 export type RecurringType = (typeof RECURRING_TYPES)[number];
+

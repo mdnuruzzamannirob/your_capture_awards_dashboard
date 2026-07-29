@@ -1,0 +1,450 @@
+{
+  "info": {
+    "_postman_id": "b1d17a48-7c79-4682-8040-40b895e68161",
+    "name": "contest",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48748156",
+    "_collection_link": "https://go.postman.co/collection/48748156-b1d17a48-7c79-4682-8040-40b895e68161?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Get Contest Creation Options Copy",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (pm.response.code < 300 && json.data && json.data.categories && json.data.categories[0] && json.data.categories[0].id) pm.collectionVariables.set(\"contestCategoryId\", json.data && json.data.categories && json.data.categories[0] && json.data.categories[0].id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/contests/create-options",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "contests",
+            "create-options"
+          ]
+        },
+        "description": "Everything the 'create contest' form needs in one call: categories, rule definitions, prize catalog."
+      },
+      "response": [
+        {
+          "name": "Example 200",
+          "originalRequest": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/contests/create-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contests",
+                "create-options"
+              ]
+            },
+            "description": "Everything the 'create contest' form needs in one call: categories, rule definitions, prize catalog."
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Contest creation options fetched successfully\",\n  \"meta\": null,\n  \"data\": {\n    \"categories\": [\n      {\n        \"id\": \"674b00000000000000000001\",\n        \"slug\": \"street-photography\",\n        \"name\": \"Street photography\",\n        \"description\": null,\n        \"isActive\": true,\n        \"order\": 10\n      }\n    ],\n    \"rules\": [\n      {\n        \"key\": \"SUBMISSION_LIMIT\",\n        \"label\": \"Submission Limit\",\n        \"icon\": \"number-circle\",\n        \"inputType\": \"number\",\n        \"defaultValue\": 4,\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 10\n      },\n      {\n        \"key\": \"SUBMISSION_RULES\",\n        \"label\": \"Submission Rules\",\n        \"icon\": \"image-upload\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"intro\": \"Do not post:\",\n          \"disallowed\": [\n            \"Non-relevant images\",\n            \"AI images\"\n          ],\n          \"removalNotice\": \"Images that don't comply may be removed.\",\n          \"allowAiImages\": false,\n          \"duplicatePolicy\": \"DISALLOW_SAME_PHOTO\"\n        },\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 20\n      },\n      {\n        \"key\": \"LEVEL_REQUIREMENTS\",\n        \"label\": \"Level Requirements\",\n        \"icon\": \"level-stars\",\n        \"inputType\": \"list\",\n        \"defaultValue\": [\n          {\n            \"level\": \"POPULAR\",\n            \"votes\": 50\n          },\n          {\n            \"level\": \"SKILLED\",\n            \"votes\": 250\n          },\n          {\n            \"level\": \"PREMIER\",\n            \"votes\": 900\n          },\n          {\n            \"level\": \"ELITE\",\n            \"votes\": 1900\n          },\n          {\n            \"level\": \"ALL_STAR\",\n            \"votes\": 5000\n          }\n        ],\n        \"appliesTo\": [\n          \"RANKING\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 30\n      },\n      {\n        \"key\": \"SUBMISSION_FORMAT\",\n        \"label\": \"Submission Format\",\n        \"icon\": \"image-plus\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"mimeTypes\": [\n            \"image/jpeg\"\n          ],\n          \"minWidth\": 700,\n          \"minHeight\": 700,\n          \"maxSizeMB\": 25\n        },\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 40\n      },\n      {\n        \"key\": \"ELIGIBILITY\",\n        \"label\": \"Eligibility\",\n        \"icon\": \"file-check\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"minAge\": 18,\n          \"text\": \"Open to all photographers ages 18 and above.\",\n          \"requiresAcceptance\": true\n        },\n        \"appliesTo\": [\n          \"JOIN\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 50\n      },\n      {\n        \"key\": \"COPYRIGHT\",\n        \"label\": \"Copyright\",\n        \"icon\": \"copyright\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"text\": \"You must own all submitted images.\",\n          \"requiresOwnership\": true,\n          \"requiresAcceptance\": true\n        },\n        \"appliesTo\": [\n          \"JOIN\",\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 60\n      },\n      {\n        \"key\": \"VOTING\",\n        \"label\": \"Voting\",\n        \"icon\": \"vote\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"text\": \"Voting is done by members only.\",\n          \"membersOnly\": true,\n          \"requireContestParticipant\": true,\n          \"disallowSelfVote\": true,\n          \"blindVoting\": true\n        },\n        \"appliesTo\": [\n          \"VOTING\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 70\n      },\n      {\n        \"key\": \"PARTICIPATION\",\n        \"label\": \"Participation\",\n        \"icon\": \"user\",\n        \"inputType\": \"object\",\n        \"defaultValue\": {\n          \"text\": \"By entering you accept the Terms of Use.\",\n          \"requiresTermsAcceptance\": true,\n          \"termsUrl\": null\n        },\n        \"appliesTo\": [\n          \"JOIN\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"order\": 80\n      }\n    ],\n    \"prizes\": [\n      {\n        \"id\": \"670700000000000000000010\",\n        \"category\": \"TOP_PHOTO\",\n        \"type\": \"TOP_PHOTO\",\n        \"target\": \"PHOTO\",\n        \"rankLimit\": null,\n        \"title\": \"Top Photo\",\n        \"description\": \"Highest-ranked photo in the contest.\",\n        \"icon\": \"trophy\",\n        \"boost\": 10,\n        \"swap\": 1,\n        \"key\": 1,\n        \"coin\": 500,\n        \"isActive\": true,\n        \"isDefault\": true,\n        \"order\": 10,\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      },\n      {\n        \"id\": \"670700000000000000000011\",\n        \"category\": \"TOP_PHOTOGRAPHER\",\n        \"type\": \"TOP_PHOTOGRAPHER\",\n        \"target\": \"PHOTOGRAPHER\",\n        \"rankLimit\": null,\n        \"title\": \"Top Photographer\",\n        \"description\": \"Highest total contest score.\",\n        \"icon\": \"camera\",\n        \"boost\": 20,\n        \"swap\": 2,\n        \"key\": 2,\n        \"coin\": 1000,\n        \"isActive\": true,\n        \"isDefault\": true,\n        \"order\": 20,\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      },\n      {\n        \"id\": \"670700000000000000000012\",\n        \"category\": \"YC_PICK\",\n        \"type\": \"YC_PICK\",\n        \"target\": \"PHOTO\",\n        \"rankLimit\": null,\n        \"title\": \"YC Pick\",\n        \"description\": \"Editorial photo selected by Your Capture Award.\",\n        \"icon\": \"star\",\n        \"boost\": 5,\n        \"swap\": 0,\n        \"key\": 1,\n        \"coin\": 250,\n        \"isActive\": true,\n        \"isDefault\": false,\n        \"order\": 40,\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      },\n      {\n        \"id\": \"{{prizeId}}\",\n        \"category\": \"TOP_10\",\n        \"type\": \"TOP_RANK\",\n        \"target\": \"PHOTO\",\n        \"rankLimit\": 10,\n        \"title\": \"Top 10 Photos\",\n        \"description\": \"Awarded to the 10 highest-ranked photos.\",\n        \"icon\": \"image\",\n        \"boost\": 5,\n        \"swap\": 0,\n        \"key\": 1,\n        \"coin\": 500,\n        \"isActive\": true,\n        \"isDefault\": false,\n        \"order\": 50,\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      }\n    ],\n    \"supportedImageMimeTypes\": [\n      \"image/jpeg\",\n      \"image/png\",\n      \"image/webp\"\n    ]\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Create Contest Copy",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const start = new Date(Date.now() + 5 * 60 * 1000);",
+              "pm.collectionVariables.set('contestStartDate', start.toISOString());",
+              "pm.collectionVariables.set('contestEndDate', new Date(start.getTime() + 30 * 60000).toISOString());"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (pm.response.code < 300 && undefined) pm.collectionVariables.set(\"contestId\", undefined);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "title",
+              "type": "text",
+              "value": "Street Photography Weekly"
+            },
+            {
+              "key": "description",
+              "type": "text",
+              "value": "Capture everyday life in public spaces."
+            },
+            {
+              "key": "categoryId",
+              "type": "text",
+              "value": "{{contestCategoryId}}"
+            },
+            {
+              "key": "startDate",
+              "type": "text",
+              "value": "{{contestStartDate}}"
+            },
+            {
+              "key": "endDate",
+              "type": "text",
+              "value": "{{contestEndDate}}"
+            },
+            {
+              "key": "isMoneyContest",
+              "type": "text",
+              "value": "false"
+            },
+            {
+              "key": "entryFeeCoins",
+              "type": "text",
+              "value": "0"
+            },
+            {
+              "key": "awards",
+              "type": "text",
+              "value": "[{\"type\":\"TOP_PHOTO\",\"target\":\"PHOTO\",\"value\":{}},{\"type\":\"TOP_PHOTOGRAPHER\",\"target\":\"PHOTOGRAPHER\",\"value\":{}}]"
+            },
+            {
+              "key": "rules",
+              "type": "text",
+              "value": "[{\"key\":\"SUBMISSION_LIMIT\",\"value\":4,\"enabled\":true,\"order\":10},{\"key\":\"LEVEL_REQUIREMENTS\",\"value\":[{\"level\":\"POPULAR\",\"votes\":2},{\"level\":\"SKILLED\",\"votes\":5},{\"level\":\"PREMIER\",\"votes\":10}],\"enabled\":true,\"order\":30},{\"key\":\"SUBMISSION_FORMAT\",\"value\":{\"mimeTypes\":[\"image/jpeg\"],\"minWidth\":700,\"minHeight\":700,\"maxSizeMB\":25},\"enabled\":true,\"order\":40}]"
+            },
+            {
+              "key": "banner",
+              "type": "file",
+              "description": "Optional. Remove this row if you don't want to attach a banner.",
+              "src": "{{contestBannerFile}}"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/contests",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "contests"
+          ]
+        },
+        "description": "startDate must be in the future and endDate must be after startDate. awards/rules are JSON strings inside the form-data body."
+      },
+      "response": [
+        {
+          "name": "Example 201",
+          "originalRequest": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "type": "text",
+                  "value": "Street Photography Weekly"
+                },
+                {
+                  "key": "description",
+                  "type": "text",
+                  "value": "Capture everyday life in public spaces."
+                },
+                {
+                  "key": "categoryId",
+                  "type": "text",
+                  "value": "{{contestCategoryId}}"
+                },
+                {
+                  "key": "startDate",
+                  "type": "text",
+                  "value": "{{contestStartDate}}"
+                },
+                {
+                  "key": "endDate",
+                  "type": "text",
+                  "value": "{{contestEndDate}}"
+                },
+                {
+                  "key": "isMoneyContest",
+                  "type": "text",
+                  "value": "false"
+                },
+                {
+                  "key": "entryFeeCoins",
+                  "type": "text",
+                  "value": "0"
+                },
+                {
+                  "key": "awards",
+                  "type": "text",
+                  "value": "[{\"type\":\"TOP_PHOTO\",\"target\":\"PHOTO\",\"value\":{}},{\"type\":\"TOP_PHOTOGRAPHER\",\"target\":\"PHOTOGRAPHER\",\"value\":{}}]"
+                },
+                {
+                  "key": "rules",
+                  "type": "text",
+                  "value": "[{\"key\":\"SUBMISSION_LIMIT\",\"value\":4,\"enabled\":true,\"order\":10},{\"key\":\"LEVEL_REQUIREMENTS\",\"value\":[{\"level\":\"POPULAR\",\"votes\":2},{\"level\":\"SKILLED\",\"votes\":5},{\"level\":\"PREMIER\",\"votes\":10}],\"enabled\":true,\"order\":30},{\"key\":\"SUBMISSION_FORMAT\",\"value\":{\"mimeTypes\":[\"image/jpeg\"],\"minWidth\":700,\"minHeight\":700,\"maxSizeMB\":25},\"enabled\":true,\"order\":40}]"
+                },
+                {
+                  "key": "banner",
+                  "type": "file",
+                  "description": "Optional. Remove this row if you don't want to attach a banner.",
+                  "src": [
+                    "{{contestBannerFile}}"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contests"
+              ]
+            },
+            "description": "startDate must be in the future and endDate must be after startDate. awards/rules are JSON strings inside the form-data body."
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Contest created successfully\",\n  \"meta\": null,\n  \"data\": {\n    \"id\": \"{{contestId}}\",\n    \"title\": \"Street Photography Weekly\",\n    \"description\": \"Capture everyday life in public spaces.\",\n    \"banner\": \"https://images.unsplash.com/photo-1689539137236-b68e436248de\",\n    \"status\": \"UPCOMING\",\n    \"isMoneyContest\": false,\n    \"maxPrize\": 0,\n    \"minPrize\": 0,\n    \"currency\": null,\n    \"entryFeeCoins\": 0,\n    \"startDate\": \"2026-07-28T10:00:00.000Z\",\n    \"endDate\": \"2026-07-28T11:00:00.000Z\",\n    \"creatorId\": \"{{adminUserId}}\",\n    \"categoryId\": \"674b00000000000000000001\",\n    \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n    \"updatedAt\": \"2026-07-28T10:00:00.000Z\",\n    \"rules\": [\n      {\n        \"key\": \"SUBMISSION_LIMIT\",\n        \"value\": 4,\n        \"enabled\": true,\n        \"order\": 10\n      },\n      {\n        \"key\": \"LEVEL_REQUIREMENTS\",\n        \"value\": [\n          {\n            \"level\": \"POPULAR\",\n            \"votes\": 2\n          },\n          {\n            \"level\": \"SKILLED\",\n            \"votes\": 5\n          },\n          {\n            \"level\": \"PREMIER\",\n            \"votes\": 10\n          }\n        ],\n        \"enabled\": true,\n        \"order\": 30\n      },\n      {\n        \"key\": \"SUBMISSION_FORMAT\",\n        \"value\": {\n          \"mimeTypes\": [\n            \"image/jpeg\"\n          ],\n          \"minWidth\": 700,\n          \"minHeight\": 700,\n          \"maxSizeMB\": 25\n        },\n        \"enabled\": true,\n        \"order\": 40\n      }\n    ],\n    \"awards\": [\n      {\n        \"id\": \"670700000000000000000001\",\n        \"category\": \"YC_PICK\",\n        \"type\": \"YC_PICK\",\n        \"target\": \"PHOTO\",\n        \"rankLimit\": null,\n        \"slotKey\": \"YC_PICK:PHOTO\",\n        \"title\": \"YC Pick\",\n        \"description\": \"Editorial photo selected by Your Capture Award.\",\n        \"icon\": \"star\",\n        \"boost\": 5,\n        \"swap\": 0,\n        \"key\": 1,\n        \"coin\": 250,\n        \"enabled\": true,\n        \"order\": 40,\n        \"contestId\": \"{{contestId}}\",\n        \"prizeId\": \"670700000000000000000012\",\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      }\n    ]\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "List All Contests (Admin) Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{adminToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/contests/all?page=1&limit=20",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "contests",
+            "all"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Example 200",
+          "originalRequest": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/contests/all?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contests",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"All contests fetched successfully\",\n  \"meta\": null,\n  \"data\": {\n    \"contests\": [\n      {\n        \"id\": \"{{contestId}}\",\n        \"title\": \"Street Photography Weekly\",\n        \"description\": \"Capture everyday life in public spaces.\",\n        \"banner\": \"https://images.unsplash.com/photo-1689539137236-b68e436248de\",\n        \"status\": \"ACTIVE\",\n        \"isMoneyContest\": false,\n        \"maxPrize\": 0,\n        \"minPrize\": 0,\n        \"currency\": null,\n        \"entryFeeCoins\": 0,\n        \"startDate\": \"2026-07-28T10:00:00.000Z\",\n        \"endDate\": \"2026-07-28T11:00:00.000Z\",\n        \"creatorId\": \"{{adminUserId}}\",\n        \"categoryId\": \"674b00000000000000000001\",\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      }\n    ],\n    \"total\": 1,\n    \"page\": 1,\n    \"limit\": 20\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Get Contest Details Copy",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{userToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/contests/{{contestId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "contests",
+            "{{contestId}}"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Example 200",
+          "originalRequest": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/contests/{{contestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contests",
+                "{{contestId}}"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json; charset=utf-8"
+            }
+          ],
+          "cookie": [],
+          "body": "{\n  \"success\": true,\n  \"message\": \"Contest fetched successfully\",\n  \"meta\": null,\n  \"data\": {\n    \"id\": \"{{contestId}}\",\n    \"title\": \"Street Photography Weekly\",\n    \"description\": \"Capture everyday life in public spaces.\",\n    \"banner\": \"https://images.unsplash.com/photo-1689539137236-b68e436248de\",\n    \"status\": \"ACTIVE\",\n    \"isMoneyContest\": false,\n    \"maxPrize\": 0,\n    \"minPrize\": 0,\n    \"currency\": null,\n    \"entryFeeCoins\": 0,\n    \"startDate\": \"2026-07-28T10:00:00.000Z\",\n    \"endDate\": \"2026-07-28T11:00:00.000Z\",\n    \"creatorId\": \"{{adminUserId}}\",\n    \"categoryId\": \"674b00000000000000000001\",\n    \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n    \"updatedAt\": \"2026-07-28T10:00:00.000Z\",\n    \"category\": {\n      \"id\": \"674b00000000000000000001\",\n      \"slug\": \"street-photography\",\n      \"name\": \"Street photography\",\n      \"description\": null,\n      \"isActive\": true,\n      \"order\": 10\n    },\n    \"rules\": [\n      {\n        \"key\": \"SUBMISSION_LIMIT\",\n        \"label\": \"Submission Limit\",\n        \"icon\": \"number-circle\",\n        \"inputType\": \"number\",\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 10,\n        \"value\": 4\n      },\n      {\n        \"key\": \"SUBMISSION_RULES\",\n        \"label\": \"Submission Rules\",\n        \"icon\": \"image-upload\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 20,\n        \"value\": {\n          \"intro\": \"Do not post:\",\n          \"disallowed\": [\n            \"Non-relevant images\",\n            \"AI images\"\n          ],\n          \"removalNotice\": \"Images that don't comply may be removed.\",\n          \"allowAiImages\": false,\n          \"duplicatePolicy\": \"DISALLOW_SAME_PHOTO\"\n        }\n      },\n      {\n        \"key\": \"LEVEL_REQUIREMENTS\",\n        \"label\": \"Level Requirements\",\n        \"icon\": \"level-stars\",\n        \"inputType\": \"list\",\n        \"appliesTo\": [\n          \"RANKING\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 30,\n        \"value\": [\n          {\n            \"level\": \"POPULAR\",\n            \"votes\": 50\n          },\n          {\n            \"level\": \"SKILLED\",\n            \"votes\": 250\n          },\n          {\n            \"level\": \"PREMIER\",\n            \"votes\": 900\n          },\n          {\n            \"level\": \"ELITE\",\n            \"votes\": 1900\n          },\n          {\n            \"level\": \"ALL_STAR\",\n            \"votes\": 5000\n          }\n        ]\n      },\n      {\n        \"key\": \"SUBMISSION_FORMAT\",\n        \"label\": \"Submission Format\",\n        \"icon\": \"image-plus\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 40,\n        \"value\": {\n          \"mimeTypes\": [\n            \"image/jpeg\"\n          ],\n          \"minWidth\": 700,\n          \"minHeight\": 700,\n          \"maxSizeMB\": 25\n        }\n      },\n      {\n        \"key\": \"ELIGIBILITY\",\n        \"label\": \"Eligibility\",\n        \"icon\": \"file-check\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"JOIN\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 50,\n        \"value\": {\n          \"minAge\": 18,\n          \"text\": \"Open to all photographers ages 18 and above.\",\n          \"requiresAcceptance\": true\n        }\n      },\n      {\n        \"key\": \"COPYRIGHT\",\n        \"label\": \"Copyright\",\n        \"icon\": \"copyright\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"JOIN\",\n          \"PHOTO_UPLOAD\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 60,\n        \"value\": {\n          \"text\": \"You must own all submitted images.\",\n          \"requiresOwnership\": true,\n          \"requiresAcceptance\": true\n        }\n      },\n      {\n        \"key\": \"VOTING\",\n        \"label\": \"Voting\",\n        \"icon\": \"vote\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"VOTING\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 70,\n        \"value\": {\n          \"text\": \"Voting is done by members only.\",\n          \"membersOnly\": true,\n          \"requireContestParticipant\": true,\n          \"disallowSelfVote\": true,\n          \"blindVoting\": true\n        }\n      },\n      {\n        \"key\": \"PARTICIPATION\",\n        \"label\": \"Participation\",\n        \"icon\": \"user\",\n        \"inputType\": \"object\",\n        \"appliesTo\": [\n          \"JOIN\",\n          \"DISPLAY\"\n        ],\n        \"displayOnly\": false,\n        \"enabled\": true,\n        \"order\": 80,\n        \"value\": {\n          \"text\": \"By entering you accept the Terms of Use.\",\n          \"requiresTermsAcceptance\": true,\n          \"termsUrl\": null\n        }\n      }\n    ],\n    \"prizes\": [\n      {\n        \"id\": \"670700000000000000000001\",\n        \"category\": \"YC_PICK\",\n        \"type\": \"YC_PICK\",\n        \"target\": \"PHOTO\",\n        \"rankLimit\": null,\n        \"slotKey\": \"YC_PICK:PHOTO\",\n        \"title\": \"YC Pick\",\n        \"description\": \"Editorial photo selected by Your Capture Award.\",\n        \"icon\": \"star\",\n        \"boost\": 5,\n        \"swap\": 0,\n        \"key\": 1,\n        \"coin\": 250,\n        \"enabled\": true,\n        \"order\": 40,\n        \"contestId\": \"{{contestId}}\",\n        \"prizeId\": \"670700000000000000000012\",\n        \"createdAt\": \"2026-07-28T10:00:00.000Z\",\n        \"updatedAt\": \"2026-07-28T10:00:00.000Z\"\n      }\n    ],\n    \"joined\": false\n  }\n}"
+        }
+      ]
+    }
+  ]
+}
