@@ -1,12 +1,16 @@
 'use client';
 
 import { Provider } from 'react-redux';
+import { useRef } from 'react';
 import AuthBootstrap from '@/components/common/AuthBootstrap';
 import { store } from '@/store/store';
 
 const ReduxProvider = ({ children }: { children: React.ReactNode }) => {
+  const storeRef = useRef<ReturnType<typeof store> | null>(null);
+  if (!storeRef.current) storeRef.current = store();
+
   return (
-    <Provider store={store()}>
+    <Provider store={storeRef.current}>
       <AuthBootstrap />
       {children}
     </Provider>
@@ -14,3 +18,4 @@ const ReduxProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default ReduxProvider;
+

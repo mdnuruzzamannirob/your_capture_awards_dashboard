@@ -14,11 +14,11 @@ const inputClass =
 const selectClass = `${inputClass} scheme-dark w-full appearance-none pr-9 text-foreground outline-none`;
 const labelClass = 'text-xs font-medium text-label-foreground data-[error=true]:text-destructive';
 const tierName: Record<string, string> = {
-  POPULAR: 'Popular',
-  SKILLED: 'Skilled',
-  PREMIER: 'Premier',
-  ELITE: 'Elite',
-  ALL_STAR: 'All Star',
+  AMATEUR: 'Amateur',
+  TALENTED: 'Talented',
+  SUPREME: 'Supreme',
+  SUPERIOR: 'Superior',
+  TOP_NOTCH: 'Top Notch',
 };
 
 const submissionOptions = [
@@ -387,3 +387,4 @@ const RulesStep = () => {
 };
 
 export default RulesStep;
+
