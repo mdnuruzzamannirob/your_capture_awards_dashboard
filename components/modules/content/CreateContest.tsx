@@ -2,7 +2,10 @@
 
 import { buildContestFormData, getDefaultContestValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { useCreateContestMutation, useGetContestCreationOptionsQuery } from '@/store/features/contest/contestApi';
+import {
+  useCreateContestMutation,
+  useGetContestCreationOptionsQuery,
+} from '@/store/features/contest/contestApi';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
@@ -22,12 +25,16 @@ function getErrorMessage(error: unknown): string {
 const CreateContest = () => {
   const router = useRouter();
   const [createContest, { isLoading }] = useCreateContestMutation();
-  const { data: optionsData, isLoading: isOptionsLoading, isError: isOptionsError, error: optionsError } =
-    useGetContestCreationOptionsQuery(undefined, {
-      refetchOnMountOrArgChange: false,
-      refetchOnFocus: false,
-      refetchOnReconnect: false,
-    });
+  const {
+    data: optionsData,
+    isLoading: isOptionsLoading,
+    isError: isOptionsError,
+    error: optionsError,
+  } = useGetContestCreationOptionsQuery(undefined, {
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
   const options = optionsData?.data;
   const didNotifyOptionsError = useRef(false);
 
@@ -47,7 +54,8 @@ const CreateContest = () => {
     }
   };
 
-  if (isOptionsLoading || !options) return <div className="p-8 text-sm">Loading contest options...</div>;
+  if (isOptionsLoading || !options)
+    return <div className="p-8 text-sm">Loading contest options...</div>;
 
   return (
     <ContestForm
@@ -61,6 +69,3 @@ const CreateContest = () => {
 };
 
 export default CreateContest;
-
-
-

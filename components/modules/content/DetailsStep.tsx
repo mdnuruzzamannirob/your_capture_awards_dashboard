@@ -39,14 +39,14 @@ const DetailsStep = () => {
       className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border"
       aria-labelledby="contest-details-title"
     >
-      <header className="border-border-subtle flex min-h-13 items-center border-b bg-[var(--bg-inset)] px-[18px] py-3">
+      <header className="border-border-subtle flex min-h-13 items-center border-b bg-(--bg-inset) px-4.5 py-3">
         <h2 id="contest-details-title" className="text-heading text-sm font-extrabold">
           Details
         </h2>
       </header>
 
-      <div className="grid gap-[14px] p-[18px]">
-        <div className="grid gap-[14px] sm:grid-cols-2">
+      <div className="grid gap-3.5 p-4.5">
+        <div className="grid gap-3.5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="details.title"
@@ -76,7 +76,7 @@ const DetailsStep = () => {
           />
         </div>
 
-        <div className="grid gap-[14px] sm:grid-cols-2">
+        <div className="grid gap-3.5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="details.startDate"
@@ -136,10 +136,10 @@ const DetailsStep = () => {
                 }}
               />
               <FormControl>
-                <div className="border-border-strong bg-surface-secondary relative grid min-h-[170px] place-items-center overflow-hidden rounded-[10px] border border-dashed">
+                <div className="border-border-strong bg-surface-secondary relative grid min-h-42.5 place-items-center overflow-hidden rounded-[10px] border border-dashed">
                   {preview ? (
                     <>
-                      <div className="relative h-[210px] w-full">
+                      <div className="relative h-52.5 w-full">
                         <Image
                           src={preview}
                           alt="Contest banner preview"
@@ -152,7 +152,7 @@ const DetailsStep = () => {
                       <button
                         type="button"
                         onClick={() => bannerInputRef.current?.click()}
-                        className="bg-background/75 text-foreground absolute right-[10px] bottom-[10px] inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-[9px] text-[10px] font-bold backdrop-blur-lg"
+                        className="bg-background/75 text-foreground absolute right-2.5 bottom-2.5 inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-2.25 text-[10px] font-bold backdrop-blur-lg"
                       >
                         Change image
                       </button>
@@ -160,7 +160,7 @@ const DetailsStep = () => {
                   ) : (
                     <label
                       htmlFor="contest-banner-upload"
-                      className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-[9px] text-[10px] font-bold transition-colors"
+                      className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.25 text-[10px] font-bold transition-colors"
                     >
                       Upload a banner image
                     </label>
@@ -194,7 +194,7 @@ const DetailsStep = () => {
           control={form.control}
           name="details.recurring"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center gap-[9px] space-y-0">
+            <FormItem className="flex flex-row items-center gap-2.25 space-y-0">
               <FormLabel className="text-body order-1 mt-0! text-[11px] font-medium">
                 Make this a recurring contest
               </FormLabel>
@@ -202,7 +202,7 @@ const DetailsStep = () => {
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
-                  className="data-[state=checked]:bg-primary order-2 h-5! w-[34px]!"
+                  className="data-[state=checked]:bg-primary order-2 h-5! w-8.5!"
                 />
               </FormControl>
               <FormMessage className={messageClass} />

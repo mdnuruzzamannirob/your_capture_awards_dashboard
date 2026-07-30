@@ -178,7 +178,7 @@ export default function ContestRichTextEditor({
   return (
     <div className="border-input bg-surface-secondary focus-within:border-primary focus-within:bg-surface relative overflow-visible rounded-[9px] border transition-colors">
       <div
-        className="border-border flex flex-wrap items-center gap-0 border-b px-[5px] py-[5px]"
+        className="border-border flex flex-wrap items-center gap-0 border-b px-1.25 py-1.25"
         aria-label="Text formatting"
       >
         <button
@@ -272,17 +272,17 @@ export default function ContestRichTextEditor({
             placeholder="https://example.com"
             value={linkUrl}
             onChange={(event) => setLinkUrl(event.target.value)}
-            className="border-input bg-surface focus:border-primary h-[30px] min-w-0 rounded-md border px-2 text-[10px] outline-none"
+            className="border-input bg-surface focus:border-primary h-7.5 min-w-0 rounded-md border px-2 text-[10px] outline-none"
           />
           <button
             type="submit"
-            className="border-primary bg-primary text-primary-foreground h-[30px] rounded-md border px-2 text-[9px] font-bold"
+            className="border-primary bg-primary text-primary-foreground h-7.5 rounded-md border px-2 text-[9px] font-bold"
           >
             Save link
           </button>
           <button
             type="button"
-            className="border-input bg-surface text-muted-foreground h-[30px] rounded-md border px-2 text-[9px] font-bold"
+            className="border-input bg-surface text-muted-foreground h-7.5 rounded-md border px-2 text-[9px] font-bold"
             onClick={() => setLinkEditorOpen(false)}
           >
             Cancel
@@ -292,7 +292,7 @@ export default function ContestRichTextEditor({
 
       <div
         ref={editorRef}
-        className="text-body empty:before:text-placeholder-foreground [&_a]:text-primary [&_blockquote]:border-primary/40 [&_blockquote]:text-muted-foreground [&_h1]:text-heading [&_h2]:text-heading [&_h3]:text-heading min-h-28 p-[10px_11px] text-xs leading-[1.55] outline-none empty:before:pointer-events-none empty:before:content-[attr(data-placeholder)] [&_a]:underline [&_a]:underline-offset-2 [&_blockquote]:mb-2 [&_blockquote]:border-l-2 [&_blockquote]:pl-[9px] [&_h1]:mb-2 [&_h1]:text-xl [&_h2]:mb-2 [&_h2]:text-[17px] [&_h3]:mb-2 [&_h3]:text-sm [&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-[19px] [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-[19px]"
+        className="text-body empty:before:text-placeholder-foreground [&_a]:text-primary [&_blockquote]:border-primary/40 [&_blockquote]:text-muted-foreground [&_h1]:text-heading [&_h2]:text-heading [&_h3]:text-heading min-h-28 p-[10px_11px] text-xs leading-[1.55] outline-none empty:before:pointer-events-none empty:before:content-[attr(data-placeholder)] [&_a]:underline [&_a]:underline-offset-2 [&_blockquote]:mb-2 [&_blockquote]:border-l-2 [&_blockquote]:pl-2.25 [&_h1]:mb-2 [&_h1]:text-xl [&_h2]:mb-2 [&_h2]:text-[17px] [&_h3]:mb-2 [&_h3]:text-sm [&_ol]:mb-2 [&_ol]:list-decimal [&_ol]:pl-4.75 [&_ul]:mb-2 [&_ul]:list-disc [&_ul]:pl-4.75"
         contentEditable
         role="textbox"
         aria-multiline="true"

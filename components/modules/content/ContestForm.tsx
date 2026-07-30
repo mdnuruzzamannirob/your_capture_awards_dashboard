@@ -81,7 +81,7 @@ const ContestForm = ({
 
   return (
     <Form {...form}>
-      <div className="mx-auto w-full max-w-[1380px]">
+      <div className="mx-auto w-full max-w-345">
         <ContestEditorHeader mode={mode === 'create' ? 'create' : 'edit'} />
         <div className="grid items-start gap-[clamp(20px,2.4vw,36px)] min-[1280px]:grid-cols-[minmax(480px,1.08fr)_minmax(390px,0.92fr)]">
           <form
