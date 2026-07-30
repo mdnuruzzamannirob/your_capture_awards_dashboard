@@ -1,4 +1,4 @@
-import { contestRuleDefinitions } from '@/lib/constants';
+﻿import { contestRuleDefinitions } from '@/lib/constants';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import type {
   Contest,
@@ -9,6 +9,20 @@ import type {
 import type { ContestCreationOptions } from '@/store/features/contest/types';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+
+const acceptedSubmissionMimeTypes = ['image/jpeg', 'image/png'] as const;
+
+type AcceptedSubmissionMimeType = (typeof acceptedSubmissionMimeTypes)[number];
+
+function normalizeSubmissionFormat(
+  format: ContestFinalValues['rules']['submissionFormat'],
+): ContestFinalValues['rules']['submissionFormat'] {
+  const mimeTypes = format.mimeTypes.filter(
+    (mimeType): mimeType is AcceptedSubmissionMimeType =>
+      acceptedSubmissionMimeTypes.includes(mimeType as AcceptedSubmissionMimeType),
+  );
+  return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg'] };
+}
 
 export function getDefaultContestValues(options?: ContestCreationOptions): ContestFinalValues {
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
@@ -97,6 +111,34 @@ function getRuleValue<T>(contest: Contest, key: ContestRuleKey, fallback: T): T 
   return clone(value as T);
 }
 
+function normalizeSubmissionRules(
+  value: unknown,
+  fallback: ContestFinalValues['rules']['submissionRules'],
+): ContestFinalValues['rules']['submissionRules'] {
+  if (Array.isArray(value)) {
+    const rules = value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()));
+    const disallowed = rules.slice(0, -1);
+    return {
+      ...clone(fallback),
+      disallowed: disallowed.length ? disallowed : clone(fallback.disallowed),
+      removalNotice: rules.at(-1) ?? fallback.removalNotice,
+      allowAiImages: !rules.some((rule) => /ai[ -]?generated|ai images/i.test(rule)),
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    const ruleValue = value as Partial<ContestFinalValues['rules']['submissionRules']>;
+    return {
+      ...clone(fallback),
+      ...ruleValue,
+      disallowed: Array.isArray(ruleValue.disallowed)
+        ? ruleValue.disallowed.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+        : clone(fallback.disallowed),
+    };
+  }
+
+  return clone(fallback);
+}
 function normalizeAward(award: ContestAward): ContestFinalValues['awards'][number] | null {
   const type = (award.type ?? award.category ?? award.prize?.category) as
     | ContestAwardType
@@ -137,7 +179,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   return {
     details: {
       title: contest.title ?? '',
-      category: typeof contest.category === 'string' ? contest.category : (contest.category?.id ?? ''),
+      category: typeof contest.category === 'string' ? contest.category : (contest.category?.id ?? contest.categoryId ?? ''),
       description: contest.description ?? '',
       banner: contest.banner ?? undefined,
       maxUploads: Number(submissionLimit),
@@ -151,12 +193,17 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       minPrize: Number(contest.minPrize ?? 0),
       maxPrize: Number(contest.maxPrize ?? 0),
       coin_requirement: Boolean(contest.coin_requirement),
-      coin_required: Number(contest.coin_required ?? 0),
+      coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
     },
     rules: {
-      submissionRules: getRuleValue(contest, 'SUBMISSION_RULES', defaults.rules.submissionRules),
+      submissionRules: normalizeSubmissionRules(
+        contest.rules?.find((rule) => rule.key === 'SUBMISSION_RULES')?.value,
+        defaults.rules.submissionRules,
+      ),
       levelRequirements: getRuleValue(contest, 'LEVEL_REQUIREMENTS', levelFallback),
-      submissionFormat: getRuleValue(contest, 'SUBMISSION_FORMAT', defaults.rules.submissionFormat),
+      submissionFormat: normalizeSubmissionFormat(
+        getRuleValue(contest, 'SUBMISSION_FORMAT', defaults.rules.submissionFormat),
+      ),
       eligibility: getRuleValue(contest, 'ELIGIBILITY', defaults.rules.eligibility),
       copyright: getRuleValue(contest, 'COPYRIGHT', defaults.rules.copyright),
       voting: getRuleValue(contest, 'VOTING', defaults.rules.voting),
@@ -194,9 +241,7 @@ export function buildContestFormData(
     LEVEL_REQUIREMENTS: rules.levelRequirements,
     SUBMISSION_FORMAT: {
       ...rules.submissionFormat,
-      mimeTypes: Array.from(new Set(rules.submissionFormat.mimeTypes.map((mimeType) =>
-        mimeType === 'image/jpg' ? 'image/jpeg' : mimeType,
-      ))),
+      mimeTypes: Array.from(new Set(rules.submissionFormat.mimeTypes)),
     },
     ELIGIBILITY: rules.eligibility,
     COPYRIGHT: rules.copyright,
@@ -253,7 +298,3 @@ export function getAwardLabel(type?: string): string {
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 }
-
-
-
-

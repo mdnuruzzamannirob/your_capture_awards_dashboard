@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
@@ -31,7 +31,7 @@ const submissionOptions = [
   {
     id: 'similar-images',
     label:
-      'Similar images — images with the same subject, background, foreground, and location must be distinct',
+      'Similar images â€” images with the same subject, background, foreground, and location must be distinct',
     value:
       'Similar images: Images with the same combination of subject, background, foreground and location are not allowed. Images must be distinct',
     matches: (item: string) => item.toLowerCase().includes('similar images'),
@@ -48,15 +48,52 @@ const submissionOptions = [
     value: 'AI images',
     matches: (item: string) => item.toLowerCase().includes('ai'),
   },
+  {
+    id: 'third-party-content',
+    label: 'Images you do not own or do not have permission to submit',
+    value: 'Images you do not own or do not have permission to submit',
+    matches: (item: string) =>
+      item.toLowerCase().includes('do not own') || item.toLowerCase().includes('permission'),
+  },
+  {
+    id: 'watermarks',
+    label: 'Visible watermarks, logos, signatures, borders, or added text',
+    value: 'Images with visible watermarks, logos, signatures, borders, or added text',
+    matches: (item: string) =>
+      item.toLowerCase().includes('watermark') || item.toLowerCase().includes('signature'),
+  },
+  {
+    id: 'offensive-content',
+    label: 'Obscene, hateful, violent, sexually explicit, or otherwise offensive content',
+    value: 'Obscene, hateful, violent, sexually explicit, or otherwise offensive content',
+    matches: (item: string) =>
+      item.toLowerCase().includes('obscene') || item.toLowerCase().includes('offensive'),
+  },
+  {
+    id: 'privacy-violations',
+    label: 'Photos that violate privacy or are submitted without required model/property releases',
+    value: 'Photos that violate privacy or are submitted without required model or property releases',
+    matches: (item: string) =>
+      item.toLowerCase().includes('privacy') || item.toLowerCase().includes('model or property'),
+  },
+  {
+    id: 'misleading-edits',
+    label: 'Misleading edits or composites that are not disclosed in the caption',
+    value: 'Misleading edits or composites that are not disclosed in the caption',
+    matches: (item: string) =>
+      item.toLowerCase().includes('misleading edits') || item.toLowerCase().includes('composites'),
+  },
+  {
+    id: 'wrong-date',
+    label: 'Photos taken outside the contest’s stated capture period',
+    value: 'Photos taken outside the contest stated capture period',
+    matches: (item: string) => item.toLowerCase().includes('capture period'),
+  },
 ] as const;
 
 const fileFormatOptions = [
   { value: 'image/jpeg', label: 'JPEG' },
-  { value: 'image/jpg', label: 'JPG' },
   { value: 'image/png', label: 'PNG' },
-  { value: 'image/webp', label: 'WEBP' },
-  { value: 'image/heic', label: 'HEIC' },
-  { value: 'image/tiff', label: 'TIFF' },
 ] as const;
 
 function RuleEditor({ title, children }: { title: string; children: ReactNode }) {
@@ -94,7 +131,7 @@ function SystemTextField({
           <div className="flex items-start justify-between gap-3">
             <FormMessage className="text-[9px]" />
             <small className="text-caption-foreground ml-auto text-[8px]">
-              {field.value.length}/800
+              {field.value.length}/300
             </small>
           </div>
         </FormItem>
@@ -149,7 +186,8 @@ const RulesStep = () => {
               <FormLabel className={`${labelClass} mb-[7px]`}>Select rules</FormLabel>
               <div className="grid gap-0.5">
                 {submissionOptions.map((option) => {
-                  const checked = field.value.some(option.matches);
+                  const disallowed = Array.isArray(field.value) ? field.value : [];
+                  const checked = disallowed.some(option.matches);
                   return (
                     <label
                       key={option.id}
@@ -159,7 +197,7 @@ const RulesStep = () => {
                         checked={checked}
                         className="size-[19px] rounded-md"
                         onCheckedChange={(nextChecked) => {
-                          const withoutCurrent = field.value.filter(
+                          const withoutCurrent = disallowed.filter(
                             (item) => !option.matches(item),
                           );
                           field.onChange(
@@ -284,7 +322,7 @@ const RulesStep = () => {
               <div className="contents" key={key}>
                 {index === 1 && (
                   <b className="text-caption-foreground pb-[11px] text-center text-xs font-medium">
-                    ×
+                    Ã—
                   </b>
                 )}
                 <FormField
@@ -351,18 +389,20 @@ const RulesStep = () => {
               <FormLabel className={labelClass}>Minimum participant age</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <select
-                    className={selectClass}
-                    value={field.value}
+                  <Input
+                    type="number"
+                    min={0}
+                    max={200}
+                    step={1}
+                    inputMode="numeric"
+                    aria-label="Minimum participant age"
+                    className={`${inputClass} pr-14`}
+                    {...field}
                     onChange={(event) => field.onChange(event.target.value)}
-                  >
-                    {Array.from({ length: 201 }, (_, age) => (
-                      <option value={age} key={age}>
-                        {age} {age === 1 ? 'year' : 'years'}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+                  />
+                  <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
+                    years
+                  </span>
                 </div>
               </FormControl>
               <FormMessage className="text-[9px]" />
@@ -387,4 +427,3 @@ const RulesStep = () => {
 };
 
 export default RulesStep;
-

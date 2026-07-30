@@ -1,4 +1,4 @@
-import { contestAwardTypes } from '@/store/features/contest/types';
+﻿import { contestAwardTypes } from '@/store/features/contest/types';
 import { z } from 'zod';
 
 const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
@@ -80,6 +80,7 @@ export const contestPrizesSchema = z
   });
 
 const requiredText = z.string().trim().min(1, 'This field is required');
+const shortRuleText = requiredText.max(300, 'Text must not exceed 300 characters');
 
 export const contestRulesSchema = z.object({
   submissionRules: z.object({
@@ -100,7 +101,7 @@ export const contestRulesSchema = z.object({
   submissionFormat: z.object({
     mimeTypes: z
       .array(
-        z.enum(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/tiff']),
+        z.enum(['image/jpeg', 'image/png']),
       )
       .min(1, 'Select a file type'),
     minWidth: z.coerce.number().int().min(1),
@@ -113,19 +114,19 @@ export const contestRulesSchema = z.object({
     requiresAcceptance: z.boolean(),
   }),
   copyright: z.object({
-    text: requiredText,
+    text: shortRuleText,
     requiresOwnership: z.boolean(),
     requiresAcceptance: z.boolean(),
   }),
   voting: z.object({
-    text: requiredText,
+    text: shortRuleText,
     membersOnly: z.boolean(),
     requireContestParticipant: z.boolean(),
     disallowSelfVote: z.boolean(),
     blindVoting: z.boolean(),
   }),
   participation: z.object({
-    text: requiredText,
+    text: shortRuleText,
     requiresTermsAcceptance: z.boolean(),
     termsUrl: z.string().trim().nullable(),
   }),
@@ -190,4 +191,3 @@ export type ContestPrizesValues = z.infer<typeof contestPrizesSchema>;
 export type ContestRulesValues = z.infer<typeof contestRulesSchema>;
 export type ContestAwardsValues = z.infer<typeof contestAwardsSchema>;
 export type ContestFinalValues = z.infer<typeof contestFinalSchema>;
-
