@@ -1,4 +1,4 @@
-export const contestRuleKeys = [
+﻿export const contestRuleKeys = [
   'SUBMISSION_LIMIT',
   'SUBMISSION_RULES',
   'LEVEL_REQUIREMENTS',
@@ -130,6 +130,7 @@ export interface Contest {
   id: string;
   title: string;
   category?: string | { id?: string; name?: string };
+  categoryId?: string | null;
   description: string;
   banner?: string | null;
   status: 'ACTIVE' | 'UPCOMING' | 'CLOSED' | string;
@@ -142,6 +143,7 @@ export interface Contest {
   maxPrize?: number;
   coin_requirement?: boolean;
   coin_required?: number;
+  entryFeeCoins?: number;
   maxUploads: number;
   level_requirements?: number[];
   rules?: ContestRule[];
@@ -212,5 +214,3 @@ export interface ApiSuccessResponse<T> {
   message: string;
   data: T;
 }
-
-
