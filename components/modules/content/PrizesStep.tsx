@@ -56,7 +56,7 @@ const PrizesStep = () => {
         <FormSwitch name="prizes.isMoneyContest" label="Is money contest" />
 
         {isMoneyContest && (
-          <div className="grid gap-[14px] sm:grid-cols-2">
+          <div className="grid items-start gap-[14px] sm:grid-cols-2">
             <FormField
               control={form.control}
               name="prizes.minPrize"

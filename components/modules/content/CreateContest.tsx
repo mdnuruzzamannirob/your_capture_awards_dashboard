@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import ContestForm from './ContestForm';
+import ContestFormSkeleton from './ContestFormSkeleton';
 
 function getErrorMessage(error: unknown): string {
   if (!error || typeof error !== 'object') return 'Something went wrong!';
@@ -28,8 +29,10 @@ const CreateContest = () => {
   const {
     data: optionsData,
     isLoading: isOptionsLoading,
+    isFetching: isOptionsFetching,
     isError: isOptionsError,
     error: optionsError,
+    refetch: refetchOptions,
   } = useGetContestCreationOptionsQuery(undefined, {
     refetchOnMountOrArgChange: false,
     refetchOnFocus: false,
@@ -54,14 +57,28 @@ const CreateContest = () => {
     }
   };
 
-  if (isOptionsLoading || !options)
-    return <div className="p-8 text-sm">Loading contest options...</div>;
+  if (!options && (isOptionsLoading || isOptionsFetching)) return <ContestFormSkeleton />;
+
+  if (!options) {
+    return (
+      <div className="border-border-subtle bg-surface-secondary text-muted-foreground rounded-lg border p-8 text-center">
+        <p>Contest options could not be loaded.</p>
+        <button
+          type="button"
+          onClick={() => refetchOptions()}
+          className="bg-primary text-primary-foreground mt-4 rounded-md px-4 py-2 text-sm font-medium"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <ContestForm
       mode="create"
       initialValues={getDefaultContestValues(options)}
-      isSubmitting={isLoading || isOptionsLoading}
+      isSubmitting={isLoading}
       onSubmit={handleSubmit}
       onCancel={() => router.push('/contest')}
     />

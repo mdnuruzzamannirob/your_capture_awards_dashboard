@@ -5,10 +5,10 @@ import { buildContestFormData, mapContestToFormValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import { useGetContestQuery, useUpdateContestMutation } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
-import { Loader2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ContestForm from './ContestForm';
+import ContestFormSkeleton from './ContestFormSkeleton';
 
 function getErrorMessage(error: unknown): string {
   if (!error || typeof error !== 'object') return 'Something went wrong!';
@@ -42,13 +42,7 @@ const UpdateContest = () => {
     }
   };
 
-  if (isLoading || isFetching) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="text-primary size-8 animate-spin" />
-      </div>
-    );
-  }
+  if (!contest && (isLoading || isFetching)) return <ContestFormSkeleton />;
 
   if (isError || !contest?.id) {
     return (
@@ -73,4 +67,3 @@ const UpdateContest = () => {
 };
 
 export default UpdateContest;
-

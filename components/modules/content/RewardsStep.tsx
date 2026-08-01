@@ -15,13 +15,13 @@ const tierAwardTypes = ['TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'] as const;
 const awardTypes = [
   'TOP_PHOTO',
   'TOP_PHOTOGRAPHER',
-  'YC_PICK',
+  // 'YC_PICK', // YC Top Pick is not needed in this project for now.
   ...tierAwardTypes,
 ] as const satisfies readonly ContestAwardType[];
 const awardLabels: Record<(typeof awardTypes)[number], string> = {
   TOP_PHOTO: 'Top Photo',
   TOP_PHOTOGRAPHER: 'Top Photographer',
-  YC_PICK: 'YC Pick',
+  // YC_PICK: 'YC Pick',
   TOP_100: 'Top 100',
   TOP_50: 'Top 50',
   TOP_20: 'Top 20',
@@ -136,7 +136,7 @@ const RewardsStep = () => {
                 <input type="hidden" {...form.register(`awards.${index}.recipient`)} />
               )}
 
-              <div className="grid grid-cols-2 gap-2.5 min-[521px]:grid-cols-4">
+              <div className="grid grid-cols-2 items-start gap-2.5 min-[521px]:grid-cols-4">
                 {(
                   [
                     ['boost', 'Boost'],

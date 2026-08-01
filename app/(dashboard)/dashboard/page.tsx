@@ -217,7 +217,7 @@ const Dashboard = () => {
   );
 
   return (
-    <section className="space-y-5">
+    <section className="dashboard-page space-y-5">
       <Title
         title="Dashboard Overview"
         description="Live platform metrics, revenue, user growth, and latest contests"

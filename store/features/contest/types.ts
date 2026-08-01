@@ -110,9 +110,11 @@ export interface ContestAward extends Partial<ContestAwardValue> {
   id?: string;
   contestId?: string;
   prizeId?: string;
-  type?: ContestAwardType;
+  type?: ContestAwardType | 'TOP_RANK';
   recipient?: 'Photo' | 'Photographer';
-  category: ContestAwardType;
+  target?: 'PHOTO' | 'PHOTOGRAPHER';
+  rankLimit?: number | null;
+  category: ContestAwardType | 'TOP_RANK';
   title?: string;
   description?: string;
   icon?: string;
@@ -142,6 +144,7 @@ export interface Contest {
   minPrize?: number;
   maxPrize?: number;
   coin_requirement?: boolean;
+  coinRequirement?: boolean;
   coin_required?: number;
   entryFeeCoins?: number;
   maxUploads: number;

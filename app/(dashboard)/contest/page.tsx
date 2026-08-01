@@ -53,7 +53,7 @@ const ContestPage = () => {
   ];
 
   return (
-    <section className="space-y-5">
+    <section className="dashboard-page space-y-5">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <Title
           title="Contest Management"

@@ -8,9 +8,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="bg-background min-h-dvh">
       <TopBar />
       <SideBar />
-      <main className="size-full min-h-dvh pt-14 lg:block lg:pl-60">
-        <div className="dashboard-page">{children}</div>
-      </main>
+      <main className="size-full min-h-dvh pt-14 lg:block lg:pl-60">{children}</main>
     </div>
   );
 };

@@ -64,7 +64,7 @@ export default function StorePage() {
   ];
 
   return (
-    <section className="space-y-5">
+    <section className="dashboard-page space-y-5">
       <Title
         title="Store Management"
         description="Create and manage store items with live product and revenue stats."
