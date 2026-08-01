@@ -4,9 +4,9 @@ import type {
   Contest,
   ContestAward,
   ContestAwardType,
+  ContestCreationOptions,
   ContestRuleKey,
 } from '@/store/features/contest/types';
-import type { ContestCreationOptions } from '@/store/features/contest/types';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -17,9 +17,8 @@ type AcceptedSubmissionMimeType = (typeof acceptedSubmissionMimeTypes)[number];
 function normalizeSubmissionFormat(
   format: ContestFinalValues['rules']['submissionFormat'],
 ): ContestFinalValues['rules']['submissionFormat'] {
-  const mimeTypes = format.mimeTypes.filter(
-    (mimeType): mimeType is AcceptedSubmissionMimeType =>
-      acceptedSubmissionMimeTypes.includes(mimeType as AcceptedSubmissionMimeType),
+  const mimeTypes = format.mimeTypes.filter((mimeType): mimeType is AcceptedSubmissionMimeType =>
+    acceptedSubmissionMimeTypes.includes(mimeType as AcceptedSubmissionMimeType),
   );
   return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg'] };
 }
@@ -31,10 +30,9 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
   const submissionRuleList = Array.isArray(values.SUBMISSION_RULES)
     ? (values.SUBMISSION_RULES as string[])
     : null;
-  const defaultPrizes = (options?.prizeDefinitions?.length
-    ? options.prizeDefinitions
-    : options?.prizes ?? []
-  ).filter((prize) => prize.isDefault);
+  const defaultPrizes = (
+    options?.prizeDefinitions?.length ? options.prizeDefinitions : (options?.prizes ?? [])
+  ).filter((prize) => prize.isDefault && prize.type !== 'YC_PICK');
 
   return {
     details: {
@@ -64,7 +62,9 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
             allowAiImages: false,
             duplicatePolicy: 'DISALLOW_SAME_PHOTO',
           }
-        : clone(fallback.SUBMISSION_RULES.defaultValue) as ContestFinalValues['rules']['submissionRules'],
+        : (clone(
+            fallback.SUBMISSION_RULES.defaultValue,
+          ) as ContestFinalValues['rules']['submissionRules']),
       levelRequirements: clone(
         values.LEVEL_REQUIREMENTS ?? fallback.LEVEL_REQUIREMENTS.defaultValue,
       ) as ContestFinalValues['rules']['levelRequirements'],
@@ -85,7 +85,15 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       ) as ContestFinalValues['rules']['participation'],
     },
     awards: defaultPrizes.map((prize) => ({
-      type: prize.type as ContestAwardType,
+      type: (prize.type === 'TOP_RANK' && prize.rankLimit
+        ? `TOP_${prize.rankLimit}`
+        : prize.type) as ContestAwardType,
+      recipient:
+        prize.type === 'TOP_RANK'
+          ? prize.target === 'PHOTOGRAPHER'
+            ? 'Photographer'
+            : 'Photo'
+          : undefined,
       boost: prize.rewards.boost,
       key: prize.rewards.key,
       swap: prize.rewards.swap,
@@ -116,7 +124,9 @@ function normalizeSubmissionRules(
   fallback: ContestFinalValues['rules']['submissionRules'],
 ): ContestFinalValues['rules']['submissionRules'] {
   if (Array.isArray(value)) {
-    const rules = value.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()));
+    const rules = value.filter(
+      (item): item is string => typeof item === 'string' && Boolean(item.trim()),
+    );
     const disallowed = rules.slice(0, -1);
     return {
       ...clone(fallback),
@@ -132,7 +142,9 @@ function normalizeSubmissionRules(
       ...clone(fallback),
       ...ruleValue,
       disallowed: Array.isArray(ruleValue.disallowed)
-        ? ruleValue.disallowed.filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+        ? ruleValue.disallowed.filter(
+            (item): item is string => typeof item === 'string' && Boolean(item.trim()),
+          )
         : clone(fallback.disallowed),
     };
   }
@@ -140,14 +152,24 @@ function normalizeSubmissionRules(
   return clone(fallback);
 }
 function normalizeAward(award: ContestAward): ContestFinalValues['awards'][number] | null {
-  const type = (award.type ?? award.category ?? award.prize?.category) as
-    | ContestAwardType
-    | undefined;
+  const sourceType = award.type ?? award.category ?? award.prize?.category;
+  // YC Pick is not used in this project at the moment.
+  if (!sourceType || sourceType === 'YC_PICK') return null;
+
+  const type = (
+    sourceType === 'TOP_RANK' && award.rankLimit ? `TOP_${award.rankLimit}` : sourceType
+  ) as ContestAwardType | undefined;
   if (!type) return null;
 
   return {
     type,
-    recipient: award.recipient,
+    recipient:
+      award.recipient ??
+      (award.target === 'PHOTO'
+        ? 'Photo'
+        : award.target === 'PHOTOGRAPHER'
+          ? 'Photographer'
+          : undefined),
     boost: Number(award.boost ?? 0),
     key: Number(award.key ?? 0),
     swap: Number(award.swap ?? 0),
@@ -179,7 +201,8 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   return {
     details: {
       title: contest.title ?? '',
-      category: typeof contest.category === 'string' ? contest.category : (contest.category?.id ?? contest.categoryId ?? ''),
+      category:
+        typeof contest.category === 'string' ? contest.category : (contest.category?.name ?? ''),
       description: contest.description ?? '',
       banner: contest.banner ?? undefined,
       maxUploads: Number(submissionLimit),
@@ -192,7 +215,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       isMoneyContest: Boolean(contest.isMoneyContest),
       minPrize: Number(contest.minPrize ?? 0),
       maxPrize: Number(contest.maxPrize ?? 0),
-      coin_requirement: Boolean(contest.coin_requirement),
+      coin_requirement: Boolean(contest.coinRequirement ?? contest.coin_requirement),
       coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
     },
     rules: {
@@ -219,25 +242,25 @@ export function buildContestFormData(
 ): FormData {
   const { details, prizes, rules, awards } = values;
   const formData = new FormData();
-  const definitions = options?.prizeDefinitions?.length
-    ? options.prizeDefinitions
-    : options?.prizes ?? [];
-
   formData.append('title', details.title);
   formData.append('description', details.description);
-  formData.append('categoryId', details.category);
+  formData.append('category', details.category);
   formData.append('startDate', details.startDate.toISOString());
   formData.append('endDate', details.endDate.toISOString());
   formData.append('isMoneyContest', String(prizes.isMoneyContest));
-  formData.append('entryFeeCoins', String(prizes.coin_requirement ? prizes.coin_required : 0));
+  if (prizes.isMoneyContest) {
+    formData.append('minPrize', String(prizes.minPrize));
+    formData.append('maxPrize', String(prizes.maxPrize));
+  }
+  formData.append('coinRequirement', String(prizes.coin_requirement));
+  if (prizes.coin_requirement) {
+    formData.append('entryFeeCoins', String(prizes.coin_required));
+  }
   if (details.banner instanceof File) formData.append('banner', details.banner);
 
   const ruleValues: Record<ContestRuleKey, unknown> = {
     SUBMISSION_LIMIT: details.maxUploads,
-    SUBMISSION_RULES: [
-      ...rules.submissionRules.disallowed,
-      rules.submissionRules.removalNotice,
-    ],
+    SUBMISSION_RULES: [...rules.submissionRules.disallowed, rules.submissionRules.removalNotice],
     LEVEL_REQUIREMENTS: rules.levelRequirements,
     SUBMISSION_FORMAT: {
       ...rules.submissionFormat,
@@ -252,7 +275,8 @@ export function buildContestFormData(
     },
   };
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
-  const ruleOrder = optionRules?.map((rule) => rule.key) ?? Object.keys(ruleValues) as ContestRuleKey[];
+  const ruleOrder =
+    optionRules?.map((rule) => rule.key) ?? (Object.keys(ruleValues) as ContestRuleKey[]);
   formData.append(
     'rules',
     JSON.stringify(
@@ -266,23 +290,21 @@ export function buildContestFormData(
   );
 
   formData.append(
-    'awards',
+    'prizes',
     JSON.stringify(
       awards.map(({ type, recipient, boost, key, swap, coin }) => {
-        const rankLimit = type.startsWith('TOP_') ? Number(type.slice(4)) : null;
-        const target = recipient === 'Photographer' || type === 'TOP_PHOTOGRAPHER'
-          ? 'PHOTOGRAPHER'
-          : 'PHOTO';
-        const definition = definitions.find((prize) =>
-          rankLimit
-            ? prize.type === 'TOP_RANK' && prize.rankLimit === rankLimit && prize.target === target
-            : prize.type === type && prize.target === target,
-        );
+        const isTopRank = /^TOP_\d+$/.test(type);
+        const rankLimit = isTopRank ? Number(type.slice(4)) : null;
+        const target =
+          recipient === 'Photographer' || type === 'TOP_PHOTOGRAPHER' ? 'PHOTOGRAPHER' : 'PHOTO';
         return {
-          type: definition?.type ?? type,
+          type: isTopRank ? 'TOP_RANK' : type,
           target,
-          ...(definition?.rankLimit ? { rankLimit: definition.rankLimit } : {}),
-          value: { boost, key, swap, coin },
+          ...(rankLimit ? { rankLimit } : {}),
+          coin,
+          boost,
+          swap,
+          key,
         };
       }),
     ),

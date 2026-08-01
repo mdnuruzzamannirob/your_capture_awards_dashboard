@@ -84,7 +84,7 @@ const ContestDetails = () => {
   }
 
   return (
-    <section className="border-border-subtle bg-surface overflow-hidden rounded-lg border">
+    <section className="">
       <div className="bg-surface-tertiary relative h-72 w-full overflow-hidden lg:h-96">
         {contest.banner ? (
           <Image
@@ -104,7 +104,7 @@ const ContestDetails = () => {
         )}
       </div>
 
-      <div className="border-border-subtle relative flex overflow-x-auto border-b bg-[var(--bg-inset)]">
+      <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">
         {CONTEST_DETAILS_TABS.map((tab, index) => (
           <button
             key={tab.key}

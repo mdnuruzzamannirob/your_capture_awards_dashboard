@@ -1,6 +1,12 @@
 import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { ApiSuccessResponse, Contest, ContestCreationOptions, ContestStats, GetContestsResponse } from './types';
+import {
+  ApiSuccessResponse,
+  Contest,
+  ContestCreationOptions,
+  ContestStats,
+  GetContestsResponse,
+} from './types';
 
 export const contestApi = createApi({
   reducerPath: 'contestApi',
@@ -22,11 +28,14 @@ export const contestApi = createApi({
         method: 'POST',
         body,
       }),
-      invalidatesTags: [
-        { type: 'Contests', id: 'LIST' },
-        { type: 'ContestStats', id: 'SINGLE' },
-        { type: 'DashboardOverview', id: 'SINGLE' },
-      ],
+      invalidatesTags: (result) =>
+        result
+          ? [
+              { type: 'Contests', id: 'LIST' },
+              { type: 'ContestStats', id: 'SINGLE' },
+              { type: 'DashboardOverview', id: 'SINGLE' },
+            ]
+          : [],
     }),
 
     updateContest: builder.mutation<ApiSuccessResponse<Contest>, { id: string; body: FormData }>({
@@ -35,12 +44,15 @@ export const contestApi = createApi({
         method: 'PUT',
         body,
       }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'Contest', id },
-        { type: 'Contests', id: 'LIST' },
-        { type: 'ContestStats', id: 'SINGLE' },
-        { type: 'DashboardOverview', id: 'SINGLE' },
-      ],
+      invalidatesTags: (result, error, { id }) =>
+        result
+          ? [
+              { type: 'Contest', id },
+              { type: 'Contests', id: 'LIST' },
+              { type: 'ContestStats', id: 'SINGLE' },
+              { type: 'DashboardOverview', id: 'SINGLE' },
+            ]
+          : [],
     }),
 
     getContests: builder.query<
@@ -81,6 +93,3 @@ export const {
   useGetContestQuery,
   useLazyGetContestQuery,
 } = contestApi;
-
-
-

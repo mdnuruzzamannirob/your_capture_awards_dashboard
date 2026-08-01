@@ -46,7 +46,7 @@ const DetailsStep = () => {
       </header>
 
       <div className="grid gap-3.5 p-4.5">
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid items-start gap-3.5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="details.title"
@@ -76,7 +76,7 @@ const DetailsStep = () => {
           />
         </div>
 
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid items-start gap-3.5 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="details.startDate"
