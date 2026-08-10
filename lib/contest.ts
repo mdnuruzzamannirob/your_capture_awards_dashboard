@@ -43,6 +43,9 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       maxUploads: Number(values.SUBMISSION_LIMIT ?? fallback.SUBMISSION_LIMIT.defaultValue),
       recurring: false,
       recurringType: undefined,
+      recurringTimezone: 'UTC',
+      recurringEndsAt: undefined,
+      recurringMaxOccurrences: undefined,
       startDate: new Date(Date.now() + 60 * 60 * 1000),
       endDate: new Date(Date.now() + 25 * 60 * 60 * 1000),
     },
@@ -208,6 +211,9 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       maxUploads: Number(submissionLimit),
       recurring: Boolean(contest.recurring),
       recurringType: contest.recurring ? (contest.recurringType ?? 'DAILY') : undefined,
+      recurringTimezone: defaults.details.recurringTimezone,
+      recurringEndsAt: undefined,
+      recurringMaxOccurrences: undefined,
       startDate: contest.startDate ? new Date(contest.startDate) : defaults.details.startDate,
       endDate: contest.endDate ? new Date(contest.endDate) : defaults.details.endDate,
     },
@@ -247,6 +253,20 @@ export function buildContestFormData(
   formData.append('category', details.category);
   formData.append('startDate', details.startDate.toISOString());
   formData.append('endDate', details.endDate.toISOString());
+  formData.append('recurring', String(details.recurring));
+  if (details.recurring) {
+    formData.append(
+      'recurrence',
+      JSON.stringify({
+        type: details.recurringType ?? 'DAILY',
+        timezone: details.recurringTimezone || 'UTC',
+        ...(details.recurringEndsAt ? { endsAt: details.recurringEndsAt.toISOString() } : {}),
+        ...(details.recurringMaxOccurrences
+          ? { maxOccurrences: details.recurringMaxOccurrences }
+          : {}),
+      }),
+    );
+  }
   formData.append('isMoneyContest', String(prizes.isMoneyContest));
   if (prizes.isMoneyContest) {
     formData.append('minPrize', String(prizes.minPrize));

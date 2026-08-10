@@ -6,7 +6,7 @@ import {
   useCreateContestMutation,
   useGetContestCreationOptionsQuery,
 } from '@/store/features/contest/contestApi';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import ContestForm from './ContestForm';
@@ -25,6 +25,8 @@ function getErrorMessage(error: unknown): string {
 
 const CreateContest = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const startRecurring = searchParams.get('recurring') === '1';
   const [createContest, { isLoading }] = useCreateContestMutation();
   const {
     data: optionsData,
@@ -74,10 +76,16 @@ const CreateContest = () => {
     );
   }
 
+  const initialValues = getDefaultContestValues(options);
+  if (startRecurring) {
+    initialValues.details.recurring = true;
+    initialValues.details.recurringType = 'DAILY';
+  }
+
   return (
     <ContestForm
       mode="create"
-      initialValues={getDefaultContestValues(options)}
+      initialValues={initialValues}
       isSubmitting={isLoading}
       onSubmit={handleSubmit}
       onCancel={() => router.push('/contest')}

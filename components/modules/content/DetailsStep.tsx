@@ -211,30 +211,97 @@ const DetailsStep = () => {
         />
 
         {recurring && (
-          <FormField
-            control={form.control}
-            name="details.recurringType"
-            render={({ field }) => (
-              <FormItem className={fieldClass}>
-                <FormLabel className={labelClass}>Recurring frequency</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <select
-                      className={selectClass}
-                      value={field.value ?? 'DAILY'}
-                      onChange={field.onChange}
-                    >
-                      <option value="DAILY">Daily</option>
-                      <option value="WEEKLY">Weekly</option>
-                      <option value="MONTHLY">Monthly</option>
-                    </select>
-                    <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
-                  </div>
-                </FormControl>
-                <FormMessage className={messageClass} />
-              </FormItem>
-            )}
-          />
+          <div className="grid gap-3.5 rounded-lg border border-dashed border-border-strong p-3.5">
+            <FormField
+              control={form.control}
+              name="details.recurringType"
+              render={({ field }) => (
+                <FormItem className={fieldClass}>
+                  <FormLabel className={labelClass}>Recurring frequency</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <select
+                        className={selectClass}
+                        value={field.value ?? 'DAILY'}
+                        onChange={field.onChange}
+                      >
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="MONTHLY">Monthly</option>
+                      </select>
+                      <ChevronDown className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+                    </div>
+                  </FormControl>
+                  <FormMessage className={messageClass} />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid items-start gap-3.5 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="details.recurringTimezone"
+                render={({ field }) => (
+                  <FormItem className={fieldClass}>
+                    <FormLabel className={labelClass}>Timezone</FormLabel>
+                    <FormControl>
+                      <Input className={inputClass} placeholder="e.g. UTC" {...field} />
+                    </FormControl>
+                    <FormMessage className={messageClass} />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="details.recurringMaxOccurrences"
+                render={({ field }) => (
+                  <FormItem className={fieldClass}>
+                    <FormLabel className={labelClass}>Max occurrences (optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={1}
+                        className={inputClass}
+                        placeholder="Unlimited"
+                        value={field.value ?? ''}
+                        onChange={(event) =>
+                          field.onChange(
+                            event.target.value === '' ? undefined : Number(event.target.value),
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage className={messageClass} />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="details.recurringEndsAt"
+              render={({ field }) => (
+                <FormItem className={fieldClass}>
+                  <FormLabel className={labelClass}>Recurrence ends at (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      className={`${inputClass} scheme-dark`}
+                      value={toDateTimeInputValue(field.value)}
+                      onBlur={field.onBlur}
+                      onChange={(event) =>
+                        field.onChange(
+                          event.target.value ? new Date(event.target.value) : undefined,
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage className={messageClass} />
+                </FormItem>
+              )}
+            />
+          </div>
         )}
       </div>
     </section>

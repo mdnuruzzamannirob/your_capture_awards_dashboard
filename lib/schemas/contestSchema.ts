@@ -31,6 +31,14 @@ export const contestDetailsSchema = z
     maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required'),
     recurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
+    recurringTimezone: z.string().trim().min(1).max(100).default('UTC'),
+    recurringEndsAt: z.coerce.date().optional(),
+    recurringMaxOccurrences: z.coerce
+      .number()
+      .int()
+      .positive('Must be at least 1')
+      .max(10000)
+      .optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
   })
@@ -47,6 +55,13 @@ export const contestDetailsSchema = z
         path: ['recurringType'],
         code: 'custom',
         message: 'Recurring frequency is required',
+      });
+    }
+    if (data.recurring && data.recurringEndsAt && data.recurringEndsAt <= data.startDate) {
+      ctx.addIssue({
+        path: ['recurringEndsAt'],
+        code: 'custom',
+        message: 'Recurrence end must be after the first occurrence',
       });
     }
   });
