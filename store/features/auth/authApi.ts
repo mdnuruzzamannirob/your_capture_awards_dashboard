@@ -23,9 +23,11 @@ export const authApi = createApi({
           dispatch(setUser(data?.user));
           Cookies.set('token', data?.token, {
             expires: arg.remember_me ? 7 : 1,
-            secure: true,
             sameSite: 'Strict',
             path: '/',
+            ...(typeof window !== 'undefined' && window.location.protocol === 'https:'
+              ? { secure: true }
+              : {}),
           });
         } catch {}
       },

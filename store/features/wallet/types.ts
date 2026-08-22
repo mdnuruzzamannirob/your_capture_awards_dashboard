@@ -18,22 +18,27 @@ export interface PaymentTransaction {
   planName: string | null;
   recurring: TransactionRecurring;
   userId: string;
-  stripe_sessino_id: string | null;
   amount: number;
   currency: string;
   method: string;
   type: TransactionType;
+  stripe_session_id: string | null;
   createdAt: string;
   updatedAt: string;
   user: PaymentUser;
 }
 
 export interface WalletTransactionStats {
+  totalTransactions: number;
+  successfulTransactions: number;
+  failedTransactions: number;
+  pendingTransactions: number;
   totalSuccessfulPayments: number;
   totalRevenue: number;
   thisMonthTotalRevenue: number;
   totalStoreRevenue: number;
   totalSubscriptionRevenue: number;
+  averageTransactionValue: number;
 }
 
 export interface TransactionsListData {

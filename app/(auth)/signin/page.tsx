@@ -8,6 +8,7 @@ import { SigninFormData, signinSchema } from '@/lib/schemas/authSchema';
 import { cn } from '@/lib/utils';
 import { useSigninMutation } from '@/store/features/auth/authApi';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -28,11 +29,18 @@ const Signin = () => {
 
   const signInSubmit = async (data: SigninFormData) => {
     try {
-      await signin({
+      const response = await signin({
         email: data?.email,
         password: data?.password,
         remember_me: rememberMe,
       }).unwrap();
+
+      Cookies.set('token', response.data.token, {
+        expires: rememberMe ? 7 : 1,
+        sameSite: 'Strict',
+        path: '/',
+        ...(window.location.protocol === 'https:' ? { secure: true } : {}),
+      });
 
       toast.success('Sign In Successful', {
         description: 'Redirecting you to the dashboard.',
