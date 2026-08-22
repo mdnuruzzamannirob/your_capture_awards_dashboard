@@ -207,7 +207,7 @@ const WalletManagement = () => {
                 <p>
                   Session ID:{' '}
                   <span className="font-mono text-xs">
-                    {selectedTransaction.stripe_sessino_id || 'N/A'}
+                    {selectedTransaction.stripe_session_id || 'N/A'}
                   </span>
                 </p>
               </div>

@@ -30,10 +30,14 @@ export const walletApi = createApi({
         success: response.success,
         message: response.message,
         data: {
-          payments: Array.isArray(response.data) ? response.data : [],
-          total: response.meta?.total ?? 0,
-          page: response.meta?.page ?? 1,
-          limit: response.meta?.limit ?? 10,
+          payments: Array.isArray(response.data)
+            ? response.data
+            : Array.isArray(response.data?.payments)
+              ? response.data.payments
+              : [],
+          total: response.data?.total ?? response.meta?.total ?? 0,
+          page: response.data?.page ?? response.meta?.page ?? 1,
+          limit: response.data?.limit ?? response.meta?.limit ?? 10,
         },
       }),
       providesTags: [{ type: 'Transactions', id: 'LIST' }],
