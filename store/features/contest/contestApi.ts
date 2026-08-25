@@ -4,6 +4,8 @@ import {
   ApiSuccessResponse,
   Contest,
   ContestCreationOptions,
+  RankedPhotographersResponse,
+  RankedPhotosResponse,
   ContestStats,
   GetContestsResponse,
 } from './types';
@@ -80,6 +82,27 @@ export const contestApi = createApi({
       query: ({ id }) => `/contests/${id}`,
       providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
     }),
+
+    getContestRankPhotos: builder.query<
+      ApiSuccessResponse<RankedPhotosResponse>,
+      { id: string; page?: number; limit?: number }
+    >({
+      query: ({ id, page = 1, limit = 20 }) =>
+        `/contests/${id}/rank-photos?page=${page}&limit=${limit}`,
+      providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
+    }),
+
+    getContestRankPhotographers: builder.query<
+      ApiSuccessResponse<RankedPhotographersResponse>,
+      { id: string; page?: number; limit?: number; level?: string }
+    >({
+      query: ({ id, page = 1, limit = 20, level }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (level) params.set('level', level);
+        return `/contests/${id}/rank-photographer?${params.toString()}`;
+      },
+      providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
+    }),
   }),
 });
 
@@ -92,4 +115,6 @@ export const {
   useLazyGetContestsQuery,
   useGetContestQuery,
   useLazyGetContestQuery,
+  useGetContestRankPhotosQuery,
+  useGetContestRankPhotographersQuery,
 } = contestApi;

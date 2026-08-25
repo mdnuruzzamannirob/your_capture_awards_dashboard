@@ -128,6 +128,78 @@ export interface ContestAward extends Partial<ContestAwardValue> {
   };
 }
 
+export interface ContestWinnerUser {
+  id?: string;
+  avatar?: string | null;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  username?: string | null;
+}
+
+export interface ContestWinnerPhoto {
+  id?: string;
+  title?: string | null;
+  contestId?: string;
+  participantId?: string;
+  photoId?: string;
+  rank?: number | null;
+  photo?: {
+    id?: string;
+    url?: string | null;
+    title?: string | null;
+  } | null;
+}
+
+export interface ContestWinner {
+  id?: string;
+  category?: ContestAwardType | 'TOP_RANK' | string;
+  type?: ContestAwardType | 'TOP_RANK' | string;
+  target?: 'PHOTO' | 'PHOTOGRAPHER' | string;
+  rank?: number | null;
+  user?: ContestWinnerUser | null;
+  photo?: ContestWinnerPhoto | null;
+  participant?: {
+    id?: string;
+    user?: ContestWinnerUser | null;
+  } | null;
+}
+
+export interface RankedPhoto {
+  contestPhotoId?: string;
+  userPhotoId?: string;
+  id?: string;
+  url?: string | null;
+  title?: string | null;
+  voteCount?: number;
+  rank?: number;
+  photographer?: ContestWinnerUser | null;
+  user?: ContestWinnerUser | null;
+}
+
+export interface RankedPhotographer {
+  participantId?: string;
+  id?: string;
+  rank?: number;
+  levelRank?: number;
+  level?: string;
+  user?: ContestWinnerUser | null;
+  photos?: RankedPhoto[];
+  totalVotes?: number;
+}
+
+export interface RankedPhotosResponse {
+  photos: RankedPhoto[];
+  meta?: unknown;
+}
+
+export interface RankedPhotographersResponse {
+  contestTotalVotes?: number;
+  levelTabs?: string[];
+  participants: RankedPhotographer[];
+  meta?: unknown;
+}
+
 export interface Contest {
   id: string;
   title: string;
@@ -147,7 +219,8 @@ export interface Contest {
   coinRequirement?: boolean;
   coin_required?: number;
   entryFeeCoins?: number;
-  maxUploads: number;
+  maxUpload?: number;
+  maxUploads?: number;
   level_requirements?: number[];
   rules?: ContestRule[];
   prizes?: ContestAward[];
@@ -162,9 +235,13 @@ export interface Contest {
     email?: string;
     avatar?: string | null;
   };
-  rankPhotos?: unknown[];
-  rankPhotographers?: unknown[];
-  winners?: unknown[] | { data?: unknown[] };
+  rankPhotos?: RankedPhoto[];
+  rankPhotographers?: RankedPhotographer[];
+  rank?: {
+    photos?: RankedPhoto[];
+    photographers?: RankedPhotographer[];
+  };
+  winners?: ContestWinner[] | { data?: ContestWinner[] };
 }
 
 export interface GetContestsResponse {

@@ -76,8 +76,9 @@ export const columns: ColumnDef<Contest>[] = [
     ),
   },
   {
-    accessorKey: 'maxUploads',
+    id: 'maxUpload',
     header: 'MAX UPLOAD',
+    cell: ({ row }) => row.original.maxUpload ?? row.original.maxUploads ?? 0,
   },
   {
     id: 'startDate',

@@ -100,7 +100,7 @@ const DetailsTab = ({
         <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
           <DetailItem label="Start date" value={formatDate(contest.startDate)} />
           <DetailItem label="End date" value={formatDate(contest.endDate)} />
-          <DetailItem label="Max uploads" value={contest.maxUploads ?? 0} />
+          <DetailItem label="Max uploads" value={contest.maxUpload ?? contest.maxUploads ?? 0} />
           <DetailItem label="Total votes" value={contest.totalVotes ?? 0} />
           <DetailItem
             label="Recurring"
