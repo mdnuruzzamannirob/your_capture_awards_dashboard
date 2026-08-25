@@ -1,7 +1,23 @@
 'use client';
 
-const WinnerTab = ({ contest }: { contest: any }) => {
-  const winners = contest?.winners?.data ?? contest?.winners ?? [];
+import type { Contest, ContestWinner } from '@/store/features/contest/types';
+
+function getWinnerUserName(winner: ContestWinner) {
+  return (
+    winner.user?.fullName ||
+    winner.participant?.user?.fullName ||
+    [winner.user?.firstName, winner.user?.lastName].filter(Boolean).join(' ') ||
+    [winner.participant?.user?.firstName, winner.participant?.user?.lastName]
+      .filter(Boolean)
+      .join(' ') ||
+    'Unknown user'
+  );
+}
+
+const WinnerTab = ({ contest }: { contest: Contest }) => {
+  const winners = Array.isArray(contest?.winners)
+    ? contest.winners
+    : (contest?.winners?.data ?? []);
 
   return (
     <div className="w-full space-y-6">
@@ -16,9 +32,7 @@ const WinnerTab = ({ contest }: { contest: any }) => {
                 ? 'Top Photographer Winner'
                 : 'Top Photo Winner'}
             </h3>
-            <p className="text-muted-foreground mt-2">
-              {winner?.participant?.user?.fullName ?? 'Unknown user'}
-            </p>
+            <p className="text-muted-foreground mt-2">{getWinnerUserName(winner)}</p>
           </div>
         ))
       ) : (
