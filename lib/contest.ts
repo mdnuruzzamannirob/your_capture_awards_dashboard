@@ -5,6 +5,7 @@ import type {
   ContestAward,
   ContestAwardType,
   ContestCreationOptions,
+  ContestOptionRule,
   ContestRuleKey,
 } from '@/store/features/contest/types';
 
@@ -13,6 +14,16 @@ const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 const acceptedSubmissionMimeTypes = ['image/jpeg', 'image/png'] as const;
 
 type AcceptedSubmissionMimeType = (typeof acceptedSubmissionMimeTypes)[number];
+
+function getOptionRuleValue(rule: ContestOptionRule): unknown {
+  return rule.value ?? rule.defaultValue;
+}
+
+function getDefaultRuleKeys(options?: ContestCreationOptions): ContestRuleKey[] {
+  const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
+  return (optionRules?.map((rule) => rule.key) ??
+    (Object.keys(contestRuleDefinitions) as ContestRuleKey[])) as ContestRuleKey[];
+}
 
 function normalizeSubmissionFormat(
   format: ContestFinalValues['rules']['submissionFormat'],
@@ -25,7 +36,10 @@ function normalizeSubmissionFormat(
 
 export function getDefaultContestValues(options?: ContestCreationOptions): ContestFinalValues {
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
-  const values = Object.fromEntries((optionRules ?? []).map((rule) => [rule.key, rule.value]));
+  const selectedRuleKeys = getDefaultRuleKeys(options);
+  const values = Object.fromEntries(
+    (optionRules ?? []).map((rule) => [rule.key, getOptionRuleValue(rule)]),
+  );
   const fallback = contestRuleDefinitions;
   const submissionRuleList = Array.isArray(values.SUBMISSION_RULES)
     ? (values.SUBMISSION_RULES as string[])
@@ -57,6 +71,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       coin_required: 0,
     },
     rules: {
+      selectedRuleKeys,
       submissionRules: submissionRuleList
         ? {
             intro: 'Do not post:',
@@ -186,6 +201,11 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   const awards = (sourceAwards ?? [])
     .map(normalizeAward)
     .filter((award): award is NonNullable<typeof award> => Boolean(award));
+  const enabledRuleKeys =
+    contest.rules?.filter((rule) => rule.enabled !== false).map((rule) => rule.key) ?? [];
+  const selectedRuleKeys = enabledRuleKeys.length
+    ? enabledRuleKeys
+    : defaults.rules.selectedRuleKeys;
   const levelFallback = (
     contest.level_requirements?.length === 5
       ? defaults.rules.levelRequirements.map((item, index) => ({
@@ -225,6 +245,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
     },
     rules: {
+      selectedRuleKeys,
       submissionRules: normalizeSubmissionRules(
         contest.rules?.find((rule) => rule.key === 'SUBMISSION_RULES')?.value,
         defaults.rules.submissionRules,
@@ -295,16 +316,23 @@ export function buildContestFormData(
     },
   };
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
+  const selectedRuleKeys = new Set(
+    rules.selectedRuleKeys.length
+      ? rules.selectedRuleKeys
+      : (Object.keys(ruleValues) as ContestRuleKey[]),
+  );
   const ruleOrder =
     optionRules?.map((rule) => rule.key) ?? (Object.keys(ruleValues) as ContestRuleKey[]);
+  const ruleOrders = new Map(optionRules?.map((rule) => [rule.key, rule.order]));
+  const selectedRuleOrder = ruleOrder.filter((key) => selectedRuleKeys.has(key));
   formData.append(
     'rules',
     JSON.stringify(
-      ruleOrder.map((key, index) => ({
+      selectedRuleOrder.map((key, index) => ({
         key,
         value: ruleValues[key],
         enabled: true,
-        order: (index + 1) * 10,
+        order: ruleOrders.get(key) ?? contestRuleDefinitions[key]?.order ?? (index + 1) * 10,
       })),
     ),
   );

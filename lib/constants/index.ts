@@ -51,6 +51,12 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
         'Similar images: Images with the same combination of subject, background, foreground and location are not allowed. Images must be distinct',
         'Same image multiple times (cropped, angle change or tone changes)',
         'AI images',
+        'Images you do not own or do not have permission to submit',
+        'Images with visible watermarks, logos, signatures, borders, or added text',
+        'Obscene, hateful, violent, sexually explicit, or otherwise offensive content',
+        'Photos that violate privacy or are submitted without required model or property releases',
+        'Misleading edits or composites that are not disclosed in the caption',
+        'Photos taken outside the contest stated capture period',
       ],
       removalNotice: "Images that don't comply may be removed from the challenge.",
       allowAiImages: false,
@@ -174,4 +180,3 @@ export const CONTEST_AWARD_OPTIONS: Array<{
 
 export const RECURRING_TYPES = ['DAILY', 'WEEKLY', 'MONTHLY'] as const;
 export type RecurringType = (typeof RECURRING_TYPES)[number];
-
