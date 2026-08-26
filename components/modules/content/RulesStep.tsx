@@ -37,7 +37,7 @@ const submissionOptions = [
   {
     id: 'similar-images',
     label:
-      'Similar images â€” images with the same subject, background, foreground, and location must be distinct',
+      'Similar images - images with the same subject, background, foreground, and location must be distinct',
     value:
       'Similar images: Images with the same combination of subject, background, foreground and location are not allowed. Images must be distinct',
     matches: (item: string) => item.toLowerCase().includes('similar images'),
@@ -92,7 +92,7 @@ const submissionOptions = [
   },
   {
     id: 'wrong-date',
-    label: 'Photos taken outside the contest’s stated capture period',
+    label: "Photos taken outside the contest's stated capture period",
     value: 'Photos taken outside the contest stated capture period',
     matches: (item: string) => item.toLowerCase().includes('capture period'),
   },
@@ -385,7 +385,7 @@ const RulesStep = () => {
                 <div className="contents" key={key}>
                   {index === 1 && (
                     <b className="text-caption-foreground pb-[11px] text-center text-xs font-medium">
-                      Ã—
+                      x
                     </b>
                   )}
                   <FormField

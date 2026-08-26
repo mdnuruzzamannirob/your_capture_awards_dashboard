@@ -11,7 +11,11 @@ export const contestDetailsSchema = z
       .trim()
       .min(5, 'Title must be at least 5 characters')
       .max(100, 'Title must not exceed 100 characters'),
-    category: z.string().trim().max(100, 'Category must not exceed 100 characters').default(''),
+    category: z
+      .string()
+      .trim()
+      .min(1, 'Category is required')
+      .max(100, 'Category must not exceed 100 characters'),
     description: z
       .string()
       .trim()
@@ -71,10 +75,18 @@ export const contestPrizesSchema = z
     isMoneyContest: z.boolean().default(false),
     minPrize: z.coerce.number().min(0).default(0),
     maxPrize: z.coerce.number().min(0).default(0),
+    currency: z.string().trim().toUpperCase().max(3).optional(),
     coin_requirement: z.boolean().default(false),
     coin_required: z.coerce.number().int().min(0).default(0),
   })
   .superRefine((data, ctx) => {
+    if (data.isMoneyContest && (!data.currency || !/^[A-Z]{3}$/.test(data.currency))) {
+      ctx.addIssue({
+        path: ['currency'],
+        code: 'custom',
+        message: 'A valid 3-letter currency code is required',
+      });
+    }
     if (data.isMoneyContest && data.maxPrize <= 0) {
       ctx.addIssue({ path: ['maxPrize'], code: 'custom', message: 'Prize amount is required' });
     }
@@ -101,7 +113,7 @@ export const contestRulesSchema = z.object({
   selectedRuleKeys: z.array(z.enum(contestRuleKeys)).min(1, 'Select at least one contest rule'),
   submissionRules: z.object({
     intro: requiredText,
-    disallowed: z.array(requiredText).min(1, 'Add at least one disallowed item'),
+    disallowed: z.array(requiredText),
     removalNotice: requiredText,
     allowAiImages: z.boolean(),
     duplicatePolicy: requiredText,
