@@ -25,6 +25,16 @@ function getDefaultRuleKeys(options?: ContestCreationOptions): ContestRuleKey[] 
     (Object.keys(contestRuleDefinitions) as ContestRuleKey[])) as ContestRuleKey[];
 }
 
+function getCategoryId(category: string, options?: ContestCreationOptions): string | undefined {
+  const normalizedCategory = category.trim().toLowerCase();
+  return options?.categories?.find(
+    (item) =>
+      item.id === category ||
+      item.name.toLowerCase() === normalizedCategory ||
+      item.slug?.toLowerCase() === normalizedCategory,
+  )?.id;
+}
+
 function normalizeSubmissionFormat(
   format: ContestFinalValues['rules']['submissionFormat'],
 ): ContestFinalValues['rules']['submissionFormat'] {
@@ -34,16 +44,44 @@ function normalizeSubmissionFormat(
   return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg'] };
 }
 
+function getDefaultSubmissionRules(
+  value: unknown,
+  fallback: ContestFinalValues['rules']['submissionRules'],
+): ContestFinalValues['rules']['submissionRules'] {
+  const defaults = clone(fallback);
+
+  if (Array.isArray(value)) {
+    const lastRule = value
+      .filter((item): item is string => typeof item === 'string' && Boolean(item.trim()))
+      .at(-1);
+
+    return {
+      ...defaults,
+      removalNotice: lastRule ?? defaults.removalNotice,
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    const ruleValue = value as Partial<ContestFinalValues['rules']['submissionRules']>;
+    return {
+      ...defaults,
+      ...ruleValue,
+      disallowed: defaults.disallowed,
+      allowAiImages: false,
+    };
+  }
+
+  return defaults;
+}
+
 export function getDefaultContestValues(options?: ContestCreationOptions): ContestFinalValues {
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
   const selectedRuleKeys = getDefaultRuleKeys(options);
+  const defaultCategory = options?.categories?.[0]?.name ?? '';
   const values = Object.fromEntries(
     (optionRules ?? []).map((rule) => [rule.key, getOptionRuleValue(rule)]),
   );
   const fallback = contestRuleDefinitions;
-  const submissionRuleList = Array.isArray(values.SUBMISSION_RULES)
-    ? (values.SUBMISSION_RULES as string[])
-    : null;
   const defaultPrizes = (
     options?.prizeDefinitions?.length ? options.prizeDefinitions : (options?.prizes ?? [])
   ).filter((prize) => prize.isDefault && prize.type !== 'YC_PICK');
@@ -51,7 +89,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
   return {
     details: {
       title: '',
-      category: '',
+      category: defaultCategory,
       description: '',
       banner: undefined,
       maxUploads: Number(values.SUBMISSION_LIMIT ?? fallback.SUBMISSION_LIMIT.defaultValue),
@@ -67,22 +105,16 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       isMoneyContest: false,
       minPrize: 0,
       maxPrize: 0,
+      currency: 'USD',
       coin_requirement: false,
       coin_required: 0,
     },
     rules: {
       selectedRuleKeys,
-      submissionRules: submissionRuleList
-        ? {
-            intro: 'Do not post:',
-            disallowed: submissionRuleList.slice(0, -1),
-            removalNotice: submissionRuleList.at(-1) ?? '',
-            allowAiImages: false,
-            duplicatePolicy: 'DISALLOW_SAME_PHOTO',
-          }
-        : (clone(
-            fallback.SUBMISSION_RULES.defaultValue,
-          ) as ContestFinalValues['rules']['submissionRules']),
+      submissionRules: getDefaultSubmissionRules(
+        values.SUBMISSION_RULES,
+        fallback.SUBMISSION_RULES.defaultValue as ContestFinalValues['rules']['submissionRules'],
+      ),
       levelRequirements: clone(
         values.LEVEL_REQUIREMENTS ?? fallback.LEVEL_REQUIREMENTS.defaultValue,
       ) as ContestFinalValues['rules']['levelRequirements'],
@@ -241,6 +273,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       isMoneyContest: Boolean(contest.isMoneyContest),
       minPrize: Number(contest.minPrize ?? 0),
       maxPrize: Number(contest.maxPrize ?? 0),
+      currency: contest.currency ?? 'USD',
       coin_requirement: Boolean(contest.coinRequirement ?? contest.coin_requirement),
       coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
     },
@@ -272,6 +305,8 @@ export function buildContestFormData(
   formData.append('title', details.title);
   formData.append('description', details.description);
   formData.append('category', details.category);
+  const categoryId = getCategoryId(details.category, options);
+  if (categoryId) formData.append('categoryId', categoryId);
   formData.append('startDate', details.startDate.toISOString());
   formData.append('endDate', details.endDate.toISOString());
   formData.append('recurring', String(details.recurring));
@@ -292,6 +327,7 @@ export function buildContestFormData(
   if (prizes.isMoneyContest) {
     formData.append('minPrize', String(prizes.minPrize));
     formData.append('maxPrize', String(prizes.maxPrize));
+    formData.append('currency', prizes.currency ?? 'USD');
   }
   formData.append('coinRequirement', String(prizes.coin_requirement));
   if (prizes.coin_requirement) {
@@ -301,7 +337,10 @@ export function buildContestFormData(
 
   const ruleValues: Record<ContestRuleKey, unknown> = {
     SUBMISSION_LIMIT: details.maxUploads,
-    SUBMISSION_RULES: [...rules.submissionRules.disallowed, rules.submissionRules.removalNotice],
+    SUBMISSION_RULES: {
+      ...rules.submissionRules,
+      disallowed: rules.submissionRules.disallowed,
+    },
     LEVEL_REQUIREMENTS: rules.levelRequirements,
     SUBMISSION_FORMAT: {
       ...rules.submissionFormat,

@@ -56,7 +56,7 @@ const PrizesStep = () => {
         <FormSwitch name="prizes.isMoneyContest" label="Is money contest" />
 
         {isMoneyContest && (
-          <div className="grid items-start gap-[14px] sm:grid-cols-2">
+          <div className="grid items-start gap-[14px] sm:grid-cols-3">
             <FormField
               control={form.control}
               name="prizes.minPrize"
@@ -89,6 +89,26 @@ const PrizesStep = () => {
                       className={inputClass}
                       {...field}
                       onChange={(event) => field.onChange(event.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[9px]" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="prizes.currency"
+              render={({ field }) => (
+                <FormItem className="gap-1.5">
+                  <FormLabel className={labelClass}>Currency</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="USD"
+                      maxLength={3}
+                      className={inputClass}
+                      {...field}
+                      value={field.value ?? ''}
+                      onChange={(event) => field.onChange(event.target.value.toUpperCase())}
                     />
                   </FormControl>
                   <FormMessage className="text-[9px]" />
