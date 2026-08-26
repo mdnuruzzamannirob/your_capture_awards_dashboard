@@ -1,4 +1,4 @@
-﻿import { contestAwardTypes } from '@/store/features/contest/types';
+﻿import { contestAwardTypes, contestRuleKeys } from '@/store/features/contest/types';
 import { z } from 'zod';
 
 const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
@@ -98,6 +98,7 @@ const requiredText = z.string().trim().min(1, 'This field is required');
 const shortRuleText = requiredText.max(300, 'Text must not exceed 300 characters');
 
 export const contestRulesSchema = z.object({
+  selectedRuleKeys: z.array(z.enum(contestRuleKeys)).min(1, 'Select at least one contest rule'),
   submissionRules: z.object({
     intro: requiredText,
     disallowed: z.array(requiredText).min(1, 'Add at least one disallowed item'),
@@ -114,11 +115,7 @@ export const contestRulesSchema = z.object({
     )
     .length(5),
   submissionFormat: z.object({
-    mimeTypes: z
-      .array(
-        z.enum(['image/jpeg', 'image/png']),
-      )
-      .min(1, 'Select a file type'),
+    mimeTypes: z.array(z.enum(['image/jpeg', 'image/png'])).min(1, 'Select a file type'),
     minWidth: z.coerce.number().int().min(1),
     minHeight: z.coerce.number().int().min(1),
     maxSizeMB: z.coerce.number().min(1),

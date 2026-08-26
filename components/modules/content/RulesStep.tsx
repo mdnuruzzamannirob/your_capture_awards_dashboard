@@ -1,9 +1,12 @@
 ﻿'use client';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import DynamicIcon from '@/components/common/DynamicIcon';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { contestRuleDefinitions } from '@/lib/constants';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import type { ContestRuleKey } from '@/store/features/contest/types';
 import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -13,6 +16,9 @@ const inputClass =
   'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
 const selectClass = `${inputClass} scheme-dark w-full appearance-none pr-9 text-foreground outline-none`;
 const labelClass = 'text-xs font-medium text-label-foreground data-[error=true]:text-destructive';
+const contestRuleOptions = (
+  Object.values(contestRuleDefinitions) as Array<(typeof contestRuleDefinitions)[ContestRuleKey]>
+).sort((a, b) => a.order - b.order);
 const tierName: Record<string, string> = {
   AMATEUR: 'Amateur',
   TALENTED: 'Talented',
@@ -72,7 +78,8 @@ const submissionOptions = [
   {
     id: 'privacy-violations',
     label: 'Photos that violate privacy or are submitted without required model/property releases',
-    value: 'Photos that violate privacy or are submitted without required model or property releases',
+    value:
+      'Photos that violate privacy or are submitted without required model or property releases',
     matches: (item: string) =>
       item.toLowerCase().includes('privacy') || item.toLowerCase().includes('model or property'),
   },
@@ -143,6 +150,8 @@ function SystemTextField({
 const RulesStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const levels = form.watch('rules.levelRequirements');
+  const selectedRuleKeys = form.watch('rules.selectedRuleKeys') ?? [];
+  const isRuleSelected = (key: ContestRuleKey) => selectedRuleKeys.includes(key);
 
   return (
     <section
@@ -155,194 +164,156 @@ const RulesStep = () => {
         </h2>
       </header>
 
-      <RuleEditor title="Submission limit">
+      <RuleEditor title="Rule fields">
         <FormField
           control={form.control}
-          name="details.maxUploads"
-          render={({ field }) => (
-            <FormItem className="gap-1.5">
-              <FormLabel className={labelClass}>Maximum submissions</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  className={inputClass}
-                  {...field}
-                  onChange={(event) => field.onChange(event.target.value)}
-                />
-              </FormControl>
-              <FormMessage className="text-[9px]" />
-            </FormItem>
-          )}
-        />
-      </RuleEditor>
+          name="rules.selectedRuleKeys"
+          render={({ field }) => {
+            const value = Array.isArray(field.value) ? field.value : [];
 
-      <RuleEditor title="Submission rules">
-        <FormField
-          control={form.control}
-          name="rules.submissionRules.disallowed"
-          render={({ field }) => (
-            <FormItem className="gap-0">
-              <FormLabel className={`${labelClass} mb-[7px]`}>Select rules</FormLabel>
-              <div className="grid gap-0.5">
-                {submissionOptions.map((option) => {
-                  const disallowed = Array.isArray(field.value) ? field.value : [];
-                  const checked = disallowed.some(option.matches);
-                  return (
-                    <label
-                      key={option.id}
-                      className="text-body hover:bg-surface-tertiary flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[7px] px-1 py-1.5 text-[10px] transition-colors"
-                    >
-                      <Checkbox
-                        checked={checked}
-                        className="size-[19px] rounded-md"
-                        onCheckedChange={(nextChecked) => {
-                          const withoutCurrent = disallowed.filter(
-                            (item) => !option.matches(item),
-                          );
-                          field.onChange(
-                            nextChecked ? [...withoutCurrent, option.value] : withoutCurrent,
-                          );
-                          if (option.id === 'ai-generated') {
-                            form.setValue('rules.submissionRules.allowAiImages', !nextChecked, {
-                              shouldDirty: true,
-                            });
-                          }
-                        }}
-                      />
-                      <span>{option.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-              <FormMessage className="mt-1 text-[9px]" />
-            </FormItem>
-          )}
-        />
-      </RuleEditor>
-
-      <RuleEditor title="Level requirements">
-        <div className="text-caption-foreground grid grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] gap-2.5 pb-1 text-xs font-bold">
-          <span>Level</span>
-          <span>Votes</span>
-        </div>
-        <div className="grid gap-[3px]">
-          {levels.map((item, index) => (
-            <div
-              key={item.level}
-              className="grid min-h-[43px] grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] items-center gap-2.5 py-[3px]"
-            >
-              <span className="text-body text-sm font-semibold">
-                {tierName[item.level] ?? item.level}
-              </span>
-              <FormField
-                control={form.control}
-                name={`rules.levelRequirements.${index}.votes`}
-                render={({ field }) => (
-                  <FormItem className="gap-1">
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type="number"
-                          min={0}
-                          aria-label={`Required votes for ${tierName[item.level] ?? item.level}`}
-                          className={`${inputClass} pr-[43px]`}
-                          {...field}
-                          onChange={(event) => field.onChange(event.target.value)}
-                        />
-                        <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
-                          votes
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage className="text-[9px]" />
-                  </FormItem>
-                )}
-              />
-            </div>
-          ))}
-        </div>
-      </RuleEditor>
-
-      <RuleEditor title="Submission format">
-        <FormField
-          control={form.control}
-          name="rules.submissionFormat.mimeTypes"
-          render={({ field }) => (
-            <FormItem className="gap-[7px]">
-              <FormLabel className={labelClass}>Accepted file formats</FormLabel>
-              <div className="flex flex-wrap gap-1.5">
-                {fileFormatOptions.map((format) => {
-                  const checked = field.value.includes(format.value);
-                  return (
-                    <label key={format.value} className="cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        className="sr-only"
-                        onChange={() =>
-                          field.onChange(
-                            checked
-                              ? field.value.filter((item) => item !== format.value)
-                              : [...field.value, format.value],
-                          )
-                        }
-                      />
-                      <span
-                        className={`inline-flex h-8 min-w-[61px] items-center justify-center gap-1 rounded-lg border px-2 text-[9px] font-extrabold transition-colors ${
-                          checked
-                            ? 'border-primary/60 bg-primary-soft text-primary-soft-foreground'
-                            : 'border-input bg-surface-secondary text-muted-foreground'
-                        }`}
+            return (
+              <FormItem className="gap-0">
+                <FormLabel className={`${labelClass} mb-[7px]`}>Select rules to add</FormLabel>
+                <div className="grid gap-1 sm:grid-cols-2">
+                  {contestRuleOptions.map((rule) => {
+                    const checked = value.includes(rule.key);
+                    return (
+                      <label
+                        key={rule.key}
+                        className="text-body hover:bg-surface-tertiary flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[7px] px-1 py-1.5 text-[10px] transition-colors"
                       >
-                        {checked && <Check size={12} />}
-                        {format.label}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-              <FormMessage className="text-[9px]" />
-            </FormItem>
-          )}
+                        <Checkbox
+                          checked={checked}
+                          className="size-[19px] rounded-md"
+                          onCheckedChange={(nextChecked) => {
+                            const selected = Boolean(nextChecked);
+                            const nextValue = selected
+                              ? contestRuleOptions
+                                  .map((option) => option.key)
+                                  .filter((key) => key === rule.key || value.includes(key))
+                              : value.filter((key) => key !== rule.key);
+                            field.onChange(nextValue);
+                          }}
+                        />
+                        <DynamicIcon
+                          name={rule.icon}
+                          className="text-caption-foreground size-[14px] shrink-0"
+                        />
+                        <span>{rule.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <FormMessage className="mt-1 text-[9px]" />
+              </FormItem>
+            );
+          }}
         />
+      </RuleEditor>
 
-        <div className="grid gap-[7px]">
-          <div className="flex items-center justify-between pb-[7px]">
-            <span className={labelClass}>Minimum resolution</span>
-            <small className="text-caption-foreground text-[8px]">Pixels</small>
+      {isRuleSelected('SUBMISSION_LIMIT') && (
+        <RuleEditor title="Submission limit">
+          <FormField
+            control={form.control}
+            name="details.maxUploads"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className={labelClass}>Maximum submissions</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    className={inputClass}
+                    {...field}
+                    onChange={(event) => field.onChange(event.target.value)}
+                  />
+                </FormControl>
+                <FormMessage className="text-[9px]" />
+              </FormItem>
+            )}
+          />
+        </RuleEditor>
+      )}
+
+      {isRuleSelected('SUBMISSION_RULES') && (
+        <RuleEditor title="Submission rules">
+          <FormField
+            control={form.control}
+            name="rules.submissionRules.disallowed"
+            render={({ field }) => (
+              <FormItem className="gap-0">
+                <FormLabel className={`${labelClass} mb-[7px]`}>Select rules</FormLabel>
+                <div className="grid gap-0.5">
+                  {submissionOptions.map((option) => {
+                    const disallowed = Array.isArray(field.value) ? field.value : [];
+                    const checked = disallowed.some(option.matches);
+                    return (
+                      <label
+                        key={option.id}
+                        className="text-body hover:bg-surface-tertiary flex min-h-[38px] cursor-pointer items-center gap-2 rounded-[7px] px-1 py-1.5 text-[10px] transition-colors"
+                      >
+                        <Checkbox
+                          checked={checked}
+                          className="size-[19px] rounded-md"
+                          onCheckedChange={(nextChecked) => {
+                            const withoutCurrent = disallowed.filter(
+                              (item) => !option.matches(item),
+                            );
+                            field.onChange(
+                              nextChecked ? [...withoutCurrent, option.value] : withoutCurrent,
+                            );
+                            if (option.id === 'ai-generated') {
+                              form.setValue('rules.submissionRules.allowAiImages', !nextChecked, {
+                                shouldDirty: true,
+                              });
+                            }
+                          }}
+                        />
+                        <span>{option.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                <FormMessage className="mt-1 text-[9px]" />
+              </FormItem>
+            )}
+          />
+        </RuleEditor>
+      )}
+
+      {isRuleSelected('LEVEL_REQUIREMENTS') && (
+        <RuleEditor title="Level requirements">
+          <div className="text-caption-foreground grid grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] gap-2.5 pb-1 text-xs font-bold">
+            <span>Level</span>
+            <span>Votes</span>
           </div>
-          <div className="grid grid-cols-[minmax(0,1fr)_15px_minmax(0,1fr)] items-end gap-[7px]">
-            {(
-              [
-                ['minWidth', 'Width'],
-                ['minHeight', 'Height'],
-              ] as const
-            ).map(([key, label], index) => (
-              <div className="contents" key={key}>
-                {index === 1 && (
-                  <b className="text-caption-foreground pb-[11px] text-center text-xs font-medium">
-                    Ã—
-                  </b>
-                )}
+          <div className="grid gap-[3px]">
+            {levels.map((item, index) => (
+              <div
+                key={item.level}
+                className="grid min-h-[43px] grid-cols-[minmax(0,1fr)_minmax(120px,0.72fr)] items-center gap-2.5 py-[3px]"
+              >
+                <span className="text-body text-sm font-semibold">
+                  {tierName[item.level] ?? item.level}
+                </span>
                 <FormField
                   control={form.control}
-                  name={`rules.submissionFormat.${key}`}
+                  name={`rules.levelRequirements.${index}.votes`}
                   render={({ field }) => (
-                    <FormItem className="gap-1.5">
-                      <FormLabel className={labelClass}>{label}</FormLabel>
+                    <FormItem className="gap-1">
                       <FormControl>
                         <div className="relative">
                           <Input
                             type="number"
-                            min={1}
-                            className={`${inputClass} pr-12`}
+                            min={0}
+                            aria-label={`Required votes for ${tierName[item.level] ?? item.level}`}
+                            className={`${inputClass} pr-[43px]`}
                             {...field}
                             onChange={(event) => field.onChange(event.target.value)}
                           />
-                          <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
-                            px
-                          </i>
+                          <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
+                            votes
+                          </span>
                         </div>
                       </FormControl>
                       <FormMessage className="text-[9px]" />
@@ -352,76 +323,177 @@ const RulesStep = () => {
               </div>
             ))}
           </div>
-        </div>
+        </RuleEditor>
+      )}
 
-        <FormField
-          control={form.control}
-          name="rules.submissionFormat.maxSizeMB"
-          render={({ field }) => (
-            <FormItem className="gap-1.5">
-              <FormLabel className={labelClass}>Maximum image size</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    min={1}
-                    className={`${inputClass} pr-12`}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
-                  />
-                  <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
-                    MB
-                  </i>
+      {isRuleSelected('SUBMISSION_FORMAT') && (
+        <RuleEditor title="Submission format">
+          <FormField
+            control={form.control}
+            name="rules.submissionFormat.mimeTypes"
+            render={({ field }) => (
+              <FormItem className="gap-[7px]">
+                <FormLabel className={labelClass}>Accepted file formats</FormLabel>
+                <div className="flex flex-wrap gap-1.5">
+                  {fileFormatOptions.map((format) => {
+                    const checked = field.value.includes(format.value);
+                    return (
+                      <label key={format.value} className="cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          className="sr-only"
+                          onChange={() =>
+                            field.onChange(
+                              checked
+                                ? field.value.filter((item) => item !== format.value)
+                                : [...field.value, format.value],
+                            )
+                          }
+                        />
+                        <span
+                          className={`inline-flex h-8 min-w-[61px] items-center justify-center gap-1 rounded-lg border px-2 text-[9px] font-extrabold transition-colors ${
+                            checked
+                              ? 'border-primary/60 bg-primary-soft text-primary-soft-foreground'
+                              : 'border-input bg-surface-secondary text-muted-foreground'
+                          }`}
+                        >
+                          {checked && <Check size={12} />}
+                          {format.label}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
-              </FormControl>
-              <FormMessage className="text-[9px]" />
-            </FormItem>
-          )}
-        />
-      </RuleEditor>
+                <FormMessage className="text-[9px]" />
+              </FormItem>
+            )}
+          />
 
-      <RuleEditor title="Eligibility">
-        <FormField
-          control={form.control}
-          name="rules.eligibility.minAge"
-          render={({ field }) => (
-            <FormItem className="gap-1.5">
-              <FormLabel className={labelClass}>Minimum participant age</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input
-                    type="number"
-                    min={0}
-                    max={200}
-                    step={1}
-                    inputMode="numeric"
-                    aria-label="Minimum participant age"
-                    className={`${inputClass} pr-14`}
-                    {...field}
-                    onChange={(event) => field.onChange(event.target.value)}
+          <div className="grid gap-[7px]">
+            <div className="flex items-center justify-between pb-[7px]">
+              <span className={labelClass}>Minimum resolution</span>
+              <small className="text-caption-foreground text-[8px]">Pixels</small>
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)_15px_minmax(0,1fr)] items-end gap-[7px]">
+              {(
+                [
+                  ['minWidth', 'Width'],
+                  ['minHeight', 'Height'],
+                ] as const
+              ).map(([key, label], index) => (
+                <div className="contents" key={key}>
+                  {index === 1 && (
+                    <b className="text-caption-foreground pb-[11px] text-center text-xs font-medium">
+                      Ã—
+                    </b>
+                  )}
+                  <FormField
+                    control={form.control}
+                    name={`rules.submissionFormat.${key}`}
+                    render={({ field }) => (
+                      <FormItem className="gap-1.5">
+                        <FormLabel className={labelClass}>{label}</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              type="number"
+                              min={1}
+                              className={`${inputClass} pr-12`}
+                              {...field}
+                              onChange={(event) => field.onChange(event.target.value)}
+                            />
+                            <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
+                              px
+                            </i>
+                          </div>
+                        </FormControl>
+                        <FormMessage className="text-[9px]" />
+                      </FormItem>
+                    )}
                   />
-                  <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
-                    years
-                  </span>
                 </div>
-              </FormControl>
-              <FormMessage className="text-[9px]" />
-            </FormItem>
-          )}
-        />
-      </RuleEditor>
+              ))}
+            </div>
+          </div>
 
-      <RuleEditor title="Copyright">
-        <SystemTextField name="rules.copyright.text" label="Copyright text" />
-      </RuleEditor>
+          <FormField
+            control={form.control}
+            name="rules.submissionFormat.maxSizeMB"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className={labelClass}>Maximum image size</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min={1}
+                      className={`${inputClass} pr-12`}
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    />
+                    <i className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold not-italic">
+                      MB
+                    </i>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-[9px]" />
+              </FormItem>
+            )}
+          />
+        </RuleEditor>
+      )}
 
-      <RuleEditor title="Voting">
-        <SystemTextField name="rules.voting.text" label="Voting text" />
-      </RuleEditor>
+      {isRuleSelected('ELIGIBILITY') && (
+        <RuleEditor title="Eligibility">
+          <FormField
+            control={form.control}
+            name="rules.eligibility.minAge"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className={labelClass}>Minimum participant age</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={200}
+                      step={1}
+                      inputMode="numeric"
+                      aria-label="Minimum participant age"
+                      className={`${inputClass} pr-14`}
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    />
+                    <span className="text-caption-foreground pointer-events-none absolute top-1/2 right-[10px] -translate-y-1/2 text-[8px] font-bold">
+                      years
+                    </span>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-[9px]" />
+              </FormItem>
+            )}
+          />
+        </RuleEditor>
+      )}
 
-      <RuleEditor title="Participation">
-        <SystemTextField name="rules.participation.text" label="Participation text" />
-      </RuleEditor>
+      {isRuleSelected('COPYRIGHT') && (
+        <RuleEditor title="Copyright">
+          <SystemTextField name="rules.copyright.text" label="Copyright text" />
+        </RuleEditor>
+      )}
+
+      {isRuleSelected('VOTING') && (
+        <RuleEditor title="Voting">
+          <SystemTextField name="rules.voting.text" label="Voting text" />
+        </RuleEditor>
+      )}
+
+      {isRuleSelected('PARTICIPATION') && (
+        <RuleEditor title="Participation">
+          <SystemTextField name="rules.participation.text" label="Participation text" />
+        </RuleEditor>
+      )}
     </section>
   );
 };

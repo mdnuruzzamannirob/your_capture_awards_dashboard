@@ -265,8 +265,13 @@ export interface ContestOptionRule {
   key: ContestRuleKey;
   label: string;
   description?: string;
+  icon?: string;
   inputType: 'number' | 'object' | 'list';
-  value: unknown;
+  value?: unknown;
+  defaultValue?: unknown;
+  appliesTo?: string[];
+  displayOnly?: boolean;
+  order?: number;
   payload?: Partial<Record<ContestRuleKey, unknown>>;
 }
 
