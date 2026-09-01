@@ -10,6 +10,7 @@ import {
   mapRecurringContestToDetailsValues,
   mapRecurringContestToIntervalValues,
 } from '@/lib/recurringContest';
+import { formatInTimeZone } from '@/lib/timezone';
 import { useGetRecurringContestQuery } from '@/store/features/recurringContest/recurringContestApi';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import Link from 'next/link';
@@ -22,17 +23,6 @@ import GeneratedContestsPanel from './GeneratedContestsPanel';
 import RecurringAwardsPanel from './RecurringAwardsPanel';
 import RecurringContestDetailsSkeleton from './RecurringContestDetailsSkeleton';
 import RecurringStatusActions from './RecurringStatusActions';
-
-function formatDate(value?: string) {
-  if (!value) return 'Not available';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'Not available';
-  return new Intl.DateTimeFormat('en', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'UTC',
-  }).format(date);
-}
 
 function DetailItem({ label, value }: { label: string; value: string | number }) {
   return (
@@ -51,6 +41,7 @@ const RecurringContestDetails = () => {
   const [intervalDialogOpen, setIntervalDialogOpen] = useState(false);
 
   const contest = data?.data;
+  const timezone = contest?.recurring.timezone ?? 'UTC';
 
   if (isLoading || isFetching) {
     return <RecurringContestDetailsSkeleton />;
@@ -118,18 +109,18 @@ const RecurringContestDetails = () => {
 
             <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
               <DetailItem label="Category" value={contest.category || 'Uncategorized'} />
-              <DetailItem label="First occurrence start" value={formatDate(contest.startDate)} />
-              <DetailItem label="First occurrence end" value={formatDate(contest.endDate)} />
+              <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, timezone)} />
+              <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, timezone)} />
               <DetailItem label="Frequency" value={getRecurrenceLabel(contest.recurring.recurringType)} />
-              <DetailItem label="Timezone" value={contest.recurring.timezone ?? 'UTC'} />
-              <DetailItem label="Next occurrence" value={formatDate(contest.recurring.nextOccurrence)} />
+              <DetailItem label="Timezone" value={timezone} />
+              <DetailItem label="Next occurrence" value={formatInTimeZone(contest.recurring.nextOccurrence, timezone)} />
               <DetailItem
                 label="Previous occurrence"
-                value={contest.recurring.previousOccurrence ? formatDate(contest.recurring.previousOccurrence) : 'None yet'}
+                value={contest.recurring.previousOccurrence ? formatInTimeZone(contest.recurring.previousOccurrence, timezone) : 'None yet'}
               />
               <DetailItem
                 label="Recurrence ends"
-                value={contest.recurring.endsAt ? formatDate(contest.recurring.endsAt) : 'Never'}
+                value={contest.recurring.endsAt ? formatInTimeZone(contest.recurring.endsAt, timezone) : 'Never'}
               />
               <DetailItem
                 label="Max occurrences"
@@ -145,8 +136,8 @@ const RecurringContestDetails = () => {
                     : 'No'
                 }
               />
-              <DetailItem label="Created at" value={formatDate(contest.createdAt)} />
-              <DetailItem label="Updated at" value={formatDate(contest.updatedAt)} />
+              <DetailItem label="Created at" value={formatInTimeZone(contest.createdAt, timezone)} />
+              <DetailItem label="Updated at" value={formatInTimeZone(contest.updatedAt, timezone)} />
             </div>
 
             {Boolean(contest.rules?.length) && (
@@ -171,6 +162,7 @@ const RecurringContestDetails = () => {
         open={detailsDialogOpen}
         onOpenChange={setDetailsDialogOpen}
         initialValues={mapRecurringContestToDetailsValues(contest)}
+        timezone={timezone}
       />
       <EditRecurringIntervalDialog
         id={contest.id}

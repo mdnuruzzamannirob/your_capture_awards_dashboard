@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { buildUpdateRecurringContestBody, getApiErrorMessage } from '@/lib/recurringContest';
 import { recurringDetailsSchema, type RecurringDetailsValues } from '@/lib/schemas/recurringContestSchema';
+import { dateToZonedInput, zonedInputToDate } from '@/lib/timezone';
 import { useUpdateRecurringContestMutation } from '@/store/features/recurringContest/recurringContestApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -21,17 +22,12 @@ import { useEffect } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-function toDateTimeInputValue(value?: Date) {
-  if (!value || Number.isNaN(value.getTime())) return '';
-  const localDate = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
-  return localDate.toISOString().slice(0, 16);
-}
-
 type EditRecurringDetailsDialogProps = {
   id: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialValues: RecurringDetailsValues;
+  timezone: string;
 };
 
 const EditRecurringDetailsDialog = ({
@@ -39,6 +35,7 @@ const EditRecurringDetailsDialog = ({
   open,
   onOpenChange,
   initialValues,
+  timezone,
 }: EditRecurringDetailsDialogProps) => {
   const [updateRecurringContest, { isLoading }] = useUpdateRecurringContestMutation();
   const form = useForm<RecurringDetailsValues>({
@@ -126,8 +123,8 @@ const EditRecurringDetailsDialog = ({
                       <Input
                         type="datetime-local"
                         className="scheme-dark"
-                        value={toDateTimeInputValue(field.value)}
-                        onChange={(event) => field.onChange(new Date(event.target.value))}
+                        value={dateToZonedInput(field.value, timezone)}
+                        onChange={(event) => field.onChange(zonedInputToDate(event.target.value, timezone))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -144,8 +141,8 @@ const EditRecurringDetailsDialog = ({
                       <Input
                         type="datetime-local"
                         className="scheme-dark"
-                        value={toDateTimeInputValue(field.value)}
-                        onChange={(event) => field.onChange(new Date(event.target.value))}
+                        value={dateToZonedInput(field.value, timezone)}
+                        onChange={(event) => field.onChange(zonedInputToDate(event.target.value, timezone))}
                       />
                     </FormControl>
                     <FormMessage />

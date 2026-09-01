@@ -19,18 +19,13 @@ import {
 } from '@/components/ui/select';
 import { buildUpdateRecurringIntervalBody, getApiErrorMessage } from '@/lib/recurringContest';
 import { recurringIntervalSchema, type RecurringIntervalValues } from '@/lib/schemas/recurringContestSchema';
+import { dateToZonedInput, zonedInputToDate } from '@/lib/timezone';
 import { useUpdateRecurringIntervalMutation } from '@/store/features/recurringContest/recurringContestApi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-
-function toDateTimeInputValue(value?: Date) {
-  if (!value || Number.isNaN(value.getTime())) return '';
-  const localDate = new Date(value.getTime() - value.getTimezoneOffset() * 60_000);
-  return localDate.toISOString().slice(0, 16);
-}
 
 type EditRecurringIntervalDialogProps = {
   id: string;
@@ -55,6 +50,8 @@ const EditRecurringIntervalDialog = ({
     if (open) form.reset(initialValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  const timezone = form.watch('timezone') || 'UTC';
 
   const onSubmit = async (values: RecurringIntervalValues) => {
     try {
@@ -146,9 +143,11 @@ const EditRecurringIntervalDialog = ({
                     <Input
                       type="datetime-local"
                       className="scheme-dark"
-                      value={toDateTimeInputValue(field.value)}
+                      value={dateToZonedInput(field.value, timezone)}
                       onChange={(event) =>
-                        field.onChange(event.target.value ? new Date(event.target.value) : undefined)
+                        field.onChange(
+                          event.target.value ? zonedInputToDate(event.target.value, timezone) : undefined,
+                        )
                       }
                     />
                   </FormControl>
