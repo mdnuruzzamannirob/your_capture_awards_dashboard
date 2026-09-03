@@ -19,6 +19,7 @@ export const contestAwardTypes = [
   'SUPREME',
   'SUPERIOR',
   'YC_PICK',
+  'TOP_200',
   'TOP_100',
   'TOP_50',
   'TOP_20',
@@ -128,6 +129,14 @@ export interface ContestAward extends Partial<ContestAwardValue> {
   };
 }
 
+export interface ContestLevelAward extends ContestAwardValue {
+  id?: string;
+  contestId?: string;
+  level: ContestLevel;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ContestWinnerUser {
   id?: string;
   avatar?: string | null;
@@ -226,6 +235,7 @@ export interface Contest {
   rules?: ContestRule[];
   prizes?: ContestAward[];
   awards?: ContestAward[];
+  levelAwards?: ContestLevelAward[];
   totalVotes?: number;
   joined?: boolean;
   createdAt?: string;

@@ -1,12 +1,22 @@
 'use client';
 
 import DynamicIcon from '@/components/common/DynamicIcon';
+import { Badge } from '@/components/ui/badge';
 import { CONTEST_AWARD_OPTIONS } from '@/lib/constants';
 import { getAwardLabel } from '@/lib/contest';
 import type { Contest } from '@/store/features/contest/types';
 
+const levelName: Record<string, string> = {
+  AMATEUR: 'Amateur',
+  TALENTED: 'Talented',
+  SUPREME: 'Supreme',
+  SUPERIOR: 'Superior',
+  TOP_NOTCH: 'Top Notch',
+};
+
 const PrizesTab = ({ contest }: { contest: Contest }) => {
   const awards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
+  const levelAwards = contest.levelAwards ?? [];
 
   return (
     <div className="space-y-5">
@@ -64,9 +74,9 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
               </div>
               <div className="mt-5 grid grid-cols-4 gap-2 text-center">
                 {[
-                  ['Boost', award.boost],
-                  ['Key', award.key],
-                  ['Swap', award.swap],
+                  ['Charge', award.boost],
+                  ['Promote', award.key],
+                  ['Trade', award.swap],
                   ['Coin', award.coin],
                 ].map(([label, value]) => (
                   <div key={String(label)} className="bg-surface-tertiary rounded-lg px-2 py-3">
@@ -85,6 +95,34 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
           No awards configured for this contest.
         </p>
       )}
+
+      <div className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border">
+        <div className="border-border-subtle border-b px-5 py-3">
+          <h3 className="text-sm font-semibold">Contest level awards</h3>
+          <p className="text-muted-foreground text-xs">
+            Optional reward paid out to participants who reach a contest level at finalization.
+          </p>
+        </div>
+        {levelAwards.length ? (
+          <ul className="divide-border-subtle divide-y">
+            {levelAwards.map((award) => (
+              <li key={award.level} className="flex items-center justify-between gap-4 px-5 py-3">
+                <p className="text-sm font-medium">{levelName[award.level] ?? award.level}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <Badge variant="outline">Charge {award.boost}</Badge>
+                  <Badge variant="outline">Promote {award.key}</Badge>
+                  <Badge variant="outline">Trade {award.swap}</Badge>
+                  <Badge variant="outline">Coin {award.coin}</Badge>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground p-5 text-sm">
+            Level awards are disabled - reaching a level in this contest stays badge-only.
+          </p>
+        )}
+      </div>
     </div>
   );
 };

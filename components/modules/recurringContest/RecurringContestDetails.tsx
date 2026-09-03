@@ -21,6 +21,7 @@ import EditRecurringDetailsDialog from './EditRecurringDetailsDialog';
 import EditRecurringIntervalDialog from './EditRecurringIntervalDialog';
 import GeneratedContestsPanel from './GeneratedContestsPanel';
 import RecurringAwardsPanel from './RecurringAwardsPanel';
+import RecurringLevelAwardsPanel from './RecurringLevelAwardsPanel';
 import RecurringContestDetailsSkeleton from './RecurringContestDetailsSkeleton';
 import RecurringStatusActions from './RecurringStatusActions';
 
@@ -95,6 +96,7 @@ const RecurringContestDetails = () => {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="awards">Awards</TabsTrigger>
+          <TabsTrigger value="level-awards">Level Awards</TabsTrigger>
           <TabsTrigger value="generated">Generated Contests</TabsTrigger>
         </TabsList>
 
@@ -150,6 +152,10 @@ const RecurringContestDetails = () => {
 
         <TabsContent value="awards" className="pt-4">
           <RecurringAwardsPanel id={contest.id} />
+        </TabsContent>
+
+        <TabsContent value="level-awards" className="pt-4">
+          <RecurringLevelAwardsPanel id={contest.id} />
         </TabsContent>
 
         <TabsContent value="generated" className="pt-4">

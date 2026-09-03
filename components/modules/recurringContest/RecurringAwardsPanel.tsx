@@ -41,9 +41,9 @@ const RecurringAwardsPanel = ({ id }: { id: string }) => {
                   )}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="outline">Boost {award.boost}</Badge>
-                  <Badge variant="outline">Key {award.key}</Badge>
-                  <Badge variant="outline">Swap {award.swap}</Badge>
+                  <Badge variant="outline">Charge {award.boost}</Badge>
+                  <Badge variant="outline">Promote {award.key}</Badge>
+                  <Badge variant="outline">Trade {award.swap}</Badge>
                   <Badge variant="outline">Coin {award.coin}</Badge>
                 </div>
               </li>

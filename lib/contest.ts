@@ -149,6 +149,8 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       swap: prize.rewards.swap,
       coin: prize.rewards.coin,
     })),
+    // Off by default - an admin opts in and configures all 5 levels from the Rules step.
+    levelAwards: [],
   };
 }
 function getRuleValue<T>(contest: Contest, key: ContestRuleKey, fallback: T): T {
@@ -233,6 +235,13 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   const awards = (sourceAwards ?? [])
     .map(normalizeAward)
     .filter((award): award is NonNullable<typeof award> => Boolean(award));
+  const levelAwards = (contest.levelAwards ?? []).map((award) => ({
+    level: award.level,
+    boost: Number(award.boost ?? 0),
+    key: Number(award.key ?? 0),
+    swap: Number(award.swap ?? 0),
+    coin: Number(award.coin ?? 0),
+  }));
   const enabledRuleKeys =
     contest.rules?.filter((rule) => rule.enabled !== false).map((rule) => rule.key) ?? [];
   const selectedRuleKeys = enabledRuleKeys.length
@@ -293,6 +302,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       participation: getRuleValue(contest, 'PARTICIPATION', defaults.rules.participation),
     },
     awards: awards.length ? awards : defaults.awards,
+    levelAwards,
   };
 }
 
@@ -300,7 +310,7 @@ export function buildContestFormData(
   values: ContestFinalValues,
   options?: ContestCreationOptions,
 ): FormData {
-  const { details, prizes, rules, awards } = values;
+  const { details, prizes, rules, awards, levelAwards } = values;
   const formData = new FormData();
   formData.append('title', details.title);
   formData.append('description', details.description);
@@ -396,6 +406,10 @@ export function buildContestFormData(
       }),
     ),
   );
+
+  // Always sent, including empty - an empty array explicitly clears any previously configured
+  // level awards rather than leaving stale rewards in place when the admin turns the toggle off.
+  formData.append('levelAwards', JSON.stringify(levelAwards ?? []));
 
   return formData;
 }

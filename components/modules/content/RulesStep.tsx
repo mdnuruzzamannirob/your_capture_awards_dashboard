@@ -1,6 +1,7 @@
 ﻿'use client';
 
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import DynamicIcon from '@/components/common/DynamicIcon';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -9,8 +10,10 @@ import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import type { ContestRuleKey } from '@/store/features/contest/types';
 import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
+
+const CONTEST_LEVELS_ORDER = ['AMATEUR', 'TALENTED', 'SUPREME', 'SUPERIOR', 'TOP_NOTCH'] as const;
 
 const inputClass =
   'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
@@ -144,6 +147,99 @@ function SystemTextField({
         </FormItem>
       )}
     />
+  );
+}
+
+function ContestLevelAwardsEditor() {
+  const form = useFormContext<ContestFinalValues>();
+  const { fields, replace } = useFieldArray({ name: 'levelAwards', control: form.control });
+  const enabled = fields.length > 0;
+
+  const handleToggle = (checked: boolean) => {
+    if (checked) {
+      replace(CONTEST_LEVELS_ORDER.map((level) => ({ level, boost: 0, key: 0, swap: 0, coin: 0 })));
+    } else {
+      replace([]);
+    }
+  };
+
+  return (
+    <RuleEditor title="Contest level awards">
+      <div className="flex items-center justify-between gap-3 pb-1">
+        <div>
+          <p className="text-body text-sm font-semibold">Reward contest levels</p>
+          <p className="text-muted-foreground text-xs">
+            Optional. Once enabled, every level from Amateur through Top Notch must be configured
+            below - rewards are paid out to participants who reach that level when the contest ends.
+          </p>
+        </div>
+        <Switch
+          checked={enabled}
+          onCheckedChange={handleToggle}
+          aria-label="Enable contest level awards"
+        />
+      </div>
+
+      {enabled && (
+        <div className="grid gap-[14px] pt-2">
+          {CONTEST_LEVELS_ORDER.map((level) => {
+            const index = fields.findIndex((field) => field.level === level);
+            if (index === -1) {
+              return null;
+            }
+
+            return (
+              <article
+                key={level}
+                className="border-border border-t pt-[14px] first:border-t-0 first:pt-0"
+              >
+                <strong className="text-heading text-xs font-extrabold">
+                  {tierName[level] ?? level}
+                </strong>
+                <input type="hidden" {...form.register(`levelAwards.${index}.level`)} />
+                <div className="mt-2.5 grid grid-cols-2 items-start gap-2.5 min-[521px]:grid-cols-4">
+                  {(
+                    [
+                      ['boost', 'Charge'],
+                      ['key', 'Promote'],
+                      ['swap', 'Trade'],
+                      ['coin', 'Coin'],
+                    ] as const
+                  ).map(([key, fieldLabel]) => (
+                    <FormField
+                      key={key}
+                      control={form.control}
+                      name={`levelAwards.${index}.${key}`}
+                      render={({ field }) => (
+                        <FormItem className="gap-1.5">
+                          <FormLabel className={labelClass}>{fieldLabel}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min={0}
+                              className={inputClass}
+                              {...field}
+                              onChange={(event) => field.onChange(event.target.value)}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-[9px]" />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+
+          {form.formState.errors.levelAwards?.root?.message && (
+            <p className="text-destructive text-[9px]">
+              {form.formState.errors.levelAwards.root.message}
+            </p>
+          )}
+        </div>
+      )}
+    </RuleEditor>
   );
 }
 
@@ -325,6 +421,8 @@ const RulesStep = () => {
           </div>
         </RuleEditor>
       )}
+
+      <ContestLevelAwardsEditor />
 
       {isRuleSelected('SUBMISSION_FORMAT') && (
         <RuleEditor title="Submission format">

@@ -1,31 +1,37 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { getAwardLabel } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import type { ContestAwardType } from '@/store/features/contest/types';
-import { Plus, Trash2, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
-const tierAwardTypes = ['TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'] as const;
+// Every contest always awards Top Photo, Top Photographer, and the Top 10/20/50/100/200
+// rank tiers (for both photo and photographer) automatically based on final ranking -
+// admins only tune the reward payout per slot, they no longer opt tiers in or out.
+const tierAwardTypes = ['TOP_10', 'TOP_20', 'TOP_50', 'TOP_100', 'TOP_200'] as const;
 const awardTypes = [
   'TOP_PHOTO',
   'TOP_PHOTOGRAPHER',
-  // 'YC_PICK', // YC Top Pick is not needed in this project for now.
   ...tierAwardTypes,
 ] as const satisfies readonly ContestAwardType[];
 const awardLabels: Record<(typeof awardTypes)[number], string> = {
   TOP_PHOTO: 'Top Photo',
   TOP_PHOTOGRAPHER: 'Top Photographer',
-  // YC_PICK: 'YC Pick',
-  TOP_100: 'Top 100',
-  TOP_50: 'Top 50',
-  TOP_20: 'Top 20',
   TOP_10: 'Top 10',
+  TOP_20: 'Top 20',
+  TOP_50: 'Top 50',
+  TOP_100: 'Top 100',
+  TOP_200: 'Top 200',
+};
+const rankBandHints: Partial<Record<(typeof awardTypes)[number], string>> = {
+  TOP_10: 'Ranks 2–10',
+  TOP_20: 'Ranks 11–20',
+  TOP_50: 'Ranks 21–50',
+  TOP_100: 'Ranks 51–100',
+  TOP_200: 'Ranks 101–200',
 };
 const inputClass =
   'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
@@ -35,74 +41,59 @@ function isTierAward(type: ContestAwardType) {
   return tierAwardTypes.includes(type as (typeof tierAwardTypes)[number]);
 }
 
+function slotOrder(type: ContestAwardType) {
+  const index = awardTypes.indexOf(type as (typeof awardTypes)[number]);
+  return index < 0 ? awardTypes.length : index;
+}
+
 const RewardsStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const { fields, append, remove } = useFieldArray({ name: 'awards', control: form.control });
+  const { fields, append } = useFieldArray({ name: 'awards', control: form.control });
   const awards = form.watch('awards');
-  const [awardDialogOpen, setAwardDialogOpen] = useState(false);
 
-  const selectedTypes = useMemo(() => new Set(awards.map((award) => award.type)), [awards]);
-  const hasTierAward = awards.some((award) => isTierAward(award.type));
-  const canAdd = awardTypes.some(
-    (type) => !selectedTypes.has(type) && (!isTierAward(type) || !hasTierAward),
-  );
-  const orderedFields = fields
-    .map((award, index) => ({ award, index }))
-    .sort((first, second) => {
-      const firstIndex = awardTypes.indexOf(first.award.type as (typeof awardTypes)[number]);
-      const secondIndex = awardTypes.indexOf(second.award.type as (typeof awardTypes)[number]);
-      return (
-        (firstIndex < 0 ? awardTypes.length : firstIndex) -
-        (secondIndex < 0 ? awardTypes.length : secondIndex)
-      );
+  // Guarantee all 12 fixed slots exist (Top Photo, Top Photographer, and each rank tier
+  // paired for Photo + Photographer) even if the contest predates this ladder or the
+  // creation-options prize catalog hasn't loaded yet.
+  useEffect(() => {
+    const present = new Set(
+      awards.map((award) => `${award.type}:${award.recipient ?? ''}`),
+    );
+    const missing: ContestFinalValues['awards'] = [];
+
+    awardTypes.forEach((type) => {
+      if (isTierAward(type)) {
+        (['Photo', 'Photographer'] as const).forEach((recipient) => {
+          if (!present.has(`${type}:${recipient}`)) {
+            missing.push({ type, recipient, boost: 0, key: 0, swap: 0, coin: 0 });
+          }
+        });
+      } else if (!present.has(`${type}:`)) {
+        missing.push({ type, boost: 0, key: 0, swap: 0, coin: 0 });
+      }
     });
 
-  function isAvailable(type: (typeof awardTypes)[number]) {
-    if (selectedTypes.has(type)) return false;
-    return !isTierAward(type) || !hasTierAward;
-  }
-
-  function addAward(type: (typeof awardTypes)[number]) {
-    if (!isAvailable(type)) return;
-    if (isTierAward(type)) {
-      append([
-        { type, recipient: 'Photo', boost: 0, key: 0, swap: 0, coin: 0 },
-        { type, recipient: 'Photographer', boost: 0, key: 0, swap: 0, coin: 0 },
-      ]);
-    } else {
-      append({ type, boost: 0, key: 0, swap: 0, coin: 0 });
+    if (missing.length) {
+      append(missing);
     }
-    setAwardDialogOpen(false);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [awards.length]);
 
-  function removeAward(index: number, type: ContestAwardType) {
-    if (!isTierAward(type)) {
-      remove(index);
-      return;
-    }
-
-    remove(fields.flatMap((field, fieldIndex) => (field.type === type ? [fieldIndex] : [])));
-  }
+  const orderedFields = fields
+    .map((award, index) => ({ award, index }))
+    .sort((first, second) => slotOrder(first.award.type) - slotOrder(second.award.type));
 
   return (
     <section
       className="border-border-subtle bg-surface-secondary overflow-hidden rounded-lg border"
       aria-labelledby="contest-awards-title"
     >
-      <header className="border-border-subtle flex min-h-13 items-center justify-between gap-4 border-b bg-[var(--bg-inset)] px-[18px] py-3">
+      <header className="border-border-subtle flex min-h-13 flex-col gap-1 border-b bg-[var(--bg-inset)] px-[18px] py-3">
         <h2 id="contest-awards-title" className="text-heading text-sm font-extrabold">
           Awards
         </h2>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!canAdd}
-          onClick={() => setAwardDialogOpen(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 border-primary h-9 rounded-[10px] px-3 text-[10px] font-bold shadow-none"
-        >
-          <Plus size={15} />
-          Add award
-        </Button>
+        <p className="text-muted-foreground text-[11px]">
+          Awarded automatically from the final ranking. Set the reward payout for each tier below.
+        </p>
       </header>
 
       <div className="grid gap-0 p-[18px]">
@@ -112,6 +103,7 @@ const RewardsStep = () => {
               ? awardLabels[award.type as keyof typeof awardLabels]
               : getAwardLabel(award.type);
           const rowLabel = award.recipient ? `${label} — ${award.recipient}` : label;
+          const hint = rankBandHints[award.type as keyof typeof rankBandHints];
           return (
             <article
               key={award.id}
@@ -120,15 +112,12 @@ const RewardsStep = () => {
               } ${visibleIndex < orderedFields.length - 1 ? 'pb-[18px]' : ''}`}
             >
               <div className="flex items-center justify-between gap-3">
-                <strong className="text-heading text-xs font-extrabold">{rowLabel}</strong>
-                <button
-                  type="button"
-                  aria-label={`Remove ${rowLabel}`}
-                  onClick={() => removeAward(index, award.type)}
-                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive grid size-[30px] place-items-center rounded-[7px] border-0 bg-transparent transition-colors"
-                >
-                  <Trash2 size={15} />
-                </button>
+                <div>
+                  <strong className="text-heading text-xs font-extrabold">{rowLabel}</strong>
+                  {hint && (
+                    <span className="text-muted-foreground ml-2 text-[10px]">{hint}</span>
+                  )}
+                </div>
               </div>
 
               <input type="hidden" {...form.register(`awards.${index}.type`)} />
@@ -139,9 +128,9 @@ const RewardsStep = () => {
               <div className="grid grid-cols-2 items-start gap-2.5 min-[521px]:grid-cols-4">
                 {(
                   [
-                    ['boost', 'Boost'],
-                    ['key', 'Key'],
-                    ['swap', 'Swap'],
+                    ['boost', 'Charge'],
+                    ['key', 'Promote'],
+                    ['swap', 'Trade'],
                     ['coin', 'Coin'],
                   ] as const
                 ).map(([key, fieldLabel]) => (
@@ -180,76 +169,6 @@ const RewardsStep = () => {
           <p className="text-destructive mt-2 text-[9px]">{form.formState.errors.awards.message}</p>
         )}
       </div>
-
-      <Dialog open={awardDialogOpen} onOpenChange={setAwardDialogOpen}>
-        <DialogContent
-          showCloseButton={false}
-          aria-describedby={undefined}
-          overlayClassName="bg-overlay/80 backdrop-blur-[5px]"
-          className="border-border-default bg-surface-secondary data-[state=open]:slide-in-from-bottom-3 max-h-[calc(100dvh-56px)] w-[min(500px,calc(100%-32px))] max-w-none gap-0 overflow-y-auto rounded-xl p-0 shadow-[var(--shadow-xl)] max-[520px]:top-auto max-[520px]:bottom-0 max-[520px]:w-full max-[520px]:max-w-none max-[520px]:translate-y-0 max-[520px]:rounded-b-none"
-        >
-          <div className="border-border flex items-start justify-between gap-4 border-b px-[18px] py-4">
-            <DialogTitle className="text-heading text-base font-extrabold">Add award</DialogTitle>
-            <button
-              type="button"
-              aria-label="Close award picker"
-              onClick={() => setAwardDialogOpen(false)}
-              className="text-muted-foreground hover:bg-accent hover:text-foreground grid size-9 place-items-center rounded-[10px] transition-colors"
-            >
-              <X size={19} />
-            </button>
-          </div>
-
-          <div className="grid gap-5 p-[18px]">
-            <div className="grid gap-2.5">
-              <span className="text-label-foreground text-[10px] font-extrabold tracking-[0.06em] uppercase">
-                Individual awards
-              </span>
-              <div className="grid grid-cols-2 gap-2 min-[420px]:grid-cols-3">
-                {awardTypes
-                  .filter((type) => !isTierAward(type))
-                  .map((type) => (
-                    <button
-                      type="button"
-                      key={type}
-                      disabled={!isAvailable(type)}
-                      onClick={() => addAward(type)}
-                      className="border-input bg-surface-secondary text-body hover:border-primary hover:bg-primary-soft hover:text-primary-soft-foreground min-h-[39px] rounded-lg border px-2 text-[10px] font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-[0.38]"
-                    >
-                      {awardLabels[type]}
-                    </button>
-                  ))}
-              </div>
-            </div>
-
-            <div className="grid gap-2.5">
-              <div className="grid gap-0.5">
-                <span className="text-label-foreground text-[10px] font-extrabold tracking-[0.06em] uppercase">
-                  Top ranking awards
-                </span>
-                <small className="text-muted-foreground text-[10px]">
-                  Selecting one adds both Photo and Photographer.
-                </small>
-              </div>
-              <div className="grid grid-cols-2 gap-2 min-[420px]:grid-cols-3">
-                {awardTypes
-                  .filter((type) => isTierAward(type))
-                  .map((type) => (
-                    <button
-                      type="button"
-                      key={type}
-                      disabled={!isAvailable(type)}
-                      onClick={() => addAward(type)}
-                      className="border-input bg-surface-secondary text-body hover:border-primary hover:bg-primary-soft hover:text-primary-soft-foreground min-h-[39px] rounded-lg border px-2 text-[10px] font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-[0.38]"
-                    >
-                      {awardLabels[type]}
-                    </button>
-                  ))}
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 };
