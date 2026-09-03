@@ -1,4 +1,10 @@
-import type { ApiSuccessResponse, Contest, ContestAwardType, ContestRule } from '@/store/features/contest/types';
+import type {
+  ApiSuccessResponse,
+  Contest,
+  ContestAwardType,
+  ContestLevel,
+  ContestRule,
+} from '@/store/features/contest/types';
 
 export type RecurringType = 'DAILY' | 'WEEKLY' | 'MONTHLY';
 export type RecurringContestStatus = 'ACTIVE' | 'PAUSED' | 'ENDED';
@@ -36,6 +42,18 @@ export interface RecurringContestAward {
   updatedAt?: string;
 }
 
+export interface RecurringContestLevelAward {
+  id?: string;
+  recurringContestId?: string;
+  level: ContestLevel;
+  boost: number;
+  swap: number;
+  key: number;
+  coin: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface RecurringContest {
   id: string;
   title: string;
@@ -55,6 +73,7 @@ export interface RecurringContest {
   lastGeneratedContestId?: string | null;
   rules?: ContestRule[];
   contestAwards?: RecurringContestAward[];
+  levelAwards?: RecurringContestLevelAward[];
   createdAt: string;
   updatedAt: string;
 }
@@ -96,6 +115,10 @@ export interface UpdateRecurringIntervalBody {
 
 export interface ReplaceRecurringAwardsBody {
   awardPrizeIds?: string[];
+}
+
+export interface ReplaceRecurringLevelAwardsBody {
+  levelAwards: Array<Pick<RecurringContestLevelAward, 'level' | 'boost' | 'swap' | 'key' | 'coin'>>;
 }
 
 export type { ApiSuccessResponse };

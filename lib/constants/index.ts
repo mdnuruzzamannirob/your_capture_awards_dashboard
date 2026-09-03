@@ -171,6 +171,7 @@ export const CONTEST_AWARD_OPTIONS: Array<{
   { value: 'SUPREME', label: 'Supreme', icon: 'Crown' },
   { value: 'SUPERIOR', label: 'Superior', icon: 'Gem' },
   { value: 'YC_PICK', label: 'YC Pick', icon: 'BadgeCheck' },
+  { value: 'TOP_200', label: 'Top 200', icon: 'Medal' },
   { value: 'TOP_100', label: 'Top 100', icon: 'Medal' },
   { value: 'TOP_50', label: 'Top 50', icon: 'Medal' },
   { value: 'TOP_20', label: 'Top 20', icon: 'Medal' },

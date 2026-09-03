@@ -6,7 +6,9 @@ import type {
   GetRecurringContestsResponse,
   RecurringContest,
   RecurringContestAward,
+  RecurringContestLevelAward,
   ReplaceRecurringAwardsBody,
+  ReplaceRecurringLevelAwardsBody,
   UpdateRecurringContestBody,
   UpdateRecurringIntervalBody,
 } from './types';
@@ -14,7 +16,13 @@ import type {
 export const recurringContestApi = createApi({
   reducerPath: 'recurringContestApi',
   baseQuery,
-  tagTypes: ['RecurringContests', 'RecurringContest', 'RecurringContestAwards', 'RecurringContestInstances'],
+  tagTypes: [
+    'RecurringContests',
+    'RecurringContest',
+    'RecurringContestAwards',
+    'RecurringContestLevelAwards',
+    'RecurringContestInstances',
+  ],
   endpoints: (builder) => ({
     getRecurringContests: builder.query<
       ApiSuccessResponse<GetRecurringContestsResponse>,
@@ -112,6 +120,22 @@ export const recurringContestApi = createApi({
         { type: 'RecurringContest', id },
       ],
     }),
+
+    getRecurringLevelAwards: builder.query<ApiSuccessResponse<RecurringContestLevelAward[]>, { id: string }>({
+      query: ({ id }) => `/recurring-contests/${id}/level-awards`,
+      providesTags: (result, error, { id }) => [{ type: 'RecurringContestLevelAwards', id }],
+    }),
+
+    replaceRecurringLevelAwards: builder.mutation<
+      ApiSuccessResponse<RecurringContestLevelAward[]>,
+      { id: string; body: ReplaceRecurringLevelAwardsBody }
+    >({
+      query: ({ id, body }) => ({ url: `/recurring-contests/${id}/level-awards`, method: 'PUT', body }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'RecurringContestLevelAwards', id },
+        { type: 'RecurringContest', id },
+      ],
+    }),
   }),
 });
 
@@ -126,4 +150,6 @@ export const {
   useGetGeneratedContestsQuery,
   useGetRecurringAwardsQuery,
   useReplaceRecurringAwardsMutation,
+  useGetRecurringLevelAwardsQuery,
+  useReplaceRecurringLevelAwardsMutation,
 } = recurringContestApi;

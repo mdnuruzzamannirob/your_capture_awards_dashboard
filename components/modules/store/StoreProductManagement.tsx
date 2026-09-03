@@ -61,6 +61,12 @@ const bundleItemStyles: Record<string, string> = {
   SWAP: 'bg-[rgba(139,108,196,0.14)] text-[#8B6CC4]',
 };
 
+const bundleItemLabels: Record<string, string> = {
+  KEY: 'Promote',
+  BOOST: 'Charge',
+  SWAP: 'Trade',
+};
+
 const StoreProductManagement = () => {
   const [category, setCategory] = useState<StoreProductCategory>('COINS');
   const [page, setPage] = useState(1);
@@ -269,7 +275,7 @@ const StoreProductManagement = () => {
                                 key={`${product.id}-${item.type}`}
                                 className={`rounded-sm px-[7px] py-0.5 text-[11px] ${bundleItemStyles[item.type] ?? 'bg-surface-tertiary text-foreground'}`}
                               >
-                                {item.type} x {item.quantity}
+                                {bundleItemLabels[item.type] ?? item.type} x {item.quantity}
                               </span>
                             ))
                           ) : (

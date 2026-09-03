@@ -185,7 +185,7 @@ export const contestAwardsSchema = z
 
     contestAwardTypes.forEach((type) => {
       const matching = awards.filter((award) => award.type === type);
-      const isTier = ['TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'].includes(type);
+      const isTier = ['TOP_200', 'TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'].includes(type);
       if (
         matching.length > 1 &&
         (!isTier ||
@@ -203,15 +203,54 @@ export const contestAwardsSchema = z
     });
   });
 
+const CONTEST_LEVEL_VALUES = ['AMATEUR', 'TALENTED', 'SUPREME', 'SUPERIOR', 'TOP_NOTCH'] as const;
+
+// Contest level awards are optional (an empty array disables the payout for reaching a contest
+// level entirely) but all-or-nothing once enabled - a partial ladder isn't allowed, mirroring the
+// backend's contestLevelAwardArraySchema validation.
+export const contestLevelAwardsSchema = z
+  .array(
+    z.object({
+      level: z.enum(CONTEST_LEVEL_VALUES),
+      boost: z.coerce.number().int().min(0).default(0),
+      key: z.coerce.number().int().min(0).default(0),
+      swap: z.coerce.number().int().min(0).default(0),
+      coin: z.coerce.number().int().min(0).default(0),
+    }),
+  )
+  .default([])
+  .superRefine((awards, ctx) => {
+    if (awards.length === 0) return;
+
+    const seen = new Set<string>();
+    awards.forEach((award, index) => {
+      if (seen.has(award.level)) {
+        ctx.addIssue({ path: [index, 'level'], code: 'custom', message: 'Duplicate contest level' });
+      }
+      seen.add(award.level);
+    });
+
+    const missing = CONTEST_LEVEL_VALUES.filter((level) => !seen.has(level));
+    if (missing.length > 0) {
+      ctx.addIssue({
+        path: [],
+        code: 'custom',
+        message: `All contest levels must be configured once level awards are enabled. Missing: ${missing.join(', ')}`,
+      });
+    }
+  });
+
 export const contestFinalSchema = z.object({
   details: contestDetailsSchema,
   prizes: contestPrizesSchema,
   rules: contestRulesSchema,
   awards: contestAwardsSchema,
+  levelAwards: contestLevelAwardsSchema,
 });
 
 export type ContestDetailsValues = z.infer<typeof contestDetailsSchema>;
 export type ContestPrizesValues = z.infer<typeof contestPrizesSchema>;
 export type ContestRulesValues = z.infer<typeof contestRulesSchema>;
 export type ContestAwardsValues = z.infer<typeof contestAwardsSchema>;
+export type ContestLevelAwardsValues = z.infer<typeof contestLevelAwardsSchema>;
 export type ContestFinalValues = z.infer<typeof contestFinalSchema>;

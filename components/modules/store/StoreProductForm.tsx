@@ -62,6 +62,11 @@ type FormErrors = Partial<
 >;
 
 const bundleTypes: StoreBundleItemType[] = ['KEY', 'BOOST', 'SWAP'];
+const bundleTypeLabels: Record<StoreBundleItemType, string> = {
+  KEY: 'Promote',
+  BOOST: 'Charge',
+  SWAP: 'Trade',
+};
 const emptyItem = (type: StoreBundleItemType = 'KEY'): BundleItemDraft => ({ type, quantity: 1 });
 
 const normalizeItems = (items?: StoreProduct['items']) => {
@@ -436,7 +441,7 @@ export default function StoreProductForm({
                             <SelectContent>
                               {options.map((opt) => (
                                 <SelectItem key={opt} value={opt}>
-                                  {opt}
+                                  {bundleTypeLabels[opt]}
                                 </SelectItem>
                               ))}
                             </SelectContent>
