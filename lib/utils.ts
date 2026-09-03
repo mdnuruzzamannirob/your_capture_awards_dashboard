@@ -77,14 +77,14 @@ export const formatDateWithTime = (isoString: string) => {
     return {};
   }
 
-  // Date Components (UTC)
-  const day = date.getUTCDate();
-  const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-  const year = date.getUTCFullYear();
+  // Date Components (local)
+  const day = date.getDate();
+  const month = date.toLocaleString('en-US', { month: 'short' });
+  const year = date.getFullYear();
 
-  // Time Components (UTC)
-  const hours = String(date.getUTCHours()).padStart(2, '0');
-  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+  // Time Components (local)
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
 
   // Combining Date and Time
   return { day, month, year, hours, minutes, timeZone: '' };
