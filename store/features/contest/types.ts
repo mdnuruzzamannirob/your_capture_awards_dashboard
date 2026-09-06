@@ -304,6 +304,33 @@ export interface ContestStats {
   completed: number;
 }
 
+export interface ContestParticipant {
+  id: string;
+  contestId: string;
+  userId: string;
+  status: 'ACTIVE' | 'BLOCKED';
+  level?: string;
+  rank?: number | null;
+  exposure_bonus?: number;
+  user?: {
+    id: string;
+    username: string | null;
+    fullName: string | null;
+    email: string;
+    avatar: string | null;
+  };
+}
+
+export interface ContestPhotoSubmission {
+  id: string;
+  title?: string | null;
+  contestId: string;
+  participantId: string;
+  rank?: number | null;
+  promoted?: boolean;
+  photo?: { id: string; url: string; title?: string | null } | null;
+}
+
 export interface ApiSuccessResponse<T> {
   success: boolean;
   statusCode?: number;

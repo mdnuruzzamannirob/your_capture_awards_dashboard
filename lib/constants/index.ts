@@ -15,6 +15,8 @@ export const CONTEST_DETAILS_TABS: { key: ContestDetailsTabKey; label: string }[
   { key: 'prizes', label: 'Awards' },
   { key: 'rank', label: 'Rank' },
   { key: 'winners', label: 'Winners' },
+  { key: 'participants', label: 'Participants' },
+  { key: 'photos', label: 'Photos' },
 ];
 
 export interface ContestRuleDefinition {

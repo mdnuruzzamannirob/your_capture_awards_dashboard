@@ -14,8 +14,21 @@ const levelName: Record<string, string> = {
   TOP_NOTCH: 'Top Notch',
 };
 
+const tierAwardTypes = ['TOP_10', 'TOP_20', 'TOP_50', 'TOP_100', 'TOP_200'];
+
+// Top 10-200 tiers are always badge-only (no promote/trade/charge/coin) - not worth
+// showing here since there's never anything configured for them to display.
+function isTierAward(award: { type?: string | null; rankLimit?: number | null }) {
+  return (
+    award.type === 'TOP_RANK' ||
+    award.rankLimit != null ||
+    tierAwardTypes.includes(award.type ?? '')
+  );
+}
+
 const PrizesTab = ({ contest }: { contest: Contest }) => {
-  const awards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
+  const allAwards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
+  const awards = allAwards.filter((award) => !isTierAward(award));
   const levelAwards = contest.levelAwards ?? [];
 
   return (
@@ -74,8 +87,8 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
               </div>
               <div className="mt-5 grid grid-cols-4 gap-2 text-center">
                 {[
-                  ['Charge', award.boost],
-                  ['Promote', award.key],
+                  ['Promote', award.boost],
+                  ['Charge', award.key],
                   ['Trade', award.swap],
                   ['Coin', award.coin],
                 ].map(([label, value]) => (
@@ -109,8 +122,8 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
               <li key={award.level} className="flex items-center justify-between gap-4 px-5 py-3">
                 <p className="text-sm font-medium">{levelName[award.level] ?? award.level}</p>
                 <div className="flex flex-wrap gap-1.5">
-                  <Badge variant="outline">Charge {award.boost}</Badge>
-                  <Badge variant="outline">Promote {award.key}</Badge>
+                  <Badge variant="outline">Promote {award.boost}</Badge>
+                  <Badge variant="outline">Charge {award.key}</Badge>
                   <Badge variant="outline">Trade {award.swap}</Badge>
                   <Badge variant="outline">Coin {award.coin}</Badge>
                 </div>

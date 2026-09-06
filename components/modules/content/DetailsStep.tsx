@@ -66,9 +66,14 @@ const DetailsStep = () => {
             name="details.category"
             render={({ field }) => (
               <FormItem className={fieldClass}>
-                <FormLabel className={labelClass}>Category</FormLabel>
+                <FormLabel className={labelClass}>Category (optional)</FormLabel>
                 <FormControl>
-                  <Input className={inputClass} placeholder="e.g. Street photography" {...field} />
+                  <Input
+                    className={inputClass}
+                    placeholder="e.g. Street photography"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
                 </FormControl>
                 <FormMessage className={messageClass} />
               </FormItem>

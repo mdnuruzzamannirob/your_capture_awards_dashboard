@@ -4,6 +4,7 @@ import {
   ApiSuccessResponse,
   Contest,
   ContestCreationOptions,
+  ContestParticipant,
   RankedPhotographersResponse,
   RankedPhotosResponse,
   ContestStats,
@@ -13,7 +14,7 @@ import {
 export const contestApi = createApi({
   reducerPath: 'contestApi',
   baseQuery,
-  tagTypes: ['Contests', 'Contest', 'ContestStats', 'DashboardOverview'],
+  tagTypes: ['Contests', 'Contest', 'ContestStats', 'DashboardOverview', 'ContestParticipants'],
   endpoints: (builder) => ({
     getContestCreationOptions: builder.query<ApiSuccessResponse<ContestCreationOptions>, void>({
       query: () => '/contests/create-options',
@@ -59,11 +60,19 @@ export const contestApi = createApi({
 
     getContests: builder.query<
       ApiSuccessResponse<GetContestsResponse>,
-      { page?: number; limit?: number; search?: string }
+      {
+        page?: number;
+        limit?: number;
+        search?: string;
+        tab?: 'active' | 'ended';
+        includeArchived?: boolean;
+      }
     >({
-      query: ({ page = 1, limit = 20, search }) => {
+      query: ({ page = 1, limit = 20, search, tab, includeArchived }) => {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
         if (search?.trim()) params.set('search', search.trim());
+        if (tab) params.set('tab', tab);
+        if (includeArchived) params.set('includeArchived', 'true');
         return `/contests/all?${params.toString()}`;
       },
       providesTags: (result) =>
@@ -103,6 +112,33 @@ export const contestApi = createApi({
       },
       providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
     }),
+
+    getContestParticipants: builder.query<
+      ApiSuccessResponse<ContestParticipant[]>,
+      { contestId: string; search?: string }
+    >({
+      query: ({ contestId, search }) => {
+        const params = new URLSearchParams();
+        if (search?.trim()) params.set('search', search.trim());
+        const qs = params.toString();
+        return `/contests/${contestId}/participants${qs ? `?${qs}` : ''}`;
+      },
+      providesTags: (result, error, { contestId }) => [
+        { type: 'ContestParticipants', id: contestId },
+      ],
+    }),
+
+    adminDeleteContestPhoto: builder.mutation<
+      ApiSuccessResponse<string>,
+      { photoId: string; contestId: string; reason?: string; reportId?: string }
+    >({
+      query: ({ photoId, reason, reportId }) => ({
+        url: `/contests/photos/${photoId}/admin`,
+        method: 'DELETE',
+        body: { reason, reportId },
+      }),
+      invalidatesTags: (result, error, { contestId }) => [{ type: 'Contest', id: contestId }],
+    }),
   }),
 });
 
@@ -117,4 +153,6 @@ export const {
   useLazyGetContestQuery,
   useGetContestRankPhotosQuery,
   useGetContestRankPhotographersQuery,
+  useGetContestParticipantsQuery,
+  useAdminDeleteContestPhotoMutation,
 } = contestApi;

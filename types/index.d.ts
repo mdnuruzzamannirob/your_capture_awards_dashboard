@@ -9,7 +9,14 @@ export interface SideMenu {
   }[];
 }
 
-export type ContestDetailsTabKey = 'details' | 'prizes' | 'rules' | 'rank' | 'winners';
+export type ContestDetailsTabKey =
+  | 'details'
+  | 'prizes'
+  | 'rules'
+  | 'rank'
+  | 'winners'
+  | 'participants'
+  | 'photos';
 
 export type SupportTicketStatus = 'pending' | 'in_progress' | 'resolved' | 'closed';
 export type SupportTicketPriority = 'low' | 'medium' | 'high';
@@ -75,6 +82,51 @@ export interface UserWallet {
   lastTransactionAt?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export type ReportReason = 'OFF_TOPIC' | 'COPYRIGHT' | 'AI_GENERATED' | 'INAPPROPRIATE_CONTENT';
+export type ReportStatus = 'PENDING' | 'ACTION_TAKEN' | 'DISMISSED';
+
+export interface ReportUserSummary {
+  id: string;
+  username: string | null;
+  fullName: string | null;
+  email: string;
+  avatar: string | null;
+  isBlocked?: boolean;
+}
+
+export interface ReportContestSummary {
+  id: string;
+  title: string;
+  description: string;
+  banner: string | null;
+}
+
+export interface ReportContestPhotoSummary {
+  id: string;
+  title: string | null;
+  contestId: string;
+  photo: { id: string; url: string; title: string | null } | null;
+  contest: ReportContestSummary | null;
+}
+
+export interface Report {
+  id: string;
+  reporterId: string;
+  reportedUserId: string;
+  contestPhotoId: string | null;
+  reason: ReportReason;
+  details: string | null;
+  status: ReportStatus;
+  reviewedById: string | null;
+  reviewedAt: string | null;
+  resolutionNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+  reporter: ReportUserSummary | null;
+  reportedUser: ReportUserSummary | null;
+  contestPhoto: ReportContestPhotoSummary | null;
 }
 
 export type StoreProductType = 'key' | 'boost' | 'swap';

@@ -2,6 +2,9 @@
 
 import { DataTable } from '@/components/common/DataTable';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGetContestsQuery, useLazyGetContestQuery } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
 import { useRouter } from 'next/navigation';
@@ -21,6 +24,8 @@ const ContestTable = () => {
   const [limit, setLimit] = useState(20);
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [tab, setTab] = useState<'all' | 'active' | 'ended'>('all');
+  const [includeArchived, setIncludeArchived] = useState(false);
   const [contestDetailsById, setContestDetailsById] = useState<Record<string, Contest>>({});
 
   useEffect(() => {
@@ -28,7 +33,13 @@ const ContestTable = () => {
     return () => window.clearTimeout(timer);
   }, [searchInput]);
 
-  const { data, isLoading, isFetching } = useGetContestsQuery({ page, limit, search });
+  const { data, isLoading, isFetching } = useGetContestsQuery({
+    page,
+    limit,
+    search,
+    tab: tab === 'all' ? undefined : tab,
+    includeArchived,
+  });
   const [getContest, { isFetching: isFetchingDetails }] = useLazyGetContestQuery();
   const contests = useMemo(() => data?.data?.contests ?? [], [data?.data?.contests]);
   const hydratedContests = useMemo(
@@ -75,21 +86,51 @@ const ContestTable = () => {
 
   return (
     <div className="space-y-4">
-      <div className="mb-4">
-        <label htmlFor="contest-search" className="sr-only">
-          Search contests
-        </label>
-        <Input
-          id="contest-search"
-          type="text"
-          value={searchInput}
-          onChange={(event) => {
-            setSearchInput(event.target.value);
-            setPage(1);
-          }}
-          placeholder="Search contests..."
-          className="max-w-md"
-        />
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <label htmlFor="contest-search" className="sr-only">
+            Search contests
+          </label>
+          <Input
+            id="contest-search"
+            type="text"
+            value={searchInput}
+            onChange={(event) => {
+              setSearchInput(event.target.value);
+              setPage(1);
+            }}
+            placeholder="Search contests..."
+            className="max-w-md"
+          />
+
+          <Tabs
+            value={tab}
+            onValueChange={(value) => {
+              setTab(value as 'all' | 'active' | 'ended');
+              setPage(1);
+            }}
+          >
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="ended">Ended</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Switch
+            id="include-archived"
+            checked={includeArchived}
+            onCheckedChange={(checked) => {
+              setIncludeArchived(checked);
+              setPage(1);
+            }}
+          />
+          <Label htmlFor="include-archived" className="text-xs">
+            Include archived (deleted)
+          </Label>
+        </div>
       </div>
 
       <DataTable

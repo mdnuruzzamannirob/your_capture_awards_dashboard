@@ -2,6 +2,8 @@
 
 import ContestDetailsSkeleton from '@/components/modules/content/ContestDetailsSkeleton';
 import DetailsTab from '@/components/modules/content/DetailsTab';
+import ParticipantsTab from '@/components/modules/content/ParticipantsTab';
+import PhotosTab from '@/components/modules/content/PhotosTab';
 import PrizesTab from '@/components/modules/content/PrizesTab';
 import RankTab from '@/components/modules/content/RankTab';
 import RulesTab from '@/components/modules/content/RulesTab';
@@ -19,9 +21,9 @@ const ContestDetails = () => {
   const params = useParams();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'prizes' | 'rules' | 'rank' | 'winners'>(
-    'details',
-  );
+  const [activeTab, setActiveTab] = useState<
+    'details' | 'prizes' | 'rules' | 'rank' | 'winners' | 'participants' | 'photos'
+  >('details');
   const [indicatorStyle, setIndicatorStyle] = useState({
     width: 0,
     left: 0,
@@ -66,6 +68,10 @@ const ContestDetails = () => {
         return <RankTab contest={currentContest} />;
       case 'winners':
         return <WinnerTab contest={currentContest} />;
+      case 'participants':
+        return <ParticipantsTab contest={currentContest} />;
+      case 'photos':
+        return <PhotosTab contest={currentContest} />;
       default:
         return null;
     }
@@ -85,14 +91,14 @@ const ContestDetails = () => {
 
   return (
     <section className="">
-      <div className="bg-surface-tertiary relative h-72 w-full overflow-hidden lg:h-96">
+      <div className="bg-surface-tertiary relative h-32 w-full overflow-hidden sm:h-40 lg:h-48">
         {contest.banner ? (
           <Image
             alt={`${contest.title} banner`}
             src={contest.banner}
             width={1920}
             height={500}
-            className="size-full object-cover"
+            className="size-full object-contain"
           />
         ) : (
           <div className="flex size-full items-center justify-center p-5 text-center">
