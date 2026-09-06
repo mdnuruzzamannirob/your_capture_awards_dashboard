@@ -78,9 +78,29 @@ const RewardsStep = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [awards.length]);
 
+  // Top 10-200 tiers are badge-only (enforced server-side too) - force their reward
+  // fields to 0 even if a stale/cached contest still has old nonzero values loaded.
+  useEffect(() => {
+    awards.forEach((award, index) => {
+      if (!isTierAward(award.type)) return;
+      (['boost', 'key', 'swap', 'coin'] as const).forEach((field) => {
+        if (Number(award[field]) !== 0) {
+          form.setValue(`awards.${index}.${field}`, 0);
+        }
+      });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [awards]);
+
   const orderedFields = fields
     .map((award, index) => ({ award, index }))
     .sort((first, second) => slotOrder(first.award.type) - slotOrder(second.award.type));
+
+  // Tier slots (Top 10-200) are always badge-only with nothing to configure, so they
+  // stay registered (still submitted as part of `awards`, so finalization keeps
+  // awarding those badges) but are never rendered as a visible row.
+  const visibleFields = orderedFields.filter(({ award }) => !isTierAward(award.type));
+  const hiddenTierFields = orderedFields.filter(({ award }) => isTierAward(award.type));
 
   return (
     <section
@@ -92,12 +112,14 @@ const RewardsStep = () => {
           Awards
         </h2>
         <p className="text-muted-foreground text-[11px]">
-          Awarded automatically from the final ranking. Set the reward payout for each tier below.
+          Awarded automatically from the final ranking. Set the reward payout for Top Photo and
+          Top Photographer below. Top 10 through Top 200 are always badge-only (no promote,
+          trade, charge, or coin reward) and aren&apos;t configurable here.
         </p>
       </header>
 
       <div className="grid gap-0 p-[18px]">
-        {orderedFields.map(({ award, index }, visibleIndex) => {
+        {visibleFields.map(({ award, index }, visibleIndex) => {
           const label =
             award.type in awardLabels
               ? awardLabels[award.type as keyof typeof awardLabels]
@@ -109,7 +131,7 @@ const RewardsStep = () => {
               key={award.id}
               className={`grid gap-[14px] ${
                 visibleIndex > 0 ? 'border-border border-t pt-[18px]' : ''
-              } ${visibleIndex < orderedFields.length - 1 ? 'pb-[18px]' : ''}`}
+              } ${visibleIndex < visibleFields.length - 1 ? 'pb-[18px]' : ''}`}
             >
               <div className="flex items-center justify-between gap-3">
                 <div>
@@ -128,8 +150,8 @@ const RewardsStep = () => {
               <div className="grid grid-cols-2 items-start gap-2.5 min-[521px]:grid-cols-4">
                 {(
                   [
-                    ['boost', 'Charge'],
-                    ['key', 'Promote'],
+                    ['boost', 'Promote'],
+                    ['key', 'Charge'],
                     ['swap', 'Trade'],
                     ['coin', 'Coin'],
                   ] as const
@@ -159,6 +181,20 @@ const RewardsStep = () => {
             </article>
           );
         })}
+
+        {/* Tier slots (Top 10-200) stay registered so they're still submitted with the
+            contest (finalization keeps granting those badges) but render nothing. */}
+        {hiddenTierFields.map(({ award, index }) => (
+          <div key={award.id} hidden>
+            <input type="hidden" {...form.register(`awards.${index}.type`)} />
+            {award.recipient && (
+              <input type="hidden" {...form.register(`awards.${index}.recipient`)} />
+            )}
+            {(['boost', 'key', 'swap', 'coin'] as const).map((field) => (
+              <input key={field} type="hidden" {...form.register(`awards.${index}.${field}`)} />
+            ))}
+          </div>
+        ))}
 
         {form.formState.errors.awards?.root?.message && (
           <p className="text-destructive mt-2 text-[9px]">

@@ -110,7 +110,7 @@ const RecurringContestDetails = () => {
             </div>
 
             <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
-              <DetailItem label="Category" value={contest.category || 'Uncategorized'} />
+              {contest.category && <DetailItem label="Category" value={contest.category} />}
               <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, timezone)} />
               <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, timezone)} />
               <DetailItem label="Frequency" value={getRecurrenceLabel(contest.recurring.recurringType)} />

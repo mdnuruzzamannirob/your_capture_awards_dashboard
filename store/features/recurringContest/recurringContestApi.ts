@@ -26,9 +26,14 @@ export const recurringContestApi = createApi({
   endpoints: (builder) => ({
     getRecurringContests: builder.query<
       ApiSuccessResponse<GetRecurringContestsResponse>,
-      { page?: number; limit?: number }
+      { page?: number; limit?: number; tab?: 'active' | 'ended'; search?: string }
     >({
-      query: ({ page = 1, limit = 20 }) => `/recurring-contests?page=${page}&limit=${limit}`,
+      query: ({ page = 1, limit = 20, tab, search }) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (tab) params.set('tab', tab);
+        if (search?.trim()) params.set('search', search.trim());
+        return `/recurring-contests?${params.toString()}`;
+      },
       providesTags: (result) =>
         result
           ? [

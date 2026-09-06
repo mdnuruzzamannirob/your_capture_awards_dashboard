@@ -25,7 +25,8 @@ function getDefaultRuleKeys(options?: ContestCreationOptions): ContestRuleKey[] 
     (Object.keys(contestRuleDefinitions) as ContestRuleKey[])) as ContestRuleKey[];
 }
 
-function getCategoryId(category: string, options?: ContestCreationOptions): string | undefined {
+function getCategoryId(category?: string, options?: ContestCreationOptions): string | undefined {
+  if (!category?.trim()) return undefined;
   const normalizedCategory = category.trim().toLowerCase();
   return options?.categories?.find(
     (item) =>
@@ -314,7 +315,7 @@ export function buildContestFormData(
   const formData = new FormData();
   formData.append('title', details.title);
   formData.append('description', details.description);
-  formData.append('category', details.category);
+  if (details.category?.trim()) formData.append('category', details.category.trim());
   const categoryId = getCategoryId(details.category, options);
   if (categoryId) formData.append('categoryId', categoryId);
   formData.append('startDate', details.startDate.toISOString());

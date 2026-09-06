@@ -14,8 +14,8 @@ export const contestDetailsSchema = z
     category: z
       .string()
       .trim()
-      .min(1, 'Category is required')
-      .max(100, 'Category must not exceed 100 characters'),
+      .max(100, 'Category must not exceed 100 characters')
+      .optional(),
     description: z
       .string()
       .trim()

@@ -3,7 +3,7 @@ import { HiOutlineWallet } from 'react-icons/hi2';
 import { IoSettingsOutline, IoStorefrontOutline } from 'react-icons/io5';
 import { LuLayoutDashboard } from 'react-icons/lu';
 import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
-import { TbRepeat, TbUsers } from 'react-icons/tb';
+import { TbFlag, TbRepeat, TbUsers } from 'react-icons/tb';
 
 export const sideMenus: SideMenu[] = [
   {
@@ -25,6 +25,11 @@ export const sideMenus: SideMenu[] = [
     name: 'Recurring Contest',
     href: '/recurring-contest',
     icon: <TbRepeat className="size-full" />,
+  },
+  {
+    name: 'Reports',
+    href: '/reports',
+    icon: <TbFlag className="size-full" />,
   },
   {
     name: 'Store',
