@@ -43,6 +43,10 @@ const RecurringContestDetails = () => {
 
   const contest = data?.data;
   const timezone = contest?.recurring.timezone ?? 'UTC';
+  // Dates are displayed in the viewer's own local timezone rather than the
+  // recurring contest's configured one - that field only controls when the
+  // recurrence pattern actually fires, shown separately below as "Recurrence timezone".
+  const displayTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   if (isLoading || isFetching) {
     return <RecurringContestDetailsSkeleton />;
@@ -111,18 +115,18 @@ const RecurringContestDetails = () => {
 
             <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
               {contest.category && <DetailItem label="Category" value={contest.category} />}
-              <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, timezone)} />
-              <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, timezone)} />
+              <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, displayTimeZone)} />
+              <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, displayTimeZone)} />
               <DetailItem label="Frequency" value={getRecurrenceLabel(contest.recurring.recurringType)} />
-              <DetailItem label="Timezone" value={timezone} />
-              <DetailItem label="Next occurrence" value={formatInTimeZone(contest.recurring.nextOccurrence, timezone)} />
+              <DetailItem label="Recurrence timezone" value={timezone} />
+              <DetailItem label="Next occurrence" value={formatInTimeZone(contest.recurring.nextOccurrence, displayTimeZone)} />
               <DetailItem
                 label="Previous occurrence"
-                value={contest.recurring.previousOccurrence ? formatInTimeZone(contest.recurring.previousOccurrence, timezone) : 'None yet'}
+                value={contest.recurring.previousOccurrence ? formatInTimeZone(contest.recurring.previousOccurrence, displayTimeZone) : 'None yet'}
               />
               <DetailItem
                 label="Recurrence ends"
-                value={contest.recurring.endsAt ? formatInTimeZone(contest.recurring.endsAt, timezone) : 'Never'}
+                value={contest.recurring.endsAt ? formatInTimeZone(contest.recurring.endsAt, displayTimeZone) : 'Never'}
               />
               <DetailItem
                 label="Max occurrences"
@@ -138,8 +142,8 @@ const RecurringContestDetails = () => {
                     : 'No'
                 }
               />
-              <DetailItem label="Created at" value={formatInTimeZone(contest.createdAt, timezone)} />
-              <DetailItem label="Updated at" value={formatInTimeZone(contest.updatedAt, timezone)} />
+              <DetailItem label="Created at" value={formatInTimeZone(contest.createdAt, displayTimeZone)} />
+              <DetailItem label="Updated at" value={formatInTimeZone(contest.updatedAt, displayTimeZone)} />
             </div>
 
             {Boolean(contest.rules?.length) && (
