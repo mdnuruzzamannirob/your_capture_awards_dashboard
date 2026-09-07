@@ -16,7 +16,6 @@ import { ImageOff } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { GoDotFill } from 'react-icons/go';
 
 const ContestDetails = () => {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -125,27 +124,13 @@ const ContestDetails = () => {
         )}
       </div>
 
-      <div className="border-border-subtle flex flex-wrap items-center justify-between gap-3 border-b bg-(--bg-inset) px-5 py-3">
-        <div className="min-w-0">
-          <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
-          {contest.category && (
-            <p className="text-muted-foreground mt-0.5 truncate text-xs">
-              {typeof contest.category === 'string' ? contest.category : contest.category.name}
-            </p>
-          )}
-        </div>
-
-        <span
-          className={cn(
-            'flex w-fit shrink-0 items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
-            contest.status === 'ACTIVE' && 'bg-success-subtle text-success',
-            (contest.status === 'CLOSED' || contest.status === 'COMPLETED') &&
-              'bg-error-subtle text-destructive',
-            contest.status === 'UPCOMING' && 'bg-warning-subtle text-warning',
-          )}
-        >
-          <GoDotFill className="size-2" /> {contest.status}
-        </span>
+      <div className="border-border-subtle border-b bg-(--bg-inset) px-5 py-3">
+        <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
+        {contest.category && (
+          <p className="text-muted-foreground mt-0.5 truncate text-xs">
+            {typeof contest.category === 'string' ? contest.category : contest.category.name}
+          </p>
+        )}
       </div>
 
       <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">
