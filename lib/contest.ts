@@ -344,7 +344,11 @@ export function buildContestFormData(
   if (prizes.coin_requirement) {
     formData.append('entryFeeCoins', String(prizes.coin_required));
   }
-  if (details.banner instanceof File) formData.append('banner', details.banner);
+  if (details.bannerUserPhotoId) {
+    formData.append('bannerUserPhotoId', details.bannerUserPhotoId);
+  } else if (details.banner instanceof File) {
+    formData.append('banner', details.banner);
+  }
 
   const ruleValues: Record<ContestRuleKey, unknown> = {
     SUBMISSION_LIMIT: details.maxUploads,

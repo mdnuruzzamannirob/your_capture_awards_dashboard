@@ -2,6 +2,7 @@ import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import {
   ApiSuccessResponse,
+  BannerCandidatesResponse,
   Contest,
   ContestCreationOptions,
   ContestParticipant,
@@ -23,6 +24,17 @@ export const contestApi = createApi({
     getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
       query: () => '/dashboard/contest/stats',
       providesTags: [{ type: 'ContestStats', id: 'SINGLE' }],
+    }),
+
+    getBannerCandidates: builder.query<
+      ApiSuccessResponse<BannerCandidatesResponse>,
+      { page?: number; limit?: number; search?: string }
+    >({
+      query: ({ page = 1, limit = 24, search } = {}) => {
+        const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (search?.trim()) params.set('search', search.trim());
+        return `/contests/banner-candidates?${params.toString()}`;
+      },
     }),
 
     createContest: builder.mutation<ApiSuccessResponse<Contest>, FormData>({
@@ -155,4 +167,5 @@ export const {
   useGetContestRankPhotographersQuery,
   useGetContestParticipantsQuery,
   useAdminDeleteContestPhotoMutation,
+  useGetBannerCandidatesQuery,
 } = contestApi;
