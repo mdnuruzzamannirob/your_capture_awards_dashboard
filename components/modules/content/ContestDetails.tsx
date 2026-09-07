@@ -12,9 +12,11 @@ import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { useGetContestQuery } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
+import { ImageOff } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { GoDotFill } from 'react-icons/go';
 
 const ContestDetails = () => {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -91,23 +93,50 @@ const ContestDetails = () => {
 
   return (
     <section className="">
-      <div className="bg-surface-tertiary relative h-32 w-full overflow-hidden sm:h-40 lg:h-48">
+      <div className="bg-surface-tertiary relative h-40 w-full overflow-hidden sm:h-48 lg:h-56">
         {contest.banner ? (
           <Image
             alt={`${contest.title} banner`}
             src={contest.banner}
-            width={1920}
-            height={500}
-            className="size-full object-contain"
+            fill
+            unoptimized
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         ) : (
-          <div className="flex size-full items-center justify-center p-5 text-center">
-            <div>
-              <p className="text-muted-foreground text-sm">No banner uploaded</p>
-              <h1 className="mt-2 text-2xl font-semibold">{contest.title}</h1>
-            </div>
+          <div className="bg-surface-tertiary flex size-full items-center justify-center">
+            <ImageOff className="text-muted-foreground size-8" />
           </div>
         )}
+
+        {/* Title + status sit on the banner itself so the page always has a clear
+            identity, banner or not. */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 p-5">
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-semibold text-white drop-shadow sm:text-2xl">
+              {contest.title}
+            </h1>
+            {contest.category && (
+              <p className="mt-1 truncate text-xs text-white/70">
+                {typeof contest.category === 'string' ? contest.category : contest.category.name}
+              </p>
+            )}
+          </div>
+
+          <span
+            className={cn(
+              'flex w-fit shrink-0 items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
+              contest.status === 'ACTIVE' && 'bg-success-subtle text-success',
+              (contest.status === 'CLOSED' || contest.status === 'COMPLETED') &&
+                'bg-error-subtle text-destructive',
+              contest.status === 'UPCOMING' && 'bg-warning-subtle text-warning',
+            )}
+          >
+            <GoDotFill className="size-2" /> {contest.status}
+          </span>
+        </div>
       </div>
 
       <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">
