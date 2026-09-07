@@ -216,6 +216,7 @@ export interface Contest {
   categoryId?: string | null;
   description: string;
   banner?: string | null;
+  bannerUploader?: { id: string; fullName?: string | null } | null;
   status: 'ACTIVE' | 'UPCOMING' | 'CLOSED' | string;
   startDate?: string;
   endDate?: string;
@@ -259,6 +260,21 @@ export interface GetContestsResponse {
   contests: Contest[];
   total?: number;
   count?: number;
+  page: number;
+  limit: number;
+}
+
+export interface BannerCandidate {
+  id: string;
+  url: string;
+  title?: string | null;
+  createdAt?: string;
+  user?: { id: string; fullName?: string | null; username?: string | null; avatar?: string | null };
+}
+
+export interface BannerCandidatesResponse {
+  photos: BannerCandidate[];
+  total: number;
   page: number;
   limit: number;
 }

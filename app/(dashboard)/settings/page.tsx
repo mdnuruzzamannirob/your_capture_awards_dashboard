@@ -21,6 +21,7 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
+import SocialLinksTab from '@/components/modules/settings/SocialLinksTab';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
@@ -511,10 +512,11 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full max-w-md grid-cols-3">
+        <TabsList className="grid w-full max-w-xl grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
+          <TabsTrigger value="social-links">Social Links</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 outline-none">
@@ -527,6 +529,10 @@ const SettingsContent = () => {
 
         <TabsContent value="site-policy" className="space-y-4 outline-none">
           <SitePolicyTab />
+        </TabsContent>
+
+        <TabsContent value="social-links" className="space-y-4 outline-none">
+          <SocialLinksTab />
         </TabsContent>
       </Tabs>
     </section>

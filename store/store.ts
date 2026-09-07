@@ -5,6 +5,7 @@ import { dashboardApi } from '@/store/features/dashboard/dashboardApi';
 import { recurringContestApi } from '@/store/features/recurringContest/recurringContestApi';
 import { notificationApi } from '@/store/features/notification/notificationApi';
 import { reportApi } from '@/store/features/report/reportApi';
+import { socialLinkApi } from '@/store/features/socialLink/socialLinkApi';
 import { supportApi } from '@/store/features/support/supportApi';
 import { storeApi } from '@/store/features/store/storeApi';
 import { userApi } from '@/store/features/user/userApi';
@@ -23,6 +24,7 @@ export const store = () => {
       [dashboardApi.reducerPath]: dashboardApi.reducer,
       [notificationApi.reducerPath]: notificationApi.reducer,
       [reportApi.reducerPath]: reportApi.reducer,
+      [socialLinkApi.reducerPath]: socialLinkApi.reducer,
       [supportApi.reducerPath]: supportApi.reducer,
       [storeApi.reducerPath]: storeApi.reducer,
       [walletApi.reducerPath]: walletApi.reducer,
@@ -39,6 +41,7 @@ export const store = () => {
         dashboardApi.middleware,
         notificationApi.middleware,
         reportApi.middleware,
+        socialLinkApi.middleware,
         supportApi.middleware,
         storeApi.middleware,
         walletApi.middleware,

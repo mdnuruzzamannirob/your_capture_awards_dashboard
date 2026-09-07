@@ -32,6 +32,10 @@ export const contestDetailsSchema = z
         (value) => !(value instanceof File) || value.size <= MAX_IMAGE_SIZE,
         'Image must be under 24MB',
       ),
+    // Set when the banner was picked from an existing user-submitted photo (gallery
+    // picker) instead of uploaded fresh - `banner` still holds that photo's URL for
+    // the preview, but submission sends this id instead of re-uploading the file.
+    bannerUserPhotoId: z.string().optional(),
     maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required'),
     recurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),

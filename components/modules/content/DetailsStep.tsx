@@ -1,14 +1,84 @@
 'use client';
 
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { useGetBannerCandidatesQuery } from '@/store/features/contest/contestApi';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
+
+const BannerPickerDialog = ({
+  open,
+  onOpenChange,
+  onSelect,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (photo: { id: string; url: string }) => void;
+}) => {
+  const [search, setSearch] = useState('');
+  const { data, isLoading, isFetching } = useGetBannerCandidatesQuery(
+    { search: search.trim() || undefined },
+    { skip: !open },
+  );
+  const photos = data?.data.photos ?? [];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Choose from submissions</DialogTitle>
+        </DialogHeader>
+
+        <Input
+          className={inputClass}
+          placeholder="Search by title or photographer"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+
+        <div className="grid max-h-96 grid-cols-3 gap-3 overflow-y-auto sm:grid-cols-4">
+          {isLoading || isFetching ? (
+            <p className="text-muted-foreground col-span-full text-sm">Loading photos...</p>
+          ) : photos.length ? (
+            photos.map((photo) => (
+              <button
+                key={photo.id}
+                type="button"
+                onClick={() => {
+                  onSelect(photo);
+                  onOpenChange(false);
+                }}
+                className="group relative aspect-square overflow-hidden rounded-lg border border-border-strong"
+              >
+                <Image
+                  src={photo.url}
+                  alt={photo.title || 'Submitted photo'}
+                  fill
+                  unoptimized
+                  sizes="200px"
+                  className="object-cover transition-transform group-hover:scale-105"
+                />
+                {photo.user?.fullName && (
+                  <span className="absolute right-0 bottom-0 left-0 truncate bg-black/60 px-1.5 py-1 text-[10px] font-medium text-white">
+                    {photo.user.fullName}
+                  </span>
+                )}
+              </button>
+            ))
+          ) : (
+            <p className="text-muted-foreground col-span-full text-sm">No submitted photos found.</p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 const inputClass =
   'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
@@ -27,7 +97,9 @@ const DetailsStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const recurring = form.watch('details.recurring');
   const banner = form.watch('details.banner') as File | string | undefined;
+  const bannerUserPhotoId = form.watch('details.bannerUserPhotoId');
   const bannerInputRef = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const preview = useMemo(() => {
     if (banner instanceof File) return URL.createObjectURL(banner);
@@ -137,7 +209,10 @@ const DetailsStep = () => {
                 className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
-                  if (file) field.onChange(file);
+                  if (file) {
+                    field.onChange(file);
+                    form.setValue('details.bannerUserPhotoId', undefined);
+                  }
                 }}
               />
               <FormControl>
@@ -154,25 +229,57 @@ const DetailsStep = () => {
                           className="object-cover"
                         />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => bannerInputRef.current?.click()}
-                        className="bg-background/75 text-foreground absolute right-2.5 bottom-2.5 inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-2.25 text-[10px] font-bold backdrop-blur-lg"
-                      >
-                        Change image
-                      </button>
+                      {bannerUserPhotoId && (
+                        <span className="bg-background/75 text-foreground absolute top-2.5 left-2.5 rounded-md border border-white/35 px-2 py-1 text-[10px] font-bold backdrop-blur-lg">
+                          From submission
+                        </span>
+                      )}
+                      <div className="absolute right-2.5 bottom-2.5 flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPickerOpen(true)}
+                          className="bg-background/75 text-foreground inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-2.25 text-[10px] font-bold backdrop-blur-lg"
+                        >
+                          Choose from submissions
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => bannerInputRef.current?.click()}
+                          className="bg-background/75 text-foreground inline-flex items-center justify-center rounded-lg border border-white/35 px-3 py-2.25 text-[10px] font-bold backdrop-blur-lg"
+                        >
+                          Change image
+                        </button>
+                      </div>
                     </>
                   ) : (
-                    <label
-                      htmlFor="contest-banner-upload"
-                      className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.25 text-[10px] font-bold transition-colors"
-                    >
-                      Upload a banner image
-                    </label>
+                    <div className="flex items-center gap-2.5">
+                      <label
+                        htmlFor="contest-banner-upload"
+                        className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.25 text-[10px] font-bold transition-colors"
+                      >
+                        Upload a banner image
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setPickerOpen(true)}
+                        className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg border px-3 py-2.25 text-[10px] font-bold transition-colors"
+                      >
+                        Choose from submissions
+                      </button>
+                    </div>
                   )}
                 </div>
               </FormControl>
               <FormMessage className={messageClass} />
+
+              <BannerPickerDialog
+                open={pickerOpen}
+                onOpenChange={setPickerOpen}
+                onSelect={(photo) => {
+                  field.onChange(photo.url);
+                  form.setValue('details.bannerUserPhotoId', photo.id);
+                }}
+              />
             </FormItem>
           )}
         />
