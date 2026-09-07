@@ -93,50 +93,59 @@ const ContestDetails = () => {
 
   return (
     <section className="">
-      <div className="bg-surface-tertiary relative h-40 w-full overflow-hidden sm:h-48 lg:h-56">
+      {/* The header is much wider than it is tall, so `object-cover` would crop a
+          banner down to a thin slice. The image is contained instead, over a blurred
+          copy of itself that fills the leftover width. */}
+      <div className="bg-surface-tertiary relative h-56 w-full overflow-hidden sm:h-72 lg:h-80">
         {contest.banner ? (
-          <Image
-            alt={`${contest.title} banner`}
-            src={contest.banner}
-            fill
-            unoptimized
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+          <>
+            <Image
+              alt=""
+              aria-hidden
+              src={contest.banner}
+              fill
+              unoptimized
+              sizes="100vw"
+              className="scale-110 object-cover blur-2xl brightness-[0.35]"
+            />
+            <Image
+              alt={`${contest.title} banner`}
+              src={contest.banner}
+              fill
+              unoptimized
+              priority
+              sizes="100vw"
+              className="object-contain"
+            />
+          </>
         ) : (
-          <div className="bg-surface-tertiary flex size-full items-center justify-center">
+          <div className="flex size-full items-center justify-center">
             <ImageOff className="text-muted-foreground size-8" />
           </div>
         )}
+      </div>
 
-        {/* Title + status sit on the banner itself so the page always has a clear
-            identity, banner or not. */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/30 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-3 p-5">
-          <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold text-white drop-shadow sm:text-2xl">
-              {contest.title}
-            </h1>
-            {contest.category && (
-              <p className="mt-1 truncate text-xs text-white/70">
-                {typeof contest.category === 'string' ? contest.category : contest.category.name}
-              </p>
-            )}
-          </div>
-
-          <span
-            className={cn(
-              'flex w-fit shrink-0 items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
-              contest.status === 'ACTIVE' && 'bg-success-subtle text-success',
-              (contest.status === 'CLOSED' || contest.status === 'COMPLETED') &&
-                'bg-error-subtle text-destructive',
-              contest.status === 'UPCOMING' && 'bg-warning-subtle text-warning',
-            )}
-          >
-            <GoDotFill className="size-2" /> {contest.status}
-          </span>
+      <div className="border-border-subtle flex flex-wrap items-center justify-between gap-3 border-b bg-(--bg-inset) px-5 py-3">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
+          {contest.category && (
+            <p className="text-muted-foreground mt-0.5 truncate text-xs">
+              {typeof contest.category === 'string' ? contest.category : contest.category.name}
+            </p>
+          )}
         </div>
+
+        <span
+          className={cn(
+            'flex w-fit shrink-0 items-center gap-1 rounded-sm px-[7px] py-0.5 text-[11px] font-medium capitalize',
+            contest.status === 'ACTIVE' && 'bg-success-subtle text-success',
+            (contest.status === 'CLOSED' || contest.status === 'COMPLETED') &&
+              'bg-error-subtle text-destructive',
+            contest.status === 'UPCOMING' && 'bg-warning-subtle text-warning',
+          )}
+        >
+          <GoDotFill className="size-2" /> {contest.status}
+        </span>
       </div>
 
       <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">
