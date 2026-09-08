@@ -1,4 +1,8 @@
-﻿import { contestAwardTypes, contestRuleKeys } from '@/store/features/contest/types';
+﻿import {
+  contestAwardTypes,
+  contestRuleKeys,
+  type ContestAwardType,
+} from '@/store/features/contest/types';
 import { z } from 'zod';
 
 const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
@@ -160,6 +164,13 @@ export const contestRulesSchema = z.object({
   }),
 });
 
+// Tier award types (Top 10/20/50/100/200) are the only ones allowed to appear
+// twice — once per recipient (Photo and Photographer) — so the array's real
+// ceiling is one slot per non-tier type plus two slots per tier type, not a
+// flat one-per-type count.
+const TIER_AWARD_TYPES: ContestAwardType[] = ['TOP_200', 'TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'];
+const MAX_CONTEST_AWARDS = contestAwardTypes.length + TIER_AWARD_TYPES.length;
+
 export const contestAwardsSchema = z
   .array(
     z.object({
@@ -172,7 +183,7 @@ export const contestAwardsSchema = z
     }),
   )
   .min(1, 'Add at least one award')
-  .max(contestAwardTypes.length)
+  .max(MAX_CONTEST_AWARDS)
   .superRefine((awards, ctx) => {
     const seen = new Set<string>();
     awards.forEach((award, index) => {
@@ -189,7 +200,7 @@ export const contestAwardsSchema = z
 
     contestAwardTypes.forEach((type) => {
       const matching = awards.filter((award) => award.type === type);
-      const isTier = ['TOP_200', 'TOP_100', 'TOP_50', 'TOP_20', 'TOP_10'].includes(type);
+      const isTier = TIER_AWARD_TYPES.includes(type);
       if (
         matching.length > 1 &&
         (!isTier ||
