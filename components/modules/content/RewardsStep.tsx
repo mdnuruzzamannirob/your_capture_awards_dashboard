@@ -67,7 +67,11 @@ const RewardsStep = () => {
             missing.push({ type, recipient, boost: 0, key: 0, swap: 0, coin: 0 });
           }
         });
-      } else if (!present.has(`${type}:`)) {
+      } else if (!awards.some((award) => award.type === type)) {
+        // Non-tier slots (Top Photo, Top Photographer) only ever have one row,
+        // but the backend still tags them with their natural recipient (Photo/
+        // Photographer). Match on type alone here, ignoring recipient, so an
+        // already-loaded row isn't mistaken for "missing" and duplicated.
         missing.push({ type, boost: 0, key: 0, swap: 0, coin: 0 });
       }
     });
