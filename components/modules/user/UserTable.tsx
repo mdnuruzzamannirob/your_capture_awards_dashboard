@@ -198,7 +198,6 @@ const UserTable = () => {
               <div className="rounded-sm border text-sm">
                 {[
                   { title: 'Email', value: selectedRow?.email },
-                  { title: 'Phone', value: selectedRow?.phone },
                   { title: 'Location', value: selectedRow?.location },
                   { title: 'Role', value: selectedRow?.role },
                   { title: 'Level', value: selectedRow?.currentLevel || 1 },
