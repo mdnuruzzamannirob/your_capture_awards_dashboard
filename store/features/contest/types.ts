@@ -239,6 +239,7 @@ export interface Contest {
   levelAwards?: ContestLevelAward[];
   totalVotes?: number;
   joined?: boolean;
+  deletedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
   creator?: {

@@ -6,12 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { useGetBannerCandidatesQuery } from '@/store/features/contest/contestApi';
-import { Check, ChevronDown, Image as ImageIcon, ImageOff, Search } from 'lucide-react';
+import { useLazyGetBannerCandidatesQuery } from '@/store/features/contest/contestApi';
+import type { BannerCandidate } from '@/store/features/contest/types';
+import { Check, ChevronDown, Image as ImageIcon, ImageOff, Loader2, Search } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
+
+const BANNER_PICKER_PAGE_SIZE = 48;
 
 const BannerPickerDialog = ({
   open,
@@ -25,13 +28,126 @@ const BannerPickerDialog = ({
   selectedPhotoId?: string;
 }) => {
   const [search, setSearch] = useState('');
-  const { data, isLoading, isFetching } = useGetBannerCandidatesQuery(
-    { search: search.trim() || undefined, limit: 48 },
-    { skip: !open },
+  const [photos, setPhotos] = useState<BannerCandidate[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const requestKeyRef = useRef('');
+  const requestRunRef = useRef(0);
+  const loadingMoreRef = useRef(false);
+  const initialLoadingRef = useRef(false);
+  const [fetchBannerCandidates] = useLazyGetBannerCandidatesQuery();
+  const normalizedSearch = search.trim();
+  const showInitialSkeleton = isInitialLoading && photos.length === 0;
+
+  const loadPage = useCallback(
+    async ({
+      nextPage,
+      mode,
+      query,
+    }: {
+      nextPage: number;
+      mode: 'replace' | 'append';
+      query: string;
+    }) => {
+      const runId = mode === 'replace' ? requestRunRef.current + 1 : requestRunRef.current;
+
+      if (mode === 'replace') {
+        requestRunRef.current = runId;
+        initialLoadingRef.current = true;
+        setIsInitialLoading(true);
+      } else {
+        if (loadingMoreRef.current || initialLoadingRef.current) return;
+        loadingMoreRef.current = true;
+        setIsLoadingMore(true);
+      }
+
+      setLoadError(null);
+
+      try {
+        const response = await fetchBannerCandidates({
+          page: nextPage,
+          limit: BANNER_PICKER_PAGE_SIZE,
+          search: query || undefined,
+        }).unwrap();
+
+        if (requestRunRef.current !== runId || requestKeyRef.current !== query) return;
+
+        const pagePhotos = response.data.photos ?? [];
+        const responseTotal = response.data.total ?? 0;
+        const responsePage = response.data.page ?? nextPage;
+        const responseLimit = response.data.limit ?? BANNER_PICKER_PAGE_SIZE;
+
+        setPhotos((currentPhotos) => {
+          if (mode === 'replace') return pagePhotos;
+
+          const knownIds = new Set(currentPhotos.map((photo) => photo.id));
+          const newPhotos = pagePhotos.filter((photo) => !knownIds.has(photo.id));
+          return [...currentPhotos, ...newPhotos];
+        });
+        setTotal(responseTotal);
+        setPage(responsePage);
+        setHasMore(responsePage * responseLimit < responseTotal && pagePhotos.length > 0);
+      } catch {
+        if (requestRunRef.current === runId && requestKeyRef.current === query) {
+          setLoadError('Unable to load submitted photos.');
+        }
+      } finally {
+        if (mode === 'replace') {
+          if (requestRunRef.current === runId && requestKeyRef.current === query) {
+            initialLoadingRef.current = false;
+            setIsInitialLoading(false);
+          }
+        } else {
+          loadingMoreRef.current = false;
+          setIsLoadingMore(false);
+        }
+      }
+    },
+    [fetchBannerCandidates],
   );
-  const photos = data?.data.photos ?? [];
-  const total = data?.data.total ?? photos.length;
-  const isBusy = isLoading || isFetching;
+
+  useEffect(() => {
+    if (!open) return;
+
+    requestKeyRef.current = normalizedSearch;
+    setPhotos([]);
+    setTotal(0);
+    setPage(0);
+    setHasMore(false);
+    setLoadError(null);
+    scrollContainerRef.current?.scrollTo({ top: 0 });
+    void loadPage({ nextPage: 1, mode: 'replace', query: normalizedSearch });
+  }, [loadPage, normalizedSearch, open]);
+
+  useEffect(() => {
+    if (!open || !hasMore || isInitialLoading || isLoadingMore || loadError) return;
+
+    const root = scrollContainerRef.current;
+    const target = loadMoreRef.current;
+    if (!root || !target) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          void loadPage({
+            nextPage: page + 1,
+            mode: 'append',
+            query: requestKeyRef.current,
+          });
+        }
+      },
+      { root, rootMargin: '360px 0px', threshold: 0 },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, isInitialLoading, isLoadingMore, loadError, loadPage, open, page]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -62,7 +178,7 @@ const BannerPickerDialog = ({
                 onChange={(event) => setSearch(event.target.value)}
               />
             </div>
-            {!isBusy && (
+            {!isInitialLoading && (
               <span className="text-muted-foreground shrink-0 text-xs font-medium tracking-wide uppercase">
                 {total} photo{total === 1 ? '' : 's'}
               </span>
@@ -70,8 +186,8 @@ const BannerPickerDialog = ({
           </div>
         </div>
 
-        <div className="scrollbar-thin flex-1 overflow-y-auto px-7 py-6">
-          {isBusy ? (
+        <div ref={scrollContainerRef} className="flex-1 scrollbar-thin overflow-y-auto px-7 py-6">
+          {showInitialSkeleton ? (
             <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {Array.from({ length: 12 }).map((_, index) => (
                 <div
@@ -95,7 +211,7 @@ const BannerPickerDialog = ({
                     className={cn(
                       'group overflow-hidden rounded-xl border text-left shadow-sm transition-all duration-200',
                       isSelected
-                        ? 'border-primary ring-primary/30 ring-2 shadow-md'
+                        ? 'border-primary ring-primary/30 shadow-md ring-2'
                         : 'border-border-strong hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-lg',
                     )}
                   >
@@ -146,12 +262,53 @@ const BannerPickerDialog = ({
                   </button>
                 );
               })}
+              <div ref={loadMoreRef} className="col-span-full h-px" aria-hidden="true" />
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
               <ImageOff className="text-muted-foreground size-9" />
-              <p className="text-sm font-medium">No submitted photos found</p>
-              <p className="text-muted-foreground text-xs">Try a different search term.</p>
+              <p className="text-sm font-medium">
+                {loadError ? 'Submitted photos could not be loaded' : 'No submitted photos found'}
+              </p>
+              <p className="text-muted-foreground text-xs">
+                {loadError ? loadError : 'Try a different search term.'}
+              </p>
+              {loadError && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    void loadPage({ nextPage: 1, mode: 'replace', query: requestKeyRef.current })
+                  }
+                  className="border-input bg-surface text-body hover:border-primary hover:text-foreground mt-2 inline-flex items-center justify-center rounded-lg border px-3 py-2 text-[11px] font-bold transition-colors"
+                >
+                  Retry
+                </button>
+              )}
+            </div>
+          )}
+
+          {photos.length > 0 && (
+            <div className="flex min-h-14 items-center justify-center pt-5">
+              {isLoadingMore ? (
+                <span className="text-muted-foreground inline-flex items-center gap-2 text-xs font-medium">
+                  <Loader2 className="size-4 animate-spin" />
+                  Loading more photos
+                </span>
+              ) : loadError ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    void loadPage({
+                      nextPage: page + 1,
+                      mode: 'append',
+                      query: requestKeyRef.current,
+                    })
+                  }
+                  className="border-input bg-surface text-body hover:border-primary hover:text-foreground inline-flex items-center justify-center rounded-lg border px-3 py-2 text-[11px] font-bold transition-colors"
+                >
+                  Retry loading more
+                </button>
+              ) : null}
             </div>
           )}
         </div>
@@ -404,7 +561,7 @@ const DetailsStep = () => {
         />
 
         {recurring && (
-          <div className="grid gap-3.5 rounded-lg border border-dashed border-border-strong p-3.5">
+          <div className="border-border-strong grid gap-3.5 rounded-lg border border-dashed p-3.5">
             <FormField
               control={form.control}
               name="details.recurringType"

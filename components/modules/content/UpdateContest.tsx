@@ -31,6 +31,9 @@ const UpdateContest = () => {
   );
   const [updateContest, { isLoading: isUpdating }] = useUpdateContestMutation();
   const contest = data?.data as Contest | undefined;
+  const canEditContest = Boolean(
+    contest && (contest.status === 'UPCOMING' || contest.status === 'NEW') && !contest.deletedAt,
+  );
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
@@ -50,6 +53,21 @@ const UpdateContest = () => {
         <p>Contest not found or could not be loaded.</p>
         <Button type="button" onClick={() => router.push('/contest')} className="mt-4">
           Back to contests
+        </Button>
+      </div>
+    );
+  }
+
+  if (!canEditContest) {
+    return (
+      <div className="border-border-subtle bg-surface-secondary text-muted-foreground rounded-lg border p-8 text-center">
+        <p>Only upcoming contests can be edited.</p>
+        <Button
+          type="button"
+          onClick={() => router.push(`/contest/${contest.id}`)}
+          className="mt-4"
+        >
+          Back to contest
         </Button>
       </div>
     );

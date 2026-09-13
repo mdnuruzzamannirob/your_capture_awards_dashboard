@@ -70,6 +70,22 @@ export const contestApi = createApi({
           : [],
     }),
 
+    deleteContest: builder.mutation<ApiSuccessResponse<string>, { id: string }>({
+      query: ({ id }) => ({
+        url: `/contests/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, error, { id }) =>
+        result
+          ? [
+              { type: 'Contest', id },
+              { type: 'Contests', id: 'LIST' },
+              { type: 'ContestStats', id: 'SINGLE' },
+              { type: 'DashboardOverview', id: 'SINGLE' },
+            ]
+          : [],
+    }),
+
     getContests: builder.query<
       ApiSuccessResponse<GetContestsResponse>,
       {
@@ -159,6 +175,7 @@ export const {
   useGetContestCreationOptionsQuery,
   useCreateContestMutation,
   useUpdateContestMutation,
+  useDeleteContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
   useGetContestQuery,
@@ -168,4 +185,5 @@ export const {
   useGetContestParticipantsQuery,
   useAdminDeleteContestPhotoMutation,
   useGetBannerCandidatesQuery,
+  useLazyGetBannerCandidatesQuery,
 } = contestApi;

@@ -4,7 +4,7 @@ import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Contest } from '@/store/features/contest/types';
-import { Info, Pencil } from 'lucide-react';
+import { Info, Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { GoDotFill } from 'react-icons/go';
 
@@ -31,10 +31,16 @@ const DetailsTab = ({
   contest,
   canEdit = true,
   onEditClick,
+  canDelete = false,
+  onDeleteClick,
+  isDeleting = false,
 }: {
   contest: Contest;
   canEdit?: boolean;
   onEditClick?: () => void;
+  canDelete?: boolean;
+  onDeleteClick?: () => void;
+  isDeleting?: boolean;
 }) => {
   const awardCount = contest.prizes?.length ?? contest.awards?.length ?? 0;
   const creatorName = contest.creator?.fullName ?? 'Unknown creator';
@@ -45,11 +51,24 @@ const DetailsTab = ({
         <h1 className="flex h-9 items-center gap-2 text-lg font-semibold">
           <Info className="size-5" /> Details
         </h1>
-        {canEdit && (
-          <Button onClick={onEditClick} className="text-foreground gap-2">
-            <Pencil className="size-4" /> Edit
-          </Button>
-        )}
+        <div className="flex flex-wrap justify-end gap-2">
+          {canEdit && (
+            <Button onClick={onEditClick} className="text-foreground gap-2">
+              <Pencil className="size-4" /> Edit
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={onDeleteClick}
+              disabled={isDeleting}
+              className="gap-2"
+            >
+              <Trash2 className="size-4" /> {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="border-border-subtle bg-surface-secondary space-y-6 rounded-lg border p-5">
@@ -116,4 +135,3 @@ const DetailsTab = ({
 };
 
 export default DetailsTab;
-

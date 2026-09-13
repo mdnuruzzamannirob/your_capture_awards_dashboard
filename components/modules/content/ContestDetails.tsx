@@ -8,14 +8,36 @@ import PrizesTab from '@/components/modules/content/PrizesTab';
 import RankTab from '@/components/modules/content/RankTab';
 import RulesTab from '@/components/modules/content/RulesTab';
 import WinnerTab from '@/components/modules/content/WinnerTab';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { useGetContestQuery } from '@/store/features/contest/contestApi';
+import { useDeleteContestMutation, useGetContestQuery } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
 import { ImageOff } from 'lucide-react';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+
+function getErrorMessage(error: unknown): string {
+  if (!error || typeof error !== 'object') return 'Something went wrong!';
+  if ('data' in error) {
+    const data = error.data as { message?: string; error?: { message?: string } } | undefined;
+    if (data?.message) return data.message;
+    if (data?.error?.message) return data.error.message;
+  }
+  if ('message' in error && typeof error.message === 'string') return error.message;
+  return 'Something went wrong!';
+}
 
 const ContestDetails = () => {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -29,11 +51,14 @@ const ContestDetails = () => {
     width: 0,
     left: 0,
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { data, isLoading, isFetching } = useGetContestQuery({ id: params?.id as string });
+  const [deleteContest, { isLoading: isDeleting }] = useDeleteContestMutation();
   const contest = data?.data as Contest | undefined;
 
-  const isUpcoming = contest?.status === 'UPCOMING';
+  const isUpcoming = contest?.status === 'UPCOMING' || contest?.status === 'NEW';
+  const canManageUpcomingContest = Boolean(isUpcoming && !contest?.deletedAt);
   const activeIndex = CONTEST_DETAILS_TABS.findIndex((t) => t.key === activeTab);
 
   useEffect(() => {
@@ -51,14 +76,30 @@ const ContestDetails = () => {
     });
   }, [activeIndex, isLoading]);
 
+  const handleDeleteContest = async () => {
+    if (!contest?.id) return;
+
+    try {
+      const response = await deleteContest({ id: contest.id }).unwrap();
+      toast.success(response.message || 'Contest deleted successfully');
+      setDeleteDialogOpen(false);
+      router.push('/contest');
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
   const renderTabContent = (currentContest: Contest) => {
     switch (activeTab) {
       case 'details':
         return (
           <DetailsTab
             contest={currentContest}
-            canEdit={isUpcoming}
+            canEdit={canManageUpcomingContest}
             onEditClick={() => router.push(`/contest/${params?.id}/edit`)}
+            canDelete={canManageUpcomingContest}
+            onDeleteClick={() => setDeleteDialogOpen(true)}
+            isDeleting={isDeleting}
           />
         );
       case 'prizes':
@@ -162,6 +203,36 @@ const ContestDetails = () => {
       </div>
 
       <div className="w-full p-5">{renderTabContent(contest)}</div>
+
+      <AlertDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          if (!isDeleting) setDeleteDialogOpen(open);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete upcoming contest?</AlertDialogTitle>
+            <AlertDialogDescription>
+              <span className="text-foreground font-medium">{contest.title}</span> will be archived
+              and hidden from contest lists. This is only allowed before participation starts.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDeleteContest();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete contest'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 };
