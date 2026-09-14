@@ -30,6 +30,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
   const allAwards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
   const awards = allAwards.filter((award) => !isTierAward(award));
   const levelAwards = contest.levelAwards ?? [];
+  const currency = contest.currency ?? 'USD';
 
   return (
     <div className="space-y-5">
@@ -50,6 +51,14 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
           <p className="text-muted-foreground text-sm">Entry coins</p>
           <p className="mt-1 font-semibold">
             {contest.coin_requirement ? (contest.coin_required ?? 0) : 'Not required'}
+          </p>
+        </div>
+        <div>
+          <p className="text-muted-foreground text-sm">Entry fee</p>
+          <p className="mt-1 font-semibold">
+            {contest.isMoneyContest && (contest.entryFeeAmount ?? 0) > 0
+              ? `${contest.entryFeeAmount} ${currency}`
+              : 'Free'}
           </p>
         </div>
         <div>

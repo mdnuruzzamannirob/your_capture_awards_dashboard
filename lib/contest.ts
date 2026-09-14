@@ -107,6 +107,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       minPrize: 0,
       maxPrize: 0,
       currency: 'USD',
+      entryFeeAmount: 0,
       coin_requirement: false,
       coin_required: 0,
     },
@@ -284,6 +285,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       minPrize: Number(contest.minPrize ?? 0),
       maxPrize: Number(contest.maxPrize ?? 0),
       currency: contest.currency ?? 'USD',
+      entryFeeAmount: Number(contest.entryFeeAmount ?? 0),
       coin_requirement: Boolean(contest.coinRequirement ?? contest.coin_requirement),
       coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
     },
@@ -339,6 +341,7 @@ export function buildContestFormData(
     formData.append('minPrize', String(prizes.minPrize));
     formData.append('maxPrize', String(prizes.maxPrize));
     formData.append('currency', prizes.currency ?? 'USD');
+    formData.append('entryFeeAmount', String(prizes.entryFeeAmount));
   }
   formData.append('coinRequirement', String(prizes.coin_requirement));
   if (prizes.coin_requirement) {

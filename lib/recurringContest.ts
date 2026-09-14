@@ -18,6 +18,7 @@ export function mapRecurringContestToDetailsValues(
     minPrize: Number(contest.minPrize ?? 0),
     maxPrize: Number(contest.maxPrize ?? 0),
     currency: contest.currency ?? undefined,
+    entryFeeAmount: Number(contest.entryFeeAmount ?? 0),
     entryFeeCoins: Number(contest.entryFeeCoins ?? 0),
   };
 }
@@ -35,6 +36,7 @@ export function buildUpdateRecurringContestBody(
     minPrize: values.isMoneyContest ? values.minPrize : 0,
     maxPrize: values.isMoneyContest ? values.maxPrize : 0,
     currency: values.isMoneyContest ? (values.currency ?? null) : null,
+    entryFeeAmount: values.isMoneyContest ? values.entryFeeAmount : 0,
     entryFeeCoins: values.entryFeeCoins,
   };
 }

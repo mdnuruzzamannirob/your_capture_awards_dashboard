@@ -133,6 +133,14 @@ const RecurringContestDetails = () => {
                 value={contest.recurring.maxOccurrences ?? 'Unlimited'}
               />
               <DetailItem label="Generated so far" value={contest.recurring.generatedOccurrences ?? 0} />
+              <DetailItem
+                label="Entry fee (USD)"
+                value={
+                  contest.isMoneyContest && contest.entryFeeAmount > 0
+                    ? `${contest.entryFeeAmount} ${contest.currency ?? 'USD'}`
+                    : 'Free'
+                }
+              />
               <DetailItem label="Entry fee (coins)" value={contest.entryFeeCoins} />
               <DetailItem
                 label="Money contest"

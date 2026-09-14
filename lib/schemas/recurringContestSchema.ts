@@ -15,6 +15,7 @@ export const recurringDetailsSchema = z
     minPrize: z.coerce.number().int().min(0).default(0),
     maxPrize: z.coerce.number().int().min(0).default(0),
     currency: z.string().trim().toUpperCase().max(3).optional(),
+    entryFeeAmount: z.coerce.number().min(0).default(0),
     entryFeeCoins: z.coerce.number().int().min(0).max(100000000).default(0),
   })
   .superRefine((data, ctx) => {
