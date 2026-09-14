@@ -341,8 +341,8 @@ export function buildContestFormData(
     formData.append('minPrize', String(prizes.minPrize));
     formData.append('maxPrize', String(prizes.maxPrize));
     formData.append('currency', prizes.currency ?? 'USD');
-    formData.append('entryFeeAmount', String(prizes.entryFeeAmount));
   }
+  formData.append('entryFeeAmount', String(prizes.entryFeeAmount));
   formData.append('coinRequirement', String(prizes.coin_requirement));
   if (prizes.coin_requirement) {
     formData.append('entryFeeCoins', String(prizes.coin_required));

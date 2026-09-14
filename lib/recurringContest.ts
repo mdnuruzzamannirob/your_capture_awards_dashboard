@@ -36,7 +36,7 @@ export function buildUpdateRecurringContestBody(
     minPrize: values.isMoneyContest ? values.minPrize : 0,
     maxPrize: values.isMoneyContest ? values.maxPrize : 0,
     currency: values.isMoneyContest ? (values.currency ?? null) : null,
-    entryFeeAmount: values.isMoneyContest ? values.entryFeeAmount : 0,
+    entryFeeAmount: values.entryFeeAmount,
     entryFeeCoins: values.entryFeeCoins,
   };
 }

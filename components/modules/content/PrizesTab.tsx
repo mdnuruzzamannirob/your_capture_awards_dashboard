@@ -56,7 +56,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
         <div>
           <p className="text-muted-foreground text-sm">Entry fee</p>
           <p className="mt-1 font-semibold">
-            {contest.isMoneyContest && (contest.entryFeeAmount ?? 0) > 0
+            {(contest.entryFeeAmount ?? 0) > 0
               ? `${contest.entryFeeAmount} ${currency}`
               : 'Free'}
           </p>

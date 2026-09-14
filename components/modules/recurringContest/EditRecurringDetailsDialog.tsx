@@ -185,7 +185,7 @@ const EditRecurringDetailsDialog = ({
             />
 
             {isMoneyContest && (
-              <div className="grid gap-4 sm:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <FormField
                   control={form.control}
                   name="minPrize"
@@ -235,27 +235,28 @@ const EditRecurringDetailsDialog = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="entryFeeAmount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Entry fee (USD)</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={0}
-                          step="0.01"
-                          {...field}
-                          onChange={(event) => field.onChange(event.target.value)}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             )}
+
+            <FormField
+              control={form.control}
+              name="entryFeeAmount"
+              render={({ field }) => (
+                <FormItem className="max-w-[220px]">
+                  <FormLabel>Entry fee (USD)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      {...field}
+                      onChange={(event) => field.onChange(event.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
