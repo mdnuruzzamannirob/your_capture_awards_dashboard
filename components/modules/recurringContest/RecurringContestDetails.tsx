@@ -136,7 +136,7 @@ const RecurringContestDetails = () => {
               <DetailItem
                 label="Entry fee (USD)"
                 value={
-                  contest.isMoneyContest && contest.entryFeeAmount > 0
+                  contest.entryFeeAmount > 0
                     ? `${contest.entryFeeAmount} ${contest.currency ?? 'USD'}`
                     : 'Free'
                 }
