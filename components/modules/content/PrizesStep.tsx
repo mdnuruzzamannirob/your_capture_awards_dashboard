@@ -56,7 +56,7 @@ const PrizesStep = () => {
         <FormSwitch name="prizes.isMoneyContest" label="Is money contest" />
 
         {isMoneyContest && (
-          <div className="grid items-start gap-[14px] sm:grid-cols-4">
+          <div className="grid items-start gap-[14px] sm:grid-cols-3">
             <FormField
               control={form.control}
               name="prizes.minPrize"
@@ -115,28 +115,29 @@ const PrizesStep = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="prizes.entryFeeAmount"
-              render={({ field }) => (
-                <FormItem className="gap-1.5">
-                  <FormLabel className={labelClass}>Entry fee (USD)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      className={inputClass}
-                      {...field}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[9px]" />
-                </FormItem>
-              )}
-            />
           </div>
         )}
+
+        <FormField
+          control={form.control}
+          name="prizes.entryFeeAmount"
+          render={({ field }) => (
+            <FormItem className="max-w-[220px] gap-1.5">
+              <FormLabel className={labelClass}>Entry fee (USD)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  className={inputClass}
+                  {...field}
+                  onChange={(event) => field.onChange(event.target.value)}
+                />
+              </FormControl>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
 
         <FormSwitch name="prizes.coin_requirement" label="Coin requirement" />
 

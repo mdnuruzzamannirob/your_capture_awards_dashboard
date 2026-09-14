@@ -68,9 +68,6 @@ const ContestForm = ({
     if (form.getValues('prizes.maxPrize') !== 0) {
       form.setValue('prizes.maxPrize', 0, { shouldDirty: true });
     }
-    if (form.getValues('prizes.entryFeeAmount') !== 0) {
-      form.setValue('prizes.entryFeeAmount', 0, { shouldDirty: true });
-    }
   }, [form, isMoneyContest]);
 
   useEffect(() => {
