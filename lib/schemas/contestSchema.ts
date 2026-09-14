@@ -84,6 +84,7 @@ export const contestPrizesSchema = z
     minPrize: z.coerce.number().min(0).default(0),
     maxPrize: z.coerce.number().min(0).default(0),
     currency: z.string().trim().toUpperCase().max(3).optional(),
+    entryFeeAmount: z.coerce.number().min(0).default(0),
     coin_requirement: z.boolean().default(false),
     coin_required: z.coerce.number().int().min(0).default(0),
   })

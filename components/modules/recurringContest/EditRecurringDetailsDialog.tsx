@@ -185,7 +185,7 @@ const EditRecurringDetailsDialog = ({
             />
 
             {isMoneyContest && (
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-4">
                 <FormField
                   control={form.control}
                   name="minPrize"
@@ -230,6 +230,25 @@ const EditRecurringDetailsDialog = ({
                       <FormLabel>Currency</FormLabel>
                       <FormControl>
                         <Input placeholder="USD" maxLength={3} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="entryFeeAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Entry fee (USD)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          {...field}
+                          onChange={(event) => field.onChange(event.target.value)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -226,6 +226,7 @@ export interface Contest {
   minPrize?: number;
   maxPrize?: number;
   currency?: string | null;
+  entryFeeAmount?: number;
   coin_requirement?: boolean;
   coinRequirement?: boolean;
   coin_required?: number;

@@ -63,6 +63,7 @@ export interface RecurringContest {
   maxPrize?: number | null;
   minPrize?: number | null;
   currency?: string | null;
+  entryFeeAmount: number;
   entryFeeCoins: number;
   startDate: string;
   endDate: string;
@@ -102,6 +103,7 @@ export interface UpdateRecurringContestBody {
   maxPrize?: number;
   minPrize?: number;
   currency?: string | null;
+  entryFeeAmount?: number;
   entryFeeCoins?: number;
 }
 
