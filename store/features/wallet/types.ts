@@ -1,4 +1,10 @@
-export type TransactionStatus = 'SUCCEEDED' | 'PENDING' | 'FAILED' | 'EXPIRED';
+export type TransactionStatus =
+  | 'SUCCEEDED'
+  | 'PENDING'
+  | 'FAILED'
+  | 'EXPIRED'
+  | 'REFUNDED'
+  | 'VALID';
 export type TransactionType = 'STORE' | 'SUBSCRIPTION' | 'CONTEST';
 export type TransactionRecurring = 'ONETIME' | 'MONTHLY' | 'YEARLY';
 

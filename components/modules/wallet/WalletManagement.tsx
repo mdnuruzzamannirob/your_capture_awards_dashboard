@@ -136,6 +136,8 @@ const WalletManagement = () => {
                       'border-destructive/50 bg-destructive/10 text-destructive',
                     selectedTransaction.status === 'EXPIRED' &&
                       'border-border/50 bg-muted/10 text-muted-foreground',
+                    selectedTransaction.status === 'REFUNDED' &&
+                      'border-info/50 bg-info/10 text-info',
                   )}
                 >
                   {selectedTransaction.status}

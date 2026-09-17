@@ -30,7 +30,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
   const allAwards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
   const awards = allAwards.filter((award) => !isTierAward(award));
   const levelAwards = contest.levelAwards ?? [];
-  const currency = contest.currency ?? 'USD';
+  const currency = 'USD';
 
   return (
     <div className="space-y-5">
