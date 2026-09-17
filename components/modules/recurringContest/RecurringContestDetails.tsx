@@ -137,7 +137,7 @@ const RecurringContestDetails = () => {
                 label="Entry fee (USD)"
                 value={
                   contest.entryFeeAmount > 0
-                    ? `${contest.entryFeeAmount} ${contest.currency ?? 'USD'}`
+                    ? `${contest.entryFeeAmount} USD`
                     : 'Free'
                 }
               />

@@ -84,7 +84,15 @@ export const contestPrizesSchema = z
     minPrize: z.coerce.number().min(0).default(0),
     maxPrize: z.coerce.number().min(0).default(0),
     currency: z.string().trim().toUpperCase().max(3).optional(),
-    entryFeeAmount: z.coerce.number().min(0).default(0),
+    entryFeeAmount: z.coerce
+      .number()
+      .min(0)
+      .refine((value) => value === 0 || value >= 0.5, 'Entry fee must be 0 or at least $0.50')
+      .refine(
+        (value) => Math.abs(value * 100 - Math.round(value * 100)) < 1e-8,
+        'Entry fee can have at most 2 decimal places',
+      )
+      .default(0),
     coin_requirement: z.boolean().default(false),
     coin_required: z.coerce.number().int().min(0).default(0),
   })

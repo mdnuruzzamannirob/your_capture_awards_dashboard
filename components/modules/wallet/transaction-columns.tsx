@@ -55,6 +55,7 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
             status === 'PENDING' && 'bg-warning-subtle text-warning',
             status === 'FAILED' && 'bg-error-subtle text-destructive',
             status === 'EXPIRED' && 'bg-surface-tertiary text-muted-foreground',
+            status === 'REFUNDED' && 'bg-info-subtle text-info',
           )}
         >
           <GoDotFill className="size-2" /> {status}
