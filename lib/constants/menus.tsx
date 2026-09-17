@@ -2,7 +2,11 @@ import { SideMenu } from '@/types';
 import { HiOutlineWallet } from 'react-icons/hi2';
 import { IoSettingsOutline, IoStorefrontOutline } from 'react-icons/io5';
 import { LuLayoutDashboard } from 'react-icons/lu';
-import { MdOutlineContactSupport, MdOutlineMonochromePhotos } from 'react-icons/md';
+import {
+  MdOutlineContactSupport,
+  MdOutlineMonochromePhotos,
+  MdOutlineQuestionAnswer,
+} from 'react-icons/md';
 import { TbFlag, TbRepeat, TbUsers } from 'react-icons/tb';
 
 export const sideMenus: SideMenu[] = [
@@ -45,6 +49,11 @@ export const sideMenus: SideMenu[] = [
     name: 'Support',
     href: '/support',
     icon: <MdOutlineContactSupport className="size-full" />,
+  },
+  {
+    name: 'FAQs',
+    href: '/faqs',
+    icon: <MdOutlineQuestionAnswer className="size-full" />,
   },
   {
     name: 'Settings',
