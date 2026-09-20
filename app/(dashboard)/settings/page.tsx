@@ -22,6 +22,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import SocialLinksTab from '@/components/modules/settings/SocialLinksTab';
+import { getImageFileError, WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
@@ -242,10 +243,17 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setAvatarFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+    if (!file) return;
+
+    const typeError = getImageFileError(file, 'web');
+    if (typeError) {
+      toast.error(typeError);
+      event.target.value = '';
+      return;
     }
+
+    setAvatarFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   const handleAvatarUpload = async () => {
@@ -292,7 +300,7 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
             <input
               id="avatarInput"
               type="file"
-              accept="image/*"
+              accept={WEB_IMAGE_ACCEPT}
               className="hidden"
               onChange={handleFileChange}
               disabled={isUploading}
