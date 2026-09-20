@@ -48,16 +48,31 @@ function slotOrder(type: ContestAwardType) {
 
 const RewardsStep = () => {
   const form = useFormContext<ContestFinalValues>();
-  const { fields, append } = useFieldArray({ name: 'awards', control: form.control });
+  const { fields, append, replace } = useFieldArray({ name: 'awards', control: form.control });
   const awards = form.watch('awards');
 
   // Guarantee all 12 fixed slots exist (Top Photo, Top Photographer, and each rank tier
   // paired for Photo + Photographer) even if the contest predates this ladder or the
   // creation-options prize catalog hasn't loaded yet.
   useEffect(() => {
-    const present = new Set(
-      awards.map((award) => `${award.type}:${award.recipient ?? ''}`),
-    );
+    // Read the live values instead of the watched `awards`: that one is captured at
+    // render time, so any effect run happening before React re-renders (notably React's
+    // double-invoked mount effects in dev) still sees the pre-append array and would
+    // append every slot a second time, leaving two of each row.
+    const current = form.getValues('awards') ?? [];
+    const present = new Set<string>();
+    const deduped: ContestFinalValues['awards'] = [];
+
+    current.forEach((award) => {
+      // Non-tier slots (Top Photo, Top Photographer) only ever have one row regardless of
+      // the recipient the backend tags them with, so they key on type alone; tier slots
+      // legitimately appear twice, once per recipient.
+      const key = isTierAward(award.type) ? `${award.type}:${award.recipient ?? ''}` : award.type;
+      if (present.has(key)) return;
+      present.add(key);
+      deduped.push(award);
+    });
+
     const missing: ContestFinalValues['awards'] = [];
 
     awardTypes.forEach((type) => {
@@ -67,14 +82,17 @@ const RewardsStep = () => {
             missing.push({ type, recipient, boost: 0, key: 0, swap: 0, coin: 0 });
           }
         });
-      } else if (!awards.some((award) => award.type === type)) {
-        // Non-tier slots (Top Photo, Top Photographer) only ever have one row,
-        // but the backend still tags them with their natural recipient (Photo/
-        // Photographer). Match on type alone here, ignoring recipient, so an
-        // already-loaded row isn't mistaken for "missing" and duplicated.
+      } else if (!present.has(type)) {
         missing.push({ type, boost: 0, key: 0, swap: 0, coin: 0 });
       }
     });
+
+    if (deduped.length !== current.length) {
+      // Already-duplicated values (a stale draft, or a contest saved while the bug was
+      // live) get collapsed back to the canonical ladder in one shot.
+      replace([...deduped, ...missing]);
+      return;
+    }
 
     if (missing.length) {
       append(missing);

@@ -4,9 +4,10 @@
   type ContestAwardType,
 } from '@/store/features/contest/types';
 import { z } from 'zod';
+import { PHOTO_UPLOAD_MIME_TYPES, WEB_IMAGE_MIME_TYPES } from '@/lib/constants/uploads';
 
 const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const ALLOWED_IMAGE_TYPES: readonly string[] = WEB_IMAGE_MIME_TYPES;
 
 export const contestDetailsSchema = z
   .object({
@@ -144,7 +145,7 @@ export const contestRulesSchema = z.object({
     )
     .length(5),
   submissionFormat: z.object({
-    mimeTypes: z.array(z.enum(['image/jpeg', 'image/png'])).min(1, 'Select a file type'),
+    mimeTypes: z.array(z.enum(PHOTO_UPLOAD_MIME_TYPES)).min(1, 'Select a file type'),
     minWidth: z.coerce.number().int().min(1),
     minHeight: z.coerce.number().int().min(1),
     maxSizeMB: z.coerce.number().min(1),

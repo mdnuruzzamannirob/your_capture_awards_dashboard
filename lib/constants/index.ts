@@ -90,10 +90,10 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'image-plus',
     inputType: 'object',
     defaultValue: {
-      mimeTypes: ['image/jpeg'],
+      mimeTypes: ['image/jpeg', 'image/png'],
       minWidth: 700,
       minHeight: 700,
-      maxSizeMB: 25,
+      maxSizeMB: 150,
     },
     appliesTo: ['PHOTO_UPLOAD', 'DISPLAY'],
     displayOnly: false,

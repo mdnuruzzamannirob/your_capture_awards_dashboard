@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
+import { WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 
 const BANNER_PICKER_PAGE_SIZE = 48;
 
@@ -442,7 +443,7 @@ const DetailsStep = () => {
                 ref={bannerInputRef}
                 id="contest-banner-upload"
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={WEB_IMAGE_ACCEPT}
                 className="hidden"
                 onChange={(event) => {
                   const file = event.target.files?.[0];

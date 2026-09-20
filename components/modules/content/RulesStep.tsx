@@ -12,6 +12,7 @@ import { Check } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import ContestRichTextEditor from './ContestRichTextEditor';
+import { CONTEST_FILE_FORMAT_OPTIONS } from '@/lib/constants/uploads';
 
 const CONTEST_LEVELS_ORDER = ['AMATEUR', 'TALENTED', 'SUPREME', 'SUPERIOR', 'TOP_NOTCH'] as const;
 
@@ -101,10 +102,9 @@ const submissionOptions = [
   },
 ] as const;
 
-const fileFormatOptions = [
-  { value: 'image/jpeg', label: 'JPEG' },
-  { value: 'image/png', label: 'PNG' },
-] as const;
+// Sourced from the shared list so admins can pick anything the server accepts.
+// JPEG and PNG remain the default selection for a new contest.
+const fileFormatOptions = CONTEST_FILE_FORMAT_OPTIONS;
 
 function RuleEditor({ title, children }: { title: string; children: ReactNode }) {
   return (

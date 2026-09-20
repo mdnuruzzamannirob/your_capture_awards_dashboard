@@ -8,12 +8,13 @@ import type {
   ContestOptionRule,
   ContestRuleKey,
 } from '@/store/features/contest/types';
+import { PHOTO_UPLOAD_MIME_TYPES, type PhotoUploadMimeType } from '@/lib/constants/uploads';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
-const acceptedSubmissionMimeTypes = ['image/jpeg', 'image/png'] as const;
+const acceptedSubmissionMimeTypes = PHOTO_UPLOAD_MIME_TYPES;
 
-type AcceptedSubmissionMimeType = (typeof acceptedSubmissionMimeTypes)[number];
+type AcceptedSubmissionMimeType = PhotoUploadMimeType;
 
 function getOptionRuleValue(rule: ContestOptionRule): unknown {
   return rule.value ?? rule.defaultValue;
@@ -42,7 +43,7 @@ function normalizeSubmissionFormat(
   const mimeTypes = format.mimeTypes.filter((mimeType): mimeType is AcceptedSubmissionMimeType =>
     acceptedSubmissionMimeTypes.includes(mimeType as AcceptedSubmissionMimeType),
   );
-  return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg'] };
+  return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg', 'image/png'] };
 }
 
 function getDefaultSubmissionRules(
