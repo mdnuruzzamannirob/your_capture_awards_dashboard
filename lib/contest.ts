@@ -43,7 +43,7 @@ function normalizeSubmissionFormat(
   const mimeTypes = format.mimeTypes.filter((mimeType): mimeType is AcceptedSubmissionMimeType =>
     acceptedSubmissionMimeTypes.includes(mimeType as AcceptedSubmissionMimeType),
   );
-  return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg', 'image/png'] };
+  return { ...format, mimeTypes: mimeTypes.length ? mimeTypes : ['image/jpeg'] };
 }
 
 function getDefaultSubmissionRules(

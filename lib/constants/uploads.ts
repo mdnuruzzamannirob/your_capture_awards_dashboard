@@ -70,8 +70,18 @@ export const getImageFileError = (
   return `Only image files are allowed. Please choose a ${label} file.`;
 };
 
+/**
+ * Formats the server still accepts, but that admins may no longer pick when
+ * configuring a contest. Kept out of the picker only - leaving them in
+ * PHOTO_UPLOAD_MIME_TYPES means uploads and existing contests already
+ * configured with them keep working.
+ */
+const CONTEST_FILE_FORMAT_EXCLUDED: readonly PhotoUploadMimeType[] = ['image/png'];
+
 /** Options for the contest SUBMISSION_FORMAT rule editor. */
-export const CONTEST_FILE_FORMAT_OPTIONS = PHOTO_UPLOAD_MIME_TYPES.map((value) => ({
+export const CONTEST_FILE_FORMAT_OPTIONS = PHOTO_UPLOAD_MIME_TYPES.filter(
+  (value) => !CONTEST_FILE_FORMAT_EXCLUDED.includes(value),
+).map((value) => ({
   value,
   label: value.replace('image/', '').toUpperCase(),
 }));

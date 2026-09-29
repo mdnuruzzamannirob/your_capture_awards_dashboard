@@ -90,7 +90,7 @@ export const contestRuleDefinitions: Record<ContestRuleKey, ContestRuleDefinitio
     icon: 'image-plus',
     inputType: 'object',
     defaultValue: {
-      mimeTypes: ['image/jpeg', 'image/png'],
+      mimeTypes: ['image/jpeg'],
       minWidth: 700,
       minHeight: 700,
       maxSizeMB: 25,
