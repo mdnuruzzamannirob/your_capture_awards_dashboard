@@ -22,6 +22,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import SocialLinksTab from '@/components/modules/settings/SocialLinksTab';
+import PhotographyOfTheYearTab from '@/components/modules/settings/PhotographyOfTheYearTab';
 import { getImageFileError, WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -520,11 +521,12 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full max-w-xl grid-cols-4">
+        <TabsList className="grid w-full max-w-3xl grid-cols-5">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
           <TabsTrigger value="social-links">Social Links</TabsTrigger>
+          <TabsTrigger value="photography-of-the-year">Photography of the Year</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 outline-none">
@@ -541,6 +543,10 @@ const SettingsContent = () => {
 
         <TabsContent value="social-links" className="space-y-4 outline-none">
           <SocialLinksTab />
+        </TabsContent>
+
+        <TabsContent value="photography-of-the-year" className="space-y-4 outline-none">
+          <PhotographyOfTheYearTab />
         </TabsContent>
       </Tabs>
     </section>
