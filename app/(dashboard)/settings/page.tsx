@@ -521,12 +521,19 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
+<<<<<<< HEAD
         <TabsList className="grid w-full max-w-3xl grid-cols-5">
+=======
+        <TabsList className="grid w-full max-w-xl grid-cols-4">
+>>>>>>> e8fab0924b9919549c087f44a8228f9c9ee3371c
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
           <TabsTrigger value="social-links">Social Links</TabsTrigger>
+<<<<<<< HEAD
           <TabsTrigger value="photography-of-the-year">Photography of the Year</TabsTrigger>
+=======
+>>>>>>> e8fab0924b9919549c087f44a8228f9c9ee3371c
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 outline-none">
@@ -544,10 +551,13 @@ const SettingsContent = () => {
         <TabsContent value="social-links" className="space-y-4 outline-none">
           <SocialLinksTab />
         </TabsContent>
+<<<<<<< HEAD
 
         <TabsContent value="photography-of-the-year" className="space-y-4 outline-none">
           <PhotographyOfTheYearTab />
         </TabsContent>
+=======
+>>>>>>> e8fab0924b9919549c087f44a8228f9c9ee3371c
       </Tabs>
     </section>
   );
