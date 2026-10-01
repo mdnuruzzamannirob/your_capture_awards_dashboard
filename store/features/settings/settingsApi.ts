@@ -2,9 +2,12 @@ import { baseQuery } from '@/store/baseQuery';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ApiSuccessResponse, ChangePasswordBody, User } from '../user/types';
 
+export type SitePolicyType = 'ABOUT' | 'TERMS' | 'POLICY' | 'PHOTOGRAPHER_OF_THE_YEAR';
+
 export interface SitePolicy {
   id: string;
-  type: 'ABOUT' | 'TERMS' | 'POLICY';
+  type: SitePolicyType;
+  title?: string | null;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -18,7 +21,8 @@ export interface UpdateProfileBody {
 
 export interface UpdateSitePolicyBody {
   content: string;
-  type: 'ABOUT' | 'TERMS' | 'POLICY';
+  type: SitePolicyType;
+  title?: string;
 }
 
 export const settingsApi = createApi({
@@ -52,7 +56,7 @@ export const settingsApi = createApi({
       }),
     }),
 
-    getSitePolicy: builder.query<ApiSuccessResponse<SitePolicy[]>, { type: string }>({
+    getSitePolicy: builder.query<ApiSuccessResponse<SitePolicy[]>, { type: SitePolicyType }>({
       query: ({ type }) => `/site-policies?type=${type}`,
       providesTags: (result, error, { type }) => [{ type: 'SitePolicy', id: type }],
     }),

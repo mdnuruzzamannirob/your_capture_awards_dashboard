@@ -526,7 +526,7 @@ const SettingsContent = () => {
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
           <TabsTrigger value="social-links">Social Links</TabsTrigger>
-          <TabsTrigger value="photography-of-the-year">Photography of the Year</TabsTrigger>
+          <TabsTrigger value="photography-of-the-year">Photographer of the Year</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 outline-none">
