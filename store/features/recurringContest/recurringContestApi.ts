@@ -53,12 +53,14 @@ export const recurringContestApi = createApi({
 
     updateRecurringContest: builder.mutation<
       ApiSuccessResponse<RecurringContest>,
-      { id: string; body: UpdateRecurringContestBody }
+      { id: string; body: UpdateRecurringContestBody | FormData }
     >({
       query: ({ id, body }) => ({ url: `/recurring-contests/${id}`, method: 'PATCH', body }),
       invalidatesTags: (result, error, { id }) => [
         { type: 'RecurringContest', id },
         { type: 'RecurringContests', id: 'LIST' },
+        // The upcoming occurrence may have been updated too (applyToUpcoming).
+        { type: 'RecurringContestInstances', id },
       ],
     }),
 

@@ -1,9 +1,33 @@
 import { z } from 'zod';
+import { MAX_CONTEST_CATEGORIES } from '@/lib/contestCategories';
+import { WEB_IMAGE_MIME_TYPES } from '@/lib/constants/uploads';
+
+const MAX_BANNER_SIZE = 24 * 1024 * 1024;
+const ALLOWED_BANNER_TYPES: readonly string[] = WEB_IMAGE_MIME_TYPES;
 
 export const recurringDetailsSchema = z
   .object({
     title: z.string().trim().min(1, 'Title is required').max(160),
-    category: z.string().trim().max(100).optional(),
+    categories: z
+      .array(z.string().trim().min(1).max(100, 'A category must not exceed 100 characters'))
+      .max(MAX_CONTEST_CATEGORIES, `Add at most ${MAX_CONTEST_CATEGORIES} categories`)
+      .default([]),
+    // A File when the admin uploads a new banner; the current banner URL otherwise.
+    banner: z
+      .union([z.custom<File>((file) => file instanceof File), z.string()])
+      .optional()
+      .refine(
+        (value) => !(value instanceof File) || ALLOWED_BANNER_TYPES.includes(value.type),
+        'Only JPG, PNG, WEBP images are allowed',
+      )
+      .refine(
+        (value) => !(value instanceof File) || value.size <= MAX_BANNER_SIZE,
+        'Image must be under 24MB',
+      ),
+    // Set when the banner was picked from an existing user-submitted photo.
+    bannerUserPhotoId: z.string().optional(),
+    // Also update the already-scheduled (not yet started) occurrence.
+    applyToUpcoming: z.boolean().default(true),
     description: z
       .string()
       .trim()

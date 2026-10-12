@@ -11,8 +11,10 @@ import {
   mapRecurringContestToIntervalValues,
 } from '@/lib/recurringContest';
 import { formatInTimeZone } from '@/lib/timezone';
+import { getContestCategories } from '@/lib/contestCategories';
 import { useGetRecurringContestQuery } from '@/store/features/recurringContest/recurringContestApi';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, ImageOff, Pencil } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -43,6 +45,7 @@ const RecurringContestDetails = () => {
 
   const contest = data?.data;
   const timezone = contest?.recurring.timezone ?? 'UTC';
+  const categories = getContestCategories(contest);
   // Dates are displayed in the viewer's own local timezone rather than the
   // recurring contest's configured one - that field only controls when the
   // recurrence pattern actually fires, shown separately below as "Recurrence timezone".
@@ -106,6 +109,36 @@ const RecurringContestDetails = () => {
 
         <TabsContent value="overview" className="pt-4">
           <div className="border-border-subtle bg-surface-secondary space-y-6 rounded-lg border p-5">
+            <div className="border-border-subtle bg-surface relative h-44 w-full overflow-hidden rounded-md border sm:h-56">
+              {contest.banner ? (
+                <Image
+                  src={contest.banner}
+                  alt={`${contest.title} banner`}
+                  fill
+                  unoptimized
+                  sizes="(max-width: 1280px) 100vw, 1280px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex size-full items-center justify-center">
+                  <ImageOff className="text-muted-foreground size-8" />
+                </div>
+              )}
+            </div>
+
+            {categories.length > 0 && (
+              <div>
+                <h2 className="text-sm font-semibold">Categories</h2>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {categories.map((category) => (
+                    <Badge key={category} variant="outline">
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div>
               <h2 className="text-sm font-semibold">Description</h2>
               <div className="mt-2 text-sm leading-6">
@@ -114,7 +147,6 @@ const RecurringContestDetails = () => {
             </div>
 
             <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
-              {contest.category && <DetailItem label="Category" value={contest.category} />}
               <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, displayTimeZone)} />
               <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, displayTimeZone)} />
               <DetailItem label="Frequency" value={getRecurrenceLabel(contest.recurring.recurringType)} />

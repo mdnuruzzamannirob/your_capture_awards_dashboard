@@ -9,6 +9,7 @@ import type {
   ContestRuleKey,
 } from '@/store/features/contest/types';
 import { PHOTO_UPLOAD_MIME_TYPES, type PhotoUploadMimeType } from '@/lib/constants/uploads';
+import { getContestCategories } from '@/lib/contestCategories';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -24,17 +25,6 @@ function getDefaultRuleKeys(options?: ContestCreationOptions): ContestRuleKey[] 
   const optionRules = options?.ruleDefinitions?.length ? options.ruleDefinitions : options?.rules;
   return (optionRules?.map((rule) => rule.key) ??
     (Object.keys(contestRuleDefinitions) as ContestRuleKey[])) as ContestRuleKey[];
-}
-
-function getCategoryId(category?: string, options?: ContestCreationOptions): string | undefined {
-  if (!category?.trim()) return undefined;
-  const normalizedCategory = category.trim().toLowerCase();
-  return options?.categories?.find(
-    (item) =>
-      item.id === category ||
-      item.name.toLowerCase() === normalizedCategory ||
-      item.slug?.toLowerCase() === normalizedCategory,
-  )?.id;
 }
 
 function normalizeSubmissionFormat(
@@ -91,7 +81,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
   return {
     details: {
       title: '',
-      category: defaultCategory,
+      categories: defaultCategory ? [defaultCategory] : [],
       description: '',
       banner: undefined,
       maxUploads: Number(values.SUBMISSION_LIMIT ?? fallback.SUBMISSION_LIMIT.defaultValue),
@@ -268,8 +258,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
   return {
     details: {
       title: contest.title ?? '',
-      category:
-        typeof contest.category === 'string' ? contest.category : (contest.category?.name ?? ''),
+      categories: getContestCategories(contest),
       description: contest.description ?? '',
       banner: contest.banner ?? undefined,
       maxUploads: Number(submissionLimit),
@@ -318,9 +307,8 @@ export function buildContestFormData(
   const formData = new FormData();
   formData.append('title', details.title);
   formData.append('description', details.description);
-  if (details.category?.trim()) formData.append('category', details.category.trim());
-  const categoryId = getCategoryId(details.category, options);
-  if (categoryId) formData.append('categoryId', categoryId);
+  // Always sent (even empty) so clearing every category on edit is persisted.
+  formData.append('categories', JSON.stringify(details.categories ?? []));
   formData.append('startDate', details.startDate.toISOString());
   formData.append('endDate', details.endDate.toISOString());
   formData.append('recurring', String(details.recurring));

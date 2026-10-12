@@ -12,12 +12,13 @@ import { Check, ChevronDown, Image as ImageIcon, ImageOff, Loader2, Search } fro
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
+import CategoryInput from './CategoryInput';
 import ContestRichTextEditor from './ContestRichTextEditor';
 import { WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 
 const BANNER_PICKER_PAGE_SIZE = 48;
 
-const BannerPickerDialog = ({
+export const BannerPickerDialog = ({
   open,
   onOpenChange,
   onSelect,
@@ -373,16 +374,15 @@ const DetailsStep = () => {
 
           <FormField
             control={form.control}
-            name="details.category"
+            name="details.categories"
             render={({ field }) => (
               <FormItem className={fieldClass}>
-                <FormLabel className={labelClass}>Category (optional)</FormLabel>
+                <FormLabel className={labelClass}>Categories (optional)</FormLabel>
                 <FormControl>
-                  <Input
-                    className={inputClass}
+                  <CategoryInput
+                    value={field.value ?? []}
+                    onChange={field.onChange}
                     placeholder="e.g. Street photography"
-                    {...field}
-                    value={field.value ?? ''}
                   />
                 </FormControl>
                 <FormMessage className={messageClass} />

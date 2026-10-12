@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { cn, formatDateWithTime } from '@/lib/utils';
 import { getRecurrenceLabel } from '@/lib/recurringContest';
+import { getContestCategories } from '@/lib/contestCategories';
 import type { RecurringContest } from '@/store/features/recurringContest/types';
 import type { ColumnDef } from '@tanstack/react-table';
 import { GoDotFill } from 'react-icons/go';
@@ -34,8 +35,12 @@ export const columns: ColumnDef<RecurringContest>[] = [
   },
   {
     id: 'category',
-    header: 'CATEGORY',
-    cell: ({ row }) => row.original.category || <span className="text-muted-foreground">—</span>,
+    header: 'CATEGORIES',
+    cell: ({ row }) => {
+      const categories = getContestCategories(row.original);
+      if (!categories.length) return <span className="text-muted-foreground">—</span>;
+      return <div className="max-w-48 truncate">{categories.join(', ')}</div>;
+    },
   },
   {
     id: 'recurrence',

@@ -68,7 +68,10 @@ export interface RecurringContest {
   startDate: string;
   endDate: string;
   creatorId: string;
+  /** Legacy single category; equals categories[0]. Prefer `categories`. */
   category?: string | null;
+  categories?: string[];
+  bannerUploaderId?: string | null;
   status: RecurringContestStatus;
   recurring: RecurringData;
   lastGeneratedContestId?: string | null;
@@ -97,6 +100,7 @@ export interface UpdateRecurringContestBody {
   title?: string;
   description?: string;
   category?: string;
+  categories?: string[];
   startDate?: string;
   endDate?: string;
   isMoneyContest?: boolean;

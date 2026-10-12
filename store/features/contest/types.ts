@@ -212,8 +212,10 @@ export interface RankedPhotographersResponse {
 export interface Contest {
   id: string;
   title: string;
-  category?: string | { id?: string; name?: string };
+  /** Legacy single category; equals categories[0]. Prefer `categories`. */
+  category?: string | { id?: string; name?: string } | null;
   categoryId?: string | null;
+  categories?: string[];
   description: string;
   banner?: string | null;
   bannerUploader?: { id: string; fullName?: string | null } | null;

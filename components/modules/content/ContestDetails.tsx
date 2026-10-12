@@ -19,6 +19,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { CONTEST_DETAILS_TABS } from '@/lib/constants';
+import { getContestCategories } from '@/lib/contestCategories';
 import { cn } from '@/lib/utils';
 import { useDeleteContestMutation, useGetContestQuery } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
@@ -56,6 +57,7 @@ const ContestDetails = () => {
   const { data, isLoading, isFetching } = useGetContestQuery({ id: params?.id as string });
   const [deleteContest, { isLoading: isDeleting }] = useDeleteContestMutation();
   const contest = data?.data as Contest | undefined;
+  const categories = getContestCategories(contest);
 
   const isUpcoming = contest?.status === 'UPCOMING' || contest?.status === 'NEW';
   const canManageUpcomingContest = Boolean(isUpcoming && !contest?.deletedAt);
@@ -167,10 +169,8 @@ const ContestDetails = () => {
 
       <div className="border-border-subtle border-b bg-(--bg-inset) px-5 py-3">
         <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
-        {contest.category && (
-          <p className="text-muted-foreground mt-0.5 truncate text-xs">
-            {typeof contest.category === 'string' ? contest.category : contest.category.name}
-          </p>
+        {categories.length > 0 && (
+          <p className="text-muted-foreground mt-0.5 truncate text-xs">{categories.join(' · ')}</p>
         )}
       </div>
 

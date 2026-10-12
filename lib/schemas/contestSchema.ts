@@ -4,6 +4,7 @@
   type ContestAwardType,
 } from '@/store/features/contest/types';
 import { z } from 'zod';
+import { MAX_CONTEST_CATEGORIES } from '@/lib/contestCategories';
 import { PHOTO_UPLOAD_MIME_TYPES, WEB_IMAGE_MIME_TYPES } from '@/lib/constants/uploads';
 
 const MAX_IMAGE_SIZE = 24 * 1024 * 1024;
@@ -16,11 +17,10 @@ export const contestDetailsSchema = z
       .trim()
       .min(5, 'Title must be at least 5 characters')
       .max(100, 'Title must not exceed 100 characters'),
-    category: z
-      .string()
-      .trim()
-      .max(100, 'Category must not exceed 100 characters')
-      .optional(),
+    categories: z
+      .array(z.string().trim().min(1).max(100, 'A category must not exceed 100 characters'))
+      .max(MAX_CONTEST_CATEGORIES, `Add at most ${MAX_CONTEST_CATEGORIES} categories`)
+      .default([]),
     description: z
       .string()
       .trim()
