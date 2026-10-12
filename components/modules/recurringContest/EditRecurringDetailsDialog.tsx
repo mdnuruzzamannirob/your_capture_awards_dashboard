@@ -19,6 +19,8 @@ import { buildUpdateRecurringContestFormData, getApiErrorMessage } from '@/lib/r
 import { recurringDetailsSchema, type RecurringDetailsValues } from '@/lib/schemas/recurringContestSchema';
 import { dateToZonedInput, zonedInputToDate } from '@/lib/timezone';
 import { useUpdateRecurringContestMutation } from '@/store/features/recurringContest/recurringContestApi';
+import { contestApi } from '@/store/features/contest/contestApi';
+import { useAppDispatch } from '@/store/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ImageOff, Loader2 } from 'lucide-react';
 import Image from 'next/image';
@@ -42,6 +44,7 @@ const EditRecurringDetailsDialog = ({
   timezone,
 }: EditRecurringDetailsDialogProps) => {
   const [updateRecurringContest, { isLoading }] = useUpdateRecurringContestMutation();
+  const dispatch = useAppDispatch();
   const form = useForm<RecurringDetailsValues>({
     resolver: zodResolver(recurringDetailsSchema) as Resolver<RecurringDetailsValues>,
     defaultValues: initialValues,
@@ -71,6 +74,8 @@ const EditRecurringDetailsDialog = ({
   const onSubmit = async (values: RecurringDetailsValues) => {
     try {
       await updateRecurringContest({ id, body: buildUpdateRecurringContestFormData(values) }).unwrap();
+      // New categories become suggestions on the API side; refresh the cached list.
+      dispatch(contestApi.util.invalidateTags([{ type: 'ContestCreationOptions', id: 'SINGLE' }]));
       toast.success('Recurring contest details updated');
       onOpenChange(false);
     } catch (error) {

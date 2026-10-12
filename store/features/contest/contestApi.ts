@@ -15,11 +15,21 @@ import {
 export const contestApi = createApi({
   reducerPath: 'contestApi',
   baseQuery,
-  tagTypes: ['Contests', 'Contest', 'ContestStats', 'DashboardOverview', 'ContestParticipants'],
+  tagTypes: [
+    'Contests',
+    'Contest',
+    'ContestStats',
+    'DashboardOverview',
+    'ContestParticipants',
+    'ContestCreationOptions',
+  ],
   endpoints: (builder) => ({
     getContestCreationOptions: builder.query<ApiSuccessResponse<ContestCreationOptions>, void>({
       query: () => '/contests/create-options',
       keepUnusedDataFor: 60 * 60,
+      // Includes the category suggestions, which grow whenever a contest is saved
+      // with a new category.
+      providesTags: [{ type: 'ContestCreationOptions', id: 'SINGLE' }],
     }),
     getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
       query: () => '/dashboard/contest/stats',
@@ -49,6 +59,7 @@ export const contestApi = createApi({
               { type: 'Contests', id: 'LIST' },
               { type: 'ContestStats', id: 'SINGLE' },
               { type: 'DashboardOverview', id: 'SINGLE' },
+              { type: 'ContestCreationOptions', id: 'SINGLE' },
             ]
           : [],
     }),
@@ -66,6 +77,7 @@ export const contestApi = createApi({
               { type: 'Contests', id: 'LIST' },
               { type: 'ContestStats', id: 'SINGLE' },
               { type: 'DashboardOverview', id: 'SINGLE' },
+              { type: 'ContestCreationOptions', id: 'SINGLE' },
             ]
           : [],
     }),
