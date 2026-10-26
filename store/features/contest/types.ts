@@ -223,6 +223,9 @@ export interface Contest {
   startDate?: string;
   endDate?: string;
   recurring?: boolean;
+  isPhotographyOfYear?: boolean;
+  // POTY only: entry fees collected and the winners' share of them.
+  potyPrizePool?: { collectedFees: number; prizePool: number; sharePercent: number; currency: string };
   recurringType?: 'DAILY' | 'WEEKLY' | 'MONTHLY' | null;
   isMoneyContest?: boolean;
   minPrize?: number;

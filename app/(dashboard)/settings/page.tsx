@@ -286,7 +286,13 @@ const ProfileTab = ({ user, refetch }: { user: any; refetch: () => void }) => {
         <CardContent className="flex flex-col items-center justify-center space-y-6 pb-6">
           <div className="border-border bg-surface-tertiary relative size-32 overflow-hidden rounded-full border-4">
             {previewUrl ? (
-              <Image alt="Avatar Preview" src={previewUrl} fill className="object-cover" />
+              <Image
+                alt="Avatar Preview"
+                src={previewUrl}
+                fill
+                sizes="128px"
+                className="object-cover"
+              />
             ) : (
               <div className="text-muted-foreground flex h-full w-full items-center justify-center text-4xl font-bold">
                 {firstName?.charAt(0) || 'U'}
@@ -521,7 +527,7 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full max-w-3xl grid-cols-5">
+        <TabsList className="grid w-full max-w-3xl grid-cols-6">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>

@@ -61,7 +61,11 @@ const ContestDetails = () => {
 
   const isUpcoming = contest?.status === 'UPCOMING' || contest?.status === 'NEW';
   const canManageUpcomingContest = Boolean(isUpcoming && !contest?.deletedAt);
-  const activeIndex = CONTEST_DETAILS_TABS.findIndex((t) => t.key === activeTab);
+  // POTY has no prizes or award winners - its standing is shown in the Rank tab.
+  const detailsTabs = contest?.isPhotographyOfYear
+    ? CONTEST_DETAILS_TABS.filter((tab) => tab.key !== 'prizes' && tab.key !== 'winners')
+    : CONTEST_DETAILS_TABS;
+  const activeIndex = detailsTabs.findIndex((t) => t.key === activeTab);
 
   useEffect(() => {
     setIsMounted(true);
@@ -175,7 +179,7 @@ const ContestDetails = () => {
       </div>
 
       <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">
-        {CONTEST_DETAILS_TABS.map((tab, index) => (
+        {detailsTabs.map((tab, index) => (
           <button
             key={tab.key}
             ref={(el) => {

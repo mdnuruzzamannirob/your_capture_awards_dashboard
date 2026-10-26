@@ -250,6 +250,7 @@ const ReportManagement = () => {
                         src={selectedReport.contestPhoto.contest.banner}
                         alt={selectedReport.contestPhoto.contest.title}
                         fill
+                        sizes="(max-width: 640px) 100vw, 640px"
                         className="object-cover"
                       />
                     )}
@@ -284,6 +285,7 @@ const ReportManagement = () => {
                         src={selectedReport.contestPhoto.photo.url}
                         alt={selectedReport.contestPhoto.photo.title || 'Submitted photo'}
                         fill
+                        sizes="80px"
                         className="object-cover"
                       />
                     </div>

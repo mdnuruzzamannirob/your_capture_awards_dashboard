@@ -2,41 +2,30 @@
 
 import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
 import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
-import DetailsStep from '@/components/modules/content/DetailsStep';
-import PrizesStep from '@/components/modules/content/PrizesStep';
-import RewardsStep from '@/components/modules/content/RewardsStep';
-import RulesStep from '@/components/modules/content/RulesStep';
+import ContestForm from '@/components/modules/content/ContestForm';
+import ContestFormSkeleton from '@/components/modules/content/ContestFormSkeleton';
+import PotyJudgingWorkspace from '@/components/modules/settings/PotyJudgingWorkspace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getDefaultContestValues } from '@/lib/contest';
-import { contestFinalSchema, type ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { buildContestFormData, getDefaultContestValues } from '@/lib/contest';
+import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
+import {
+  useCreatePhotographyOfTheYearContestMutation,
+  useGetContestCreationOptionsQuery,
+} from '@/store/features/contest/contestApi';
 import {
   useGetSitePolicyQuery,
   useUpdateSitePolicyMutation,
 } from '@/store/features/settings/settingsApi';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, FilePenLine, FileText, Loader2, Settings2, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { type FieldErrors, type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const CONTENT_TYPE = 'PHOTOGRAPHER_OF_THE_YEAR' as const;
-
-function findFirstError(errors: FieldErrors<ContestFinalValues>): string | undefined {
-  const queue: unknown[] = [errors];
-  while (queue.length) {
-    const current = queue.shift();
-    if (!current || typeof current !== 'object') continue;
-    if ('message' in current && typeof current.message === 'string') return current.message;
-    queue.push(...Object.values(current));
-  }
-  return undefined;
-}
 
 const getTextContent = (value: string) =>
   value
@@ -45,54 +34,57 @@ const getTextContent = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-const getErrorMessage = (error: unknown) => {
-  if (!error || typeof error !== 'object') return 'Unable to save the Learn More page.';
+const getErrorMessage = (error: unknown, fallback = 'Unable to save the Learn More page.') => {
+  if (!error || typeof error !== 'object') return fallback;
   if ('data' in error) {
     const data = (error as { data?: { message?: string } }).data;
     if (data?.message) return data.message;
   }
-  return 'Unable to save the Learn More page.';
+  return fallback;
 };
 
 const ContestSetup = () => {
-  const form = useForm<ContestFinalValues>({
-    resolver: zodResolver(contestFinalSchema) as Resolver<ContestFinalValues>,
-    defaultValues: getDefaultContestValues(),
-    mode: 'onChange',
-  });
+  const [createContest, { isLoading: isCreating }] = useCreatePhotographyOfTheYearContestMutation();
+  const {
+    data: optionsData,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetContestCreationOptionsQuery();
+  const options = optionsData?.data;
 
-  const recurring = form.watch('details.recurring');
-  const isMoneyContest = form.watch('prizes.isMoneyContest');
-  const coinRequirement = form.watch('prizes.coin_requirement');
-
-  useEffect(() => {
-    const current = form.getValues('details.recurringType');
-    if (!recurring && current !== undefined) {
-      form.setValue('details.recurringType', undefined, { shouldDirty: true });
-    } else if (recurring && !current) {
-      form.setValue('details.recurringType', 'DAILY', { shouldDirty: true });
+  const handleSubmit = async (values: ContestFinalValues) => {
+    try {
+      const body = buildContestFormData(values, options);
+      await createContest(body).unwrap();
+      toast.success('Photographer of the Year contest created.');
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Unable to create the Photographer of the Year contest.'));
     }
-  }, [form, recurring]);
-
-  useEffect(() => {
-    if (isMoneyContest) return;
-    if (form.getValues('prizes.minPrize') !== 0) {
-      form.setValue('prizes.minPrize', 0, { shouldDirty: true });
-    }
-    if (form.getValues('prizes.maxPrize') !== 0) {
-      form.setValue('prizes.maxPrize', 0, { shouldDirty: true });
-    }
-  }, [form, isMoneyContest]);
-
-  useEffect(() => {
-    if (!coinRequirement && form.getValues('prizes.coin_required') !== 0) {
-      form.setValue('prizes.coin_required', 0, { shouldDirty: true });
-    }
-  }, [coinRequirement, form]);
-
-  const handleSubmit = () => {
-    toast.info('Design preview only - saving is not wired up yet.');
   };
+
+  if (!options && (isLoading || isFetching)) return <ContestFormSkeleton />;
+
+  if (!options || isError) {
+    return (
+      <div className="border-border-subtle bg-surface-secondary text-muted-foreground rounded-lg border p-8 text-center">
+        <p>Contest options could not be loaded.</p>
+        <Button type="button" onClick={() => refetch()} className="mt-4">
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  const initialValues = getDefaultContestValues(options);
+  initialValues.details.isPhotographyOfYear = true;
+  initialValues.details.maxUploads = 8;
+  initialValues.details.recurring = false;
+  initialValues.prizes.isMoneyContest = false;
+  initialValues.prizes.entryFeeAmount = 4.99;
+  initialValues.prizes.coin_requirement = false;
+  initialValues.awards = [];
 
   return (
     <div className="pt-2">
@@ -102,40 +94,15 @@ const ContestSetup = () => {
           Contest setup
         </h3>
         <p className="text-muted-foreground mt-1 text-sm">
-          Configure the yearly contest details, prizes, rules, and rewards.
+          Create and configure the annual contest here. Judging and winner selection are managed in this tab.
         </p>
       </div>
-
-      <Form {...form}>
-        <div className="grid items-start gap-[clamp(20px,2.4vw,36px)] min-[1280px]:grid-cols-[minmax(480px,1.08fr)_minmax(390px,0.92fr)]">
-          <form
-            className="grid min-w-0 gap-3"
-            onSubmit={form.handleSubmit(handleSubmit, (errors) => {
-              toast.error(findFirstError(errors) ?? 'Please check the highlighted fields.');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            })}
-          >
-            <DetailsStep />
-            <PrizesStep />
-            <RulesStep />
-            <RewardsStep />
-
-            <div className="mt-2 flex flex-wrap items-center justify-end gap-2.5 pt-1">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => form.reset(getDefaultContestValues())}
-              >
-                Reset
-              </Button>
-              <Button type="submit" className="min-w-36">
-                Save Photography of the Year
-              </Button>
-            </div>
-          </form>
-          <div className="hidden min-[1280px]:block" aria-hidden="true" />
-        </div>
-      </Form>
+      <ContestForm
+        mode="create"
+        initialValues={initialValues}
+        isSubmitting={isCreating}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
@@ -306,6 +273,10 @@ const PhotographyOfTheYearTab = () => (
           <FileText className="size-4" />
           Learn More Content
         </TabsTrigger>
+        <TabsTrigger value="judging" className="px-5">
+          <Trophy className="size-4" />
+          Judging
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="contest-setup">
@@ -313,6 +284,9 @@ const PhotographyOfTheYearTab = () => (
       </TabsContent>
       <TabsContent value="learn-more">
         <LearnMoreContent />
+      </TabsContent>
+      <TabsContent value="judging">
+        <PotyJudgingWorkspace />
       </TabsContent>
     </Tabs>
   </div>

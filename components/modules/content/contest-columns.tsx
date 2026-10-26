@@ -29,7 +29,14 @@ export const columns: ColumnDef<Contest>[] = [
   {
     accessorKey: 'title',
     header: 'TITLE',
-    cell: ({ row }) => <div className="max-w-56 font-medium capitalize">{row.original.title}</div>,
+    cell: ({ row }) => (
+      <div className="flex max-w-64 flex-col gap-1 font-medium capitalize">
+        <span>{row.original.title}</span>
+        {row.original.isPhotographyOfYear && (
+          <Badge variant="outline" className="w-fit text-[10px]">Photographer of the Year</Badge>
+        )}
+      </div>
+    ),
   },
   {
     id: 'creator',

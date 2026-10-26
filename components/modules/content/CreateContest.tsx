@@ -4,6 +4,7 @@ import { buildContestFormData, getDefaultContestValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import {
   useCreateContestMutation,
+  useCreatePhotographyOfTheYearContestMutation,
   useGetContestCreationOptionsQuery,
 } from '@/store/features/contest/contestApi';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -28,6 +29,7 @@ const CreateContest = () => {
   const searchParams = useSearchParams();
   const startRecurring = searchParams.get('recurring') === '1';
   const [createContest, { isLoading }] = useCreateContestMutation();
+  const [createPotyContest, { isLoading: isCreatingPoty }] = useCreatePhotographyOfTheYearContestMutation();
   const {
     data: optionsData,
     isLoading: isOptionsLoading,
@@ -51,7 +53,12 @@ const CreateContest = () => {
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
-      await createContest(buildContestFormData(values, options)).unwrap();
+      const body = buildContestFormData(values, options);
+      if (values.details.isPhotographyOfYear) {
+        await createPotyContest(body).unwrap();
+      } else {
+        await createContest(body).unwrap();
+      }
       toast.success('New contest created');
       router.push('/contest');
     } catch (error) {
@@ -86,7 +93,7 @@ const CreateContest = () => {
     <ContestForm
       mode="create"
       initialValues={initialValues}
-      isSubmitting={isLoading}
+        isSubmitting={isLoading || isCreatingPoty}
       onSubmit={handleSubmit}
       onCancel={() => router.push('/contest')}
     />

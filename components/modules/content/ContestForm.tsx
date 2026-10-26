@@ -11,6 +11,7 @@ import { type FieldErrors, type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import ContestEditorHeader from './ContestEditorHeader';
 import DetailsStep from './DetailsStep';
+import PotyEntryFeeStep from './PotyEntryFeeStep';
 import PrizesStep from './PrizesStep';
 import RewardsStep from './RewardsStep';
 import RulesStep from './RulesStep';
@@ -20,7 +21,7 @@ interface ContestFormProps {
   initialValues?: ContestFinalValues;
   isSubmitting: boolean;
   onSubmit: (values: ContestFinalValues) => Promise<void>;
-  onCancel: () => void;
+  onCancel?: () => void;
 }
 
 function findFirstError(errors: FieldErrors<ContestFinalValues>): string | undefined {
@@ -48,6 +49,7 @@ const ContestForm = ({
   });
 
   const recurring = form.watch('details.recurring');
+  const isPhotographyOfYear = form.watch('details.isPhotographyOfYear');
   const isMoneyContest = form.watch('prizes.isMoneyContest');
   const coinRequirement = form.watch('prizes.coin_requirement');
 
@@ -92,14 +94,22 @@ const ContestForm = ({
             })}
           >
             <DetailsStep />
-            <PrizesStep />
             <RulesStep />
-            <RewardsStep />
+            {isPhotographyOfYear ? (
+              <PotyEntryFeeStep />
+            ) : (
+              <>
+                <PrizesStep />
+                <RewardsStep />
+              </>
+            )}
 
             <div className="mt-2 flex flex-wrap items-center justify-end gap-2.5 pt-1">
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-                Cancel
-              </Button>
+              {onCancel ? (
+                <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+                  Cancel
+                </Button>
+              ) : null}
               <Button
                 type="submit"
                 disabled={isSubmitDisabled}

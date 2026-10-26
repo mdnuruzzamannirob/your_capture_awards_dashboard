@@ -120,6 +120,16 @@ const DetailsTab = ({
           <DetailItem label="End date" value={formatDate(contest.endDate)} />
           <DetailItem label="Max uploads" value={contest.maxUpload ?? contest.maxUploads ?? 0} />
           <DetailItem label="Total votes" value={contest.totalVotes ?? 0} />
+          {contest.isPhotographyOfYear ? (
+            <>
+              <DetailItem label="Entry fee" value={`$${Number(contest.entryFeeAmount ?? 0).toFixed(2)}`} />
+              <DetailItem label="Fees collected" value={`$${Number(contest.potyPrizePool?.collectedFees ?? 0).toFixed(2)}`} />
+              <DetailItem
+                label={`Prize pool (${contest.potyPrizePool?.sharePercent ?? 60}%)`}
+                value={`$${Number(contest.potyPrizePool?.prizePool ?? 0).toFixed(2)}`}
+              />
+            </>
+          ) : null}
           <DetailItem
             label="Recurring"
             value={contest.recurring ? (contest.recurringType ?? 'Yes') : 'No'}

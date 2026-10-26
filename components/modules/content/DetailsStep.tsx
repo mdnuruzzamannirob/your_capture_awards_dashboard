@@ -335,6 +335,7 @@ function toDateTimeInputValue(value?: Date) {
 const DetailsStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const recurring = form.watch('details.recurring');
+  const isPhotographyOfYear = form.watch('details.isPhotographyOfYear');
   const banner = form.watch('details.banner') as File | string | undefined;
   const bannerUserPhotoId = form.watch('details.bannerUserPhotoId');
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -541,6 +542,7 @@ const DetailsStep = () => {
           )}
         />
 
+        {!isPhotographyOfYear && (
         <FormField
           control={form.control}
           name="details.recurring"
@@ -560,6 +562,7 @@ const DetailsStep = () => {
             </FormItem>
           )}
         />
+        )}
 
         {recurring && (
           <div className="border-border-strong grid gap-3.5 rounded-lg border border-dashed p-3.5">

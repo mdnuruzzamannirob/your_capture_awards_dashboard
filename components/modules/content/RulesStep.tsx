@@ -245,6 +245,7 @@ function ContestLevelAwardsEditor() {
 
 const RulesStep = () => {
   const form = useFormContext<ContestFinalValues>();
+  const isPhotographyOfYear = form.watch('details.isPhotographyOfYear');
   const levels = form.watch('rules.levelRequirements');
   const selectedRuleKeys = form.watch('rules.selectedRuleKeys') ?? [];
   const isRuleSelected = (key: ContestRuleKey) => selectedRuleKeys.includes(key);
@@ -319,11 +320,16 @@ const RulesStep = () => {
                   <Input
                     type="number"
                     min={1}
+                    disabled={isPhotographyOfYear}
                     className={inputClass}
                     {...field}
+                    value={isPhotographyOfYear ? 8 : field.value}
                     onChange={(event) => field.onChange(event.target.value)}
                   />
                 </FormControl>
+                {isPhotographyOfYear && (
+                  <p className="text-caption-foreground text-[9px]">POTY entries are fixed at 8 photos per participant.</p>
+                )}
                 <FormMessage className="text-[9px]" />
               </FormItem>
             )}

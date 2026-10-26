@@ -133,6 +133,7 @@ const ParticipantsTab = ({ contest }: { contest: Contest }) => {
                         alt={displayName}
                         fill
                         unoptimized
+                        sizes="44px"
                         className="object-cover"
                       />
                     ) : (

@@ -85,6 +85,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       description: '',
       banner: undefined,
       maxUploads: Number(values.SUBMISSION_LIMIT ?? fallback.SUBMISSION_LIMIT.defaultValue),
+      isPhotographyOfYear: false,
       recurring: false,
       recurringType: undefined,
       recurringTimezone: 'UTC',
@@ -262,6 +263,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       description: contest.description ?? '',
       banner: contest.banner ?? undefined,
       maxUploads: Number(submissionLimit),
+      isPhotographyOfYear: Boolean(contest.isPhotographyOfYear),
       recurring: Boolean(contest.recurring),
       recurringType: contest.recurring ? (contest.recurringType ?? 'DAILY') : undefined,
       recurringTimezone: defaults.details.recurringTimezone,
@@ -294,7 +296,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       voting: getRuleValue(contest, 'VOTING', defaults.rules.voting),
       participation: getRuleValue(contest, 'PARTICIPATION', defaults.rules.participation),
     },
-    awards: awards.length ? awards : defaults.awards,
+    awards: contest.isPhotographyOfYear ? [] : awards.length ? awards : defaults.awards,
     levelAwards,
   };
 }
@@ -343,7 +345,7 @@ export function buildContestFormData(
   }
 
   const ruleValues: Record<ContestRuleKey, unknown> = {
-    SUBMISSION_LIMIT: details.maxUploads,
+    SUBMISSION_LIMIT: details.isPhotographyOfYear ? 8 : details.maxUploads,
     SUBMISSION_RULES: {
       ...rules.submissionRules,
       disallowed: rules.submissionRules.disallowed,
@@ -386,21 +388,23 @@ export function buildContestFormData(
   formData.append(
     'prizes',
     JSON.stringify(
-      awards.map(({ type, recipient, boost, key, swap, coin }) => {
-        const isTopRank = /^TOP_\d+$/.test(type);
-        const rankLimit = isTopRank ? Number(type.slice(4)) : null;
-        const target =
-          recipient === 'Photographer' || type === 'TOP_PHOTOGRAPHER' ? 'PHOTOGRAPHER' : 'PHOTO';
-        return {
-          type: isTopRank ? 'TOP_RANK' : type,
-          target,
-          ...(rankLimit ? { rankLimit } : {}),
-          coin,
-          boost,
-          swap,
-          key,
-        };
-      }),
+      (details.isPhotographyOfYear ? [] : awards).map(
+        ({ type, recipient, boost, key, swap, coin }) => {
+          const isTopRank = /^TOP_\d+$/.test(type);
+          const rankLimit = isTopRank ? Number(type.slice(4)) : null;
+          const target =
+            recipient === 'Photographer' || type === 'TOP_PHOTOGRAPHER' ? 'PHOTOGRAPHER' : 'PHOTO';
+          return {
+            type: isTopRank ? 'TOP_RANK' : type,
+            target,
+            ...(rankLimit ? { rankLimit } : {}),
+            coin,
+            boost,
+            swap,
+            key,
+          };
+        },
+      ),
     ),
   );
 

@@ -31,6 +31,10 @@ export const contestApi = createApi({
       // with a new category.
       providesTags: [{ type: 'ContestCreationOptions', id: 'SINGLE' }],
     }),
+    getPhotographyOfTheYearContests: builder.query<ApiSuccessResponse<Contest[]>, void>({
+      query: () => '/photographer-of-the-year',
+      providesTags: [{ type: 'Contests', id: 'POTY' }],
+    }),
     getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
       query: () => '/dashboard/contest/stats',
       providesTags: [{ type: 'ContestStats', id: 'SINGLE' }],
@@ -57,11 +61,24 @@ export const contestApi = createApi({
         result
           ? [
               { type: 'Contests', id: 'LIST' },
+              { type: 'Contests', id: 'POTY' },
               { type: 'ContestStats', id: 'SINGLE' },
               { type: 'DashboardOverview', id: 'SINGLE' },
               { type: 'ContestCreationOptions', id: 'SINGLE' },
             ]
           : [],
+    }),
+
+    createPhotographyOfTheYearContest: builder.mutation<ApiSuccessResponse<Contest>, FormData>({
+      query: (body) => ({ url: '/photographer-of-the-year', method: 'POST', body }),
+      invalidatesTags: (result) => result
+        ? [
+            { type: 'Contests', id: 'LIST' },
+            { type: 'Contests', id: 'POTY' },
+            { type: 'ContestStats', id: 'SINGLE' },
+            { type: 'DashboardOverview', id: 'SINGLE' },
+          ]
+        : [],
     }),
 
     updateContest: builder.mutation<ApiSuccessResponse<Contest>, { id: string; body: FormData }>({
@@ -80,6 +97,23 @@ export const contestApi = createApi({
               { type: 'ContestCreationOptions', id: 'SINGLE' },
             ]
           : [],
+    }),
+
+    updatePhotographyOfTheYearContest: builder.mutation<ApiSuccessResponse<Contest>, { id: string; body: FormData }>({
+      query: ({ id, body }) => ({
+        url: `/photographer-of-the-year/${id}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => result
+        ? [
+            { type: 'Contest', id },
+            { type: 'Contests', id: 'LIST' },
+            { type: 'Contests', id: 'POTY' },
+            { type: 'ContestStats', id: 'SINGLE' },
+            { type: 'DashboardOverview', id: 'SINGLE' },
+          ]
+        : [],
     }),
 
     deleteContest: builder.mutation<ApiSuccessResponse<string>, { id: string }>({
@@ -134,19 +168,22 @@ export const contestApi = createApi({
 
     getContestRankPhotos: builder.query<
       ApiSuccessResponse<RankedPhotosResponse>,
-      { id: string; page?: number; limit?: number }
+      { id: string; page?: number; limit?: number; isPhotographyOfYear?: boolean }
     >({
-      query: ({ id, page = 1, limit = 20 }) =>
-        `/contests/${id}/rank-photos?page=${page}&limit=${limit}`,
+      query: ({ id, page = 1, limit = 20, isPhotographyOfYear }) =>
+        isPhotographyOfYear
+          ? `/photographer-of-the-year/${id}/ranking?page=${page}&limit=${limit}`
+          : `/contests/${id}/rank-photos?page=${page}&limit=${limit}`,
       providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
     }),
 
     getContestRankPhotographers: builder.query<
       ApiSuccessResponse<RankedPhotographersResponse>,
-      { id: string; page?: number; limit?: number; level?: string }
+      { id: string; page?: number; limit?: number; level?: string; isPhotographyOfYear?: boolean }
     >({
-      query: ({ id, page = 1, limit = 20, level }) => {
+      query: ({ id, page = 1, limit = 20, level, isPhotographyOfYear }) => {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+        if (isPhotographyOfYear) return `/photographer-of-the-year/${id}/ranking/photographers?${params.toString()}`;
         if (level) params.set('level', level);
         return `/contests/${id}/rank-photographer?${params.toString()}`;
       },
@@ -185,15 +222,20 @@ export const contestApi = createApi({
 export const {
   useGetContestStatsQuery,
   useGetContestCreationOptionsQuery,
+  useGetPhotographyOfTheYearContestsQuery,
   useCreateContestMutation,
+  useCreatePhotographyOfTheYearContestMutation,
   useUpdateContestMutation,
+  useUpdatePhotographyOfTheYearContestMutation,
   useDeleteContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
   useGetContestQuery,
   useLazyGetContestQuery,
   useGetContestRankPhotosQuery,
+  useLazyGetContestRankPhotosQuery,
   useGetContestRankPhotographersQuery,
+  useLazyGetContestRankPhotographersQuery,
   useGetContestParticipantsQuery,
   useAdminDeleteContestPhotoMutation,
   useGetBannerCandidatesQuery,

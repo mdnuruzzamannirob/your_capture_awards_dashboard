@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { buildContestFormData, mapContestToFormValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { useGetContestQuery, useUpdateContestMutation } from '@/store/features/contest/contestApi';
+import { useGetContestQuery, useUpdateContestMutation, useUpdatePhotographyOfTheYearContestMutation } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -30,6 +30,7 @@ const UpdateContest = () => {
     { skip: !contestId },
   );
   const [updateContest, { isLoading: isUpdating }] = useUpdateContestMutation();
+  const [updatePotyContest, { isLoading: isUpdatingPoty }] = useUpdatePhotographyOfTheYearContestMutation();
   const contest = data?.data as Contest | undefined;
   const canEditContest = Boolean(
     contest && (contest.status === 'UPCOMING' || contest.status === 'NEW') && !contest.deletedAt,
@@ -37,7 +38,12 @@ const UpdateContest = () => {
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
-      await updateContest({ id: contestId, body: buildContestFormData(values) }).unwrap();
+      const body = buildContestFormData(values);
+      if (contest?.isPhotographyOfYear) {
+        await updatePotyContest({ id: contestId, body }).unwrap();
+      } else {
+        await updateContest({ id: contestId, body }).unwrap();
+      }
       toast.success('Contest updated successfully');
       router.push(`/contest/${contestId}`);
     } catch (error) {
@@ -77,7 +83,7 @@ const UpdateContest = () => {
     <ContestForm
       mode="update"
       initialValues={mapContestToFormValues(contest)}
-      isSubmitting={isUpdating}
+      isSubmitting={isUpdating || isUpdatingPoty}
       onSubmit={handleSubmit}
       onCancel={() => router.push(`/contest/${contestId}`)}
     />

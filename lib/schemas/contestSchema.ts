@@ -42,6 +42,7 @@ export const contestDetailsSchema = z
     // the preview, but submission sends this id instead of re-uploading the file.
     bannerUserPhotoId: z.string().optional(),
     maxUploads: z.coerce.number().int().min(1, 'At least 1 upload is required'),
+    isPhotographyOfYear: z.boolean().default(false),
     recurring: z.boolean().default(false),
     recurringType: z.enum(['DAILY', 'WEEKLY', 'MONTHLY']).optional(),
     recurringTimezone: z.string().trim().min(1).max(100).default('UTC'),
@@ -68,6 +69,13 @@ export const contestDetailsSchema = z
         path: ['recurringType'],
         code: 'custom',
         message: 'Recurring frequency is required',
+      });
+    }
+    if (data.isPhotographyOfYear && data.recurring) {
+      ctx.addIssue({
+        path: ['recurring'],
+        code: 'custom',
+        message: 'Photographer of the Year contests use admin-set dates and cannot recur',
       });
     }
     if (data.recurring && data.recurringEndsAt && data.recurringEndsAt <= data.startDate) {
@@ -192,7 +200,6 @@ export const contestAwardsSchema = z
       coin: z.coerce.number().int().min(0).default(0),
     }),
   )
-  .min(1, 'Add at least one award')
   .max(MAX_CONTEST_AWARDS)
   .superRefine((awards, ctx) => {
     const seen = new Set<string>();
@@ -265,13 +272,23 @@ export const contestLevelAwardsSchema = z
     }
   });
 
-export const contestFinalSchema = z.object({
-  details: contestDetailsSchema,
-  prizes: contestPrizesSchema,
-  rules: contestRulesSchema,
-  awards: contestAwardsSchema,
-  levelAwards: contestLevelAwardsSchema,
-});
+export const contestFinalSchema = z
+  .object({
+    details: contestDetailsSchema,
+    prizes: contestPrizesSchema,
+    rules: contestRulesSchema,
+    awards: contestAwardsSchema,
+    levelAwards: contestLevelAwardsSchema,
+  })
+  .superRefine((values, ctx) => {
+    if (!values.details.isPhotographyOfYear && values.awards.length === 0) {
+      ctx.addIssue({
+        path: ['awards'],
+        code: 'custom',
+        message: 'Add at least one award',
+      });
+    }
+  });
 
 export type ContestDetailsValues = z.infer<typeof contestDetailsSchema>;
 export type ContestPrizesValues = z.infer<typeof contestPrizesSchema>;
