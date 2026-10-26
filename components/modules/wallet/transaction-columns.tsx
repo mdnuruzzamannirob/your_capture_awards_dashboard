@@ -24,8 +24,10 @@ export const transactionColumns: ColumnDef<PaymentTransaction>[] = [
     header: 'USER',
     cell: ({ row }) => (
       <div>
-        <div className="font-medium">{row.original.user.fullName || 'Unknown User'}</div>
-        <div className="text-muted-foreground text-xs">{row.original.user.email}</div>
+        <div className="font-medium">
+          {row.original.user ? row.original.user.fullName || 'Unknown User' : 'Deleted User'}
+        </div>
+        <div className="text-muted-foreground text-xs">{row.original.user?.email}</div>
       </div>
     ),
   },

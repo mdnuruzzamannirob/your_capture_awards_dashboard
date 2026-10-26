@@ -31,7 +31,8 @@ export interface PaymentTransaction {
   stripe_session_id: string | null;
   createdAt: string;
   updatedAt: string;
-  user: PaymentUser;
+  // null when the paying user has since been deleted
+  user: PaymentUser | null;
 }
 
 export interface WalletTransactionStats {

@@ -153,7 +153,9 @@ const WalletManagement = () => {
                       <div className="space-y-1">
                         <p className="text-muted-foreground text-sm">Name</p>
                         <p className="text-sm font-medium">
-                          {selectedTransaction.user.fullName || 'Unknown User'}
+                          {selectedTransaction.user
+                            ? selectedTransaction.user.fullName || 'Unknown User'
+                            : 'Deleted User'}
                         </p>
                       </div>
                     </div>
@@ -161,7 +163,7 @@ const WalletManagement = () => {
                       <Mail className="text-muted-foreground mt-0.5 size-4" />
                       <div className="space-y-1">
                         <p className="text-muted-foreground text-sm">Email</p>
-                        <p className="text-sm font-medium">{selectedTransaction.user.email}</p>
+                        <p className="text-sm font-medium">{selectedTransaction.user?.email ?? '—'}</p>
                       </div>
                     </div>
                   </div>
