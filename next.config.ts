@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  allowedDevOrigins: ['10.10.28.200']
+  allowedDevOrigins: ['10.10.28.200', "'connected-specially-normally-physics.trycloudflare.com'"]
 };
 
 export default nextConfig;

@@ -494,11 +494,16 @@ const SettingsContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const [mounted, setMounted] = useState(false);
 
   const currentTab = searchParams.get('tab') || 'profile';
 
   const { data: userData, isLoading: isUserLoading, refetch } = useGetMeQuery();
   const user = userData?.data;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleTabChange = (value: string) => {
     startTransition(() => {
@@ -508,7 +513,11 @@ const SettingsContent = () => {
     });
   };
 
-  if (isUserLoading) {
+  // Keep the server render and the first client render identical. Redux may
+  // already have the user cached in the browser, while the server necessarily
+  // starts with the loading state; rendering tabs immediately would make
+  // Radix's markup differ during hydration.
+  if (!mounted || isUserLoading) {
     return (
       <section className="dashboard-page animate-pulse space-y-5">
         <Title

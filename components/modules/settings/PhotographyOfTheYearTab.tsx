@@ -82,7 +82,6 @@ const ContestSetup = () => {
   initialValues.details.maxUploads = 8;
   initialValues.details.recurring = false;
   initialValues.prizes.isMoneyContest = false;
-  initialValues.prizes.entryFeeAmount = 4.99;
   initialValues.prizes.coin_requirement = false;
   initialValues.awards = [];
 
@@ -275,7 +274,7 @@ const PhotographyOfTheYearTab = () => (
         </TabsTrigger>
         <TabsTrigger value="judging" className="px-5">
           <Trophy className="size-4" />
-          Judging
+          Rankings &amp; judging
         </TabsTrigger>
       </TabsList>
 

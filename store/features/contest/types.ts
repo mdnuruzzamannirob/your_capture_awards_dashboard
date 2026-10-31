@@ -202,6 +202,14 @@ export interface RankedPhotosResponse {
   meta?: unknown;
 }
 
+export interface PhotographyOfTheYearJudgingResult {
+  winners: string[];
+  winnerPhotoIds?: string[];
+  firstPhotoId?: string | null;
+  secondPhotoId?: string | null;
+  thirdPhotoId?: string | null;
+}
+
 export interface RankedPhotographersResponse {
   contestTotalVotes?: number;
   levelTabs?: string[];

@@ -22,9 +22,9 @@ const PotyEntryFeeStep = () => {
       <div>
         <p className="text-sm font-semibold">Entry fee &amp; prize pool</p>
         <p className="text-muted-foreground mt-1 text-xs leading-5">
-          Every participant pays this fee to join. {PRIZE_POOL_SHARE_PERCENT}% of all collected fees becomes
+          Every participant pays the configured fee to join. {PRIZE_POOL_SHARE_PERCENT}% of all collected fees becomes
           the prize pool shared by the 1st, 2nd and 3rd place winners. Judges review every submitted
-          photo in Settings, select 10 finalists, then choose the three winners.
+          photo in Settings, the top 10 are advanced automatically by ranking, then judges choose the three winners.
         </p>
       </div>
       <FormField

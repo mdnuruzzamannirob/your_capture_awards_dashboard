@@ -8,6 +8,7 @@ import {
   ContestParticipant,
   RankedPhotographersResponse,
   RankedPhotosResponse,
+  PhotographyOfTheYearJudgingResult,
   ContestStats,
   GetContestsResponse,
 } from './types';
@@ -34,6 +35,13 @@ export const contestApi = createApi({
     getPhotographyOfTheYearContests: builder.query<ApiSuccessResponse<Contest[]>, void>({
       query: () => '/photographer-of-the-year',
       providesTags: [{ type: 'Contests', id: 'POTY' }],
+    }),
+    getPhotographyOfTheYearJudgingResult: builder.query<
+      ApiSuccessResponse<PhotographyOfTheYearJudgingResult>,
+      { id: string }
+    >({
+      query: ({ id }) => `/photographer-of-the-year/${id}/judging-result`,
+      providesTags: (result, error, { id }) => [{ type: 'Contest', id }],
     }),
     getContestStats: builder.query<ApiSuccessResponse<ContestStats>, void>({
       query: () => '/dashboard/contest/stats',
@@ -113,6 +121,19 @@ export const contestApi = createApi({
             { type: 'ContestStats', id: 'SINGLE' },
             { type: 'DashboardOverview', id: 'SINGLE' },
           ]
+        : [],
+    }),
+    submitPhotographyOfTheYearJudgingResult: builder.mutation<
+      ApiSuccessResponse<PhotographyOfTheYearJudgingResult>,
+      { id: string; body: { winnerPhotoIds: string[] } }
+    >({
+      query: ({ id, body }) => ({
+        url: `/photographer-of-the-year/${id}/judging-result`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => result
+        ? [{ type: 'Contest', id }, { type: 'Contests', id: 'POTY' }]
         : [],
     }),
 
@@ -223,10 +244,12 @@ export const {
   useGetContestStatsQuery,
   useGetContestCreationOptionsQuery,
   useGetPhotographyOfTheYearContestsQuery,
+  useGetPhotographyOfTheYearJudgingResultQuery,
   useCreateContestMutation,
   useCreatePhotographyOfTheYearContestMutation,
   useUpdateContestMutation,
   useUpdatePhotographyOfTheYearContestMutation,
+  useSubmitPhotographyOfTheYearJudgingResultMutation,
   useDeleteContestMutation,
   useGetContestsQuery,
   useLazyGetContestsQuery,
