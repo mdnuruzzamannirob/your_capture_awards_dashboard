@@ -23,10 +23,14 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useAdminDeleteContestPhotoMutation } from '@/store/features/contest/contestApi';
-import { useGetReportsQuery, useReviewReportMutation } from '@/store/features/report/reportApi';
+import {
+  useGetReportsQuery,
+  useRemoveReportedPhotoFromPlatformMutation,
+  useReviewReportMutation,
+} from '@/store/features/report/reportApi';
 import { useToggleUserBlockMutation } from '@/store/features/user/userApi';
 import type { Report, ReportStatus } from '@/types';
-import { Calendar, ImageOff, ShieldBan, Trash2, User, X } from 'lucide-react';
+import { Calendar, ImageOff, ShieldAlert, ShieldBan, Trash2, User, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -56,11 +60,15 @@ const ReportManagement = () => {
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [resolutionNote, setResolutionNote] = useState('');
-  const [confirmAction, setConfirmAction] = useState<'remove-photo' | 'ban-user' | null>(null);
+  const [confirmAction, setConfirmAction] = useState<
+    'remove-photo' | 'delete-from-platform' | 'ban-user' | null
+  >(null);
 
   const reportsQuery = useGetReportsQuery({ page, limit, status: statusFilter });
   const [reviewReport, { isLoading: isReviewing }] = useReviewReportMutation();
   const [adminDeletePhoto, { isLoading: isDeletingPhoto }] = useAdminDeleteContestPhotoMutation();
+  const [removeFromPlatform, { isLoading: isRemovingFromPlatform }] =
+    useRemoveReportedPhotoFromPlatformMutation();
   const [toggleUserBlock, { isLoading: isBanning }] = useToggleUserBlockMutation();
 
   const reports = reportsQuery.data?.data ?? [];
@@ -104,6 +112,33 @@ const ReportManagement = () => {
     }
   };
 
+  const handleDeleteFromPlatform = async () => {
+    if (!selectedReport) return;
+    try {
+      const response = await removeFromPlatform({
+        reportId: selectedReport.id,
+        reason: resolutionNote.trim() || undefined,
+      }).unwrap();
+      const contests = response.data.affectedContestIds.length;
+      const extraReports = response.data.resolvedReportCount - 1;
+      toast.success(
+        [
+          'Photo deleted from the platform.',
+          contests ? `Removed from ${contests} contest${contests === 1 ? '' : 's'}.` : '',
+          extraReports > 0
+            ? `${extraReports} other report${extraReports === 1 ? '' : 's'} on this photo resolved.`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      );
+      setConfirmAction(null);
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'Failed to delete the photo from the platform.'));
+    }
+  };
+
   const handleBanUser = async () => {
     if (!selectedReport?.reportedUser) return;
     try {
@@ -117,6 +152,10 @@ const ReportManagement = () => {
 
   const columns = createReportColumns(handleViewReport);
   const isPending = selectedReport?.status === 'PENDING';
+  // The image that was reported. Older reports only know the contest slot.
+  const reportedPhoto =
+    selectedReport?.reportedPhoto ?? selectedReport?.contestPhoto?.photo ?? null;
+  const isCopyrightReport = selectedReport?.reason === 'COPYRIGHT';
 
   return (
     <>
@@ -277,30 +316,44 @@ const ReportManagement = () => {
               )}
 
               <div className="rounded-lg border p-4">
-                <h4 className="mb-3 font-semibold">Submitted photo</h4>
-                {selectedReport.contestPhoto?.photo ? (
+                <h4 className="mb-3 font-semibold">Reported photo</h4>
+                {reportedPhoto ? (
                   <div className="flex items-center gap-3">
                     <div className="bg-muted relative size-20 shrink-0 overflow-hidden rounded-md">
                       <Image
-                        src={selectedReport.contestPhoto.photo.url}
-                        alt={selectedReport.contestPhoto.photo.title || 'Submitted photo'}
+                        src={reportedPhoto.url}
+                        alt={reportedPhoto.title || 'Reported photo'}
                         fill
                         sizes="80px"
                         className="object-cover"
                       />
                     </div>
                     <p className="text-muted-foreground text-sm">
-                      {selectedReport.contestPhoto.photo.title || selectedReport.contestPhoto.title}
+                      {reportedPhoto.title || selectedReport.contestPhoto?.title}
                     </p>
                   </div>
                 ) : (
                   <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                    <ImageOff className="size-4" /> No photo linked to this report.
+                    <ImageOff className="size-4" />
+                    {selectedReport.contestPhoto
+                      ? 'This photo has already been removed.'
+                      : 'No photo linked to this report.'}
+                  </div>
+                )}
+                {reportedPhoto && isCopyrightReport && (
+                  <div className="border-destructive/30 bg-destructive/5 mt-4 flex items-start gap-2 rounded-md border p-3 text-sm">
+                    <ShieldAlert className="text-destructive mt-0.5 size-4 shrink-0" />
+                    <p className="text-muted-foreground">
+                      If the copyright claim is valid, use{' '}
+                      <strong className="text-foreground">Delete from platform</strong> to remove
+                      this photo from the owner&apos;s gallery and from every contest it was entered
+                      in.
+                    </p>
                   </div>
                 )}
               </div>
 
-              {isPending && (
+              {(isPending || reportedPhoto) && (
                 <div className="rounded-lg border p-4">
                   <h4 className="mb-2 font-semibold">Resolution note (optional)</h4>
                   <Textarea
@@ -348,25 +401,60 @@ const ReportManagement = () => {
                     </Button>
                   </>
                 )}
+                {reportedPhoto && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setConfirmAction('delete-from-platform')}
+                    disabled={isRemovingFromPlatform}
+                  >
+                    <ShieldAlert className="size-4" /> Delete from platform
+                  </Button>
+                )}
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={confirmAction === 'remove-photo'} onOpenChange={() => setConfirmAction(null)}>
+      <AlertDialog
+        open={confirmAction === 'remove-photo'}
+        onOpenChange={() => setConfirmAction(null)}
+      >
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove this photo?</AlertDialogTitle>
             <AlertDialogDescription>
-              The photo will be permanently removed from the contest and the owner will be
-              notified by email with the reason you provided. This does not block their account.
+              The photo will be permanently removed from the contest and the owner will be notified
+              by email with the reason you provided. This does not block their account.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeletingPhoto}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleRemovePhoto} disabled={isDeletingPhoto}>
               {isDeletingPhoto ? 'Removing...' : 'Remove Photo'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={confirmAction === 'delete-from-platform'}
+        onOpenChange={() => setConfirmAction(null)}
+      >
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this photo from the platform?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The photo is deleted permanently: it is removed from the owner&apos;s gallery, from
+              every contest it was entered in, and the stored file is deleted. Other open reports
+              about this photo are resolved too. The owner is notified, with the resolution note as
+              the reason. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRemovingFromPlatform}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteFromPlatform} disabled={isRemovingFromPlatform}>
+              {isRemovingFromPlatform ? 'Deleting...' : 'Delete from platform'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -387,7 +475,11 @@ const ReportManagement = () => {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isBanning}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleBanUser} disabled={isBanning}>
-              {isBanning ? 'Updating...' : selectedReport?.reportedUser?.isBlocked ? 'Unblock' : 'Ban'}
+              {isBanning
+                ? 'Updating...'
+                : selectedReport?.reportedUser?.isBlocked
+                  ? 'Unblock'
+                  : 'Ban'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

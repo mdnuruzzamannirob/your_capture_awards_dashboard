@@ -22,6 +22,12 @@ interface ContestFormProps {
   isSubmitting: boolean;
   onSubmit: (values: ContestFinalValues) => Promise<void>;
   onCancel?: () => void;
+  /**
+   * The contest is already running (Photographer of the Year can be edited while
+   * active). Start date, entry fee and rules are shown read-only because people
+   * have already joined under them.
+   */
+  lockStartedFields?: boolean;
 }
 
 function findFirstError(errors: FieldErrors<ContestFinalValues>): string | undefined {
@@ -41,6 +47,7 @@ const ContestForm = ({
   isSubmitting,
   onSubmit,
   onCancel,
+  lockStartedFields = false,
 }: ContestFormProps) => {
   const form = useForm<ContestFinalValues>({
     resolver: zodResolver(contestFinalSchema) as Resolver<ContestFinalValues>,
@@ -93,10 +100,23 @@ const ContestForm = ({
               window.scrollTo({ top: 0, behavior: 'smooth' });
             })}
           >
-            <DetailsStep />
-            <RulesStep />
+            {lockStartedFields ? (
+              <div className="border-warning/30 bg-warning/10 text-warning rounded-lg border px-4 py-3 text-xs leading-5">
+                This contest is already running. You can change the title, description, categories,
+                banner and end date. The start date, entry fee and rules are locked because
+                participants have already joined under them.
+              </div>
+            ) : null}
+            <DetailsStep startDateLocked={lockStartedFields} />
+            {/* A disabled fieldset disables every input and checkbox button inside it. */}
+            <fieldset
+              disabled={lockStartedFields}
+              className={lockStartedFields ? 'pointer-events-none min-w-0 opacity-60' : 'min-w-0'}
+            >
+              <RulesStep locked={lockStartedFields} />
+            </fieldset>
             {isPhotographyOfYear ? (
-              <PotyEntryFeeStep />
+              <PotyEntryFeeStep locked={lockStartedFields} />
             ) : (
               <>
                 <PrizesStep />

@@ -4,6 +4,7 @@ import { TipTapEditor } from '@/components/common/tiptap-editor/TipTapEditor';
 import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import ContestForm from '@/components/modules/content/ContestForm';
 import ContestFormSkeleton from '@/components/modules/content/ContestFormSkeleton';
+import PotyContestList from '@/components/modules/settings/PotyContestList';
 import PotyJudgingWorkspace from '@/components/modules/settings/PotyJudgingWorkspace';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,12 +17,13 @@ import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import {
   useCreatePhotographyOfTheYearContestMutation,
   useGetContestCreationOptionsQuery,
+  useGetPhotographyOfTheYearContestsQuery,
 } from '@/store/features/contest/contestApi';
 import {
   useGetSitePolicyQuery,
   useUpdateSitePolicyMutation,
 } from '@/store/features/settings/settingsApi';
-import { Eye, FilePenLine, FileText, Loader2, Settings2, Trophy } from 'lucide-react';
+import { Eye, FilePenLine, FileText, Loader2, Plus, Settings2, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -53,12 +55,19 @@ const ContestSetup = () => {
     refetch,
   } = useGetContestCreationOptionsQuery();
   const options = optionsData?.data;
+  const { data: potyData } = useGetPhotographyOfTheYearContestsQuery();
+  const hasContests = Boolean(potyData?.data?.length);
+  // With contests already listed, the create form stays tucked away until asked for.
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
       const body = buildContestFormData(values, options);
       await createContest(body).unwrap();
       toast.success('Photographer of the Year contest created.');
+      setShowCreateForm(false);
+      setFormKey((key) => key + 1);
     } catch (error) {
       toast.error(getErrorMessage(error, 'Unable to create the Photographer of the Year contest.'));
     }
@@ -86,22 +95,50 @@ const ContestSetup = () => {
   initialValues.awards = [];
 
   return (
-    <div className="pt-2">
-      <div className="mb-5">
-        <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
-          <Settings2 className="text-primary size-5" />
-          Contest setup
-        </h3>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Create and configure the annual contest here. Judging and winner selection are managed in this tab.
-        </p>
+    <div className="space-y-8 pt-2">
+      <div>
+        <div className="mb-4">
+          <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+            <Trophy className="text-primary size-5" />
+            Existing contests
+          </h3>
+          <p className="text-muted-foreground mt-1 text-sm">
+            View, edit or delete a Photographer of the Year contest. Editing and deleting stay
+            available until the contest ends.
+          </p>
+        </div>
+        <PotyContestList />
       </div>
-      <ContestForm
-        mode="create"
-        initialValues={initialValues}
-        isSubmitting={isCreating}
-        onSubmit={handleSubmit}
-      />
+
+      <div>
+        <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="text-heading flex items-center gap-2 text-lg font-semibold">
+              <Settings2 className="text-primary size-5" />
+              Create a contest
+            </h3>
+            <p className="text-muted-foreground mt-1 text-sm">
+              Create and configure the annual contest here. Judging and winner selection are managed
+              in this tab.
+            </p>
+          </div>
+          {hasContests && !showCreateForm ? (
+            <Button type="button" variant="outline" onClick={() => setShowCreateForm(true)}>
+              <Plus className="size-4" /> New contest
+            </Button>
+          ) : null}
+        </div>
+        {!hasContests || showCreateForm ? (
+          <ContestForm
+            key={formKey}
+            mode="create"
+            initialValues={initialValues}
+            isSubmitting={isCreating}
+            onSubmit={handleSubmit}
+            onCancel={hasContests ? () => setShowCreateForm(false) : undefined}
+          />
+        ) : null}
+      </div>
     </div>
   );
 };

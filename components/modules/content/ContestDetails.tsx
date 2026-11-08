@@ -60,7 +60,14 @@ const ContestDetails = () => {
   const categories = getContestCategories(contest);
 
   const isUpcoming = contest?.status === 'UPCOMING' || contest?.status === 'NEW';
-  const canManageUpcomingContest = Boolean(isUpcoming && !contest?.deletedAt);
+  // Photographer of the Year runs for a year, so it can be edited or deleted
+  // while active too (until its end date).
+  const isRunningPoty = Boolean(
+    contest?.isPhotographyOfYear &&
+      contest.status === 'ACTIVE' &&
+      new Date(contest.endDate ?? 0).getTime() > Date.now(),
+  );
+  const canManageUpcomingContest = Boolean((isUpcoming || isRunningPoty) && !contest?.deletedAt);
   // POTY has no prizes or award winners - its standing is shown in the Rank tab.
   const detailsTabs = contest?.isPhotographyOfYear
     ? CONTEST_DETAILS_TABS.filter((tab) => tab.key !== 'prizes' && tab.key !== 'winners')
@@ -89,7 +96,9 @@ const ContestDetails = () => {
       const response = await deleteContest({ id: contest.id }).unwrap();
       toast.success(response.message || 'Contest deleted successfully');
       setDeleteDialogOpen(false);
-      router.push('/contest');
+      router.push(
+        contest.isPhotographyOfYear ? '/settings?tab=photography-of-the-year' : '/contest',
+      );
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -216,10 +225,17 @@ const ContestDetails = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete upcoming contest?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {contest.isPhotographyOfYear
+                ? 'Delete Photographer of the Year contest?'
+                : 'Delete upcoming contest?'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               <span className="text-foreground font-medium">{contest.title}</span> will be archived
-              and hidden from contest lists. This is only allowed before participation starts.
+              and hidden from contest lists.{' '}
+              {contest.isPhotographyOfYear
+                ? 'Entries already submitted are archived with it. If anyone has paid the entry fee, refund those payments from the Wallet page first.'
+                : 'This is only allowed before participation starts.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

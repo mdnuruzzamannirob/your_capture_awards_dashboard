@@ -122,11 +122,25 @@ const DetailsTab = ({
           <DetailItem label="Total votes" value={contest.totalVotes ?? 0} />
           {contest.isPhotographyOfYear ? (
             <>
-              <DetailItem label="Entry fee" value={`$${Number(contest.entryFeeAmount ?? 0).toFixed(2)}`} />
-              <DetailItem label="Fees collected" value={`$${Number(contest.potyPrizePool?.collectedFees ?? 0).toFixed(2)}`} />
               <DetailItem
-                label={`Prize pool (${contest.potyPrizePool?.sharePercent ?? 60}%)`}
+                label="Entry fee"
+                value={`$${Number(contest.entryFeeAmount ?? 0).toFixed(2)}`}
+              />
+              <DetailItem
+                label="Fees collected"
+                value={`$${Number(contest.potyPrizePool?.collectedFees ?? 0).toFixed(2)}`}
+              />
+              <DetailItem
+                label={`Prize pool for winners (${contest.potyPrizePool?.sharePercent ?? 40}%)`}
                 value={`$${Number(contest.potyPrizePool?.prizePool ?? 0).toFixed(2)}`}
+              />
+              <DetailItem
+                label={`Platform share (${contest.potyPrizePool?.platformSharePercent ?? 60}%)`}
+                value={`$${Number(
+                  contest.potyPrizePool?.platformShare ??
+                    (contest.potyPrizePool?.collectedFees ?? 0) -
+                      (contest.potyPrizePool?.prizePool ?? 0),
+                ).toFixed(2)}`}
               />
             </>
           ) : null}

@@ -332,7 +332,7 @@ function toDateTimeInputValue(value?: Date) {
   return localDate.toISOString().slice(0, 16);
 }
 
-const DetailsStep = () => {
+const DetailsStep = ({ startDateLocked = false }: { startDateLocked?: boolean }) => {
   const form = useFormContext<ContestFinalValues>();
   const recurring = form.watch('details.recurring');
   const isPhotographyOfYear = form.watch('details.isPhotographyOfYear');
@@ -398,12 +398,15 @@ const DetailsStep = () => {
             name="details.startDate"
             render={({ field }) => (
               <FormItem className={fieldClass}>
-                <FormLabel className={labelClass}>Start date &amp; time</FormLabel>
+                <FormLabel className={labelClass}>
+                  Start date &amp; time{startDateLocked ? ' (locked, contest has started)' : ''}
+                </FormLabel>
                 <FormControl>
                   <Input
                     type="datetime-local"
                     className={`${inputClass} scheme-dark`}
                     value={toDateTimeInputValue(field.value)}
+                    disabled={startDateLocked}
                     onBlur={field.onBlur}
                     onChange={(event) => field.onChange(new Date(event.target.value))}
                   />

@@ -147,6 +147,7 @@ export const contestApi = createApi({
           ? [
               { type: 'Contest', id },
               { type: 'Contests', id: 'LIST' },
+              { type: 'Contests', id: 'POTY' },
               { type: 'ContestStats', id: 'SINGLE' },
               { type: 'DashboardOverview', id: 'SINGLE' },
             ]

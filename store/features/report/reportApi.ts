@@ -1,7 +1,13 @@
 import { baseQuery } from '@/store/baseQuery';
 import type { ReportStatus } from '@/types';
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { ReportResponse, ReportsResponse, ReviewReportBody } from './types';
+import {
+  RemoveReportedPhotoBody,
+  RemoveReportedPhotoResponse,
+  ReportResponse,
+  ReportsResponse,
+  ReviewReportBody,
+} from './types';
 
 export const reportApi = createApi({
   reducerPath: 'reportApi',
@@ -42,7 +48,29 @@ export const reportApi = createApi({
         { type: 'Report', id: reportId },
       ],
     }),
+
+    // Copyright takedown: deletes the reported photo from the whole platform and
+    // resolves this report plus any other open report about the same photo.
+    removeReportedPhotoFromPlatform: builder.mutation<
+      RemoveReportedPhotoResponse,
+      RemoveReportedPhotoBody
+    >({
+      query: ({ reportId, reason }) => ({
+        url: `/reports/${reportId}/remove-photo`,
+        method: 'POST',
+        body: { reason },
+      }),
+      invalidatesTags: (result, error, { reportId }) => [
+        { type: 'Reports', id: 'LIST' },
+        { type: 'Report', id: reportId },
+      ],
+    }),
   }),
 });
 
-export const { useGetReportsQuery, useGetReportQuery, useReviewReportMutation } = reportApi;
+export const {
+  useGetReportsQuery,
+  useGetReportQuery,
+  useReviewReportMutation,
+  useRemoveReportedPhotoFromPlatformMutation,
+} = reportApi;

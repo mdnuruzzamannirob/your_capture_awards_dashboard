@@ -3,7 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { buildContestFormData, mapContestToFormValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
-import { useGetContestQuery, useUpdateContestMutation, useUpdatePhotographyOfTheYearContestMutation } from '@/store/features/contest/contestApi';
+import {
+  useGetContestQuery,
+  useUpdateContestMutation,
+  useUpdatePhotographyOfTheYearContestMutation,
+} from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -30,15 +34,27 @@ const UpdateContest = () => {
     { skip: !contestId },
   );
   const [updateContest, { isLoading: isUpdating }] = useUpdateContestMutation();
-  const [updatePotyContest, { isLoading: isUpdatingPoty }] = useUpdatePhotographyOfTheYearContestMutation();
+  const [updatePotyContest, { isLoading: isUpdatingPoty }] =
+    useUpdatePhotographyOfTheYearContestMutation();
   const contest = data?.data as Contest | undefined;
-  const canEditContest = Boolean(
-    contest && (contest.status === 'UPCOMING' || contest.status === 'NEW') && !contest.deletedAt,
+  const isUpcoming = contest?.status === 'UPCOMING' || contest?.status === 'NEW';
+  // Photographer of the Year runs for a year, so it stays editable while active.
+  const isRunningPoty = Boolean(
+    contest?.isPhotographyOfYear &&
+      contest.status === 'ACTIVE' &&
+      new Date(contest.endDate ?? 0).getTime() > Date.now(),
   );
+  const canEditContest = Boolean(contest && (isUpcoming || isRunningPoty) && !contest.deletedAt);
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
       const body = buildContestFormData(values);
+      if (isRunningPoty) {
+        // Locked once the contest has started; the API rejects changes to them.
+        body.delete('startDate');
+        body.delete('entryFeeAmount');
+        body.delete('rules');
+      }
       if (contest?.isPhotographyOfYear) {
         await updatePotyContest({ id: contestId, body }).unwrap();
       } else {
@@ -67,7 +83,11 @@ const UpdateContest = () => {
   if (!canEditContest) {
     return (
       <div className="border-border-subtle bg-surface-secondary text-muted-foreground rounded-lg border p-8 text-center">
-        <p>Only upcoming contests can be edited.</p>
+        <p>
+          {contest.isPhotographyOfYear
+            ? 'Photographer of the Year can only be edited until it ends.'
+            : 'Only upcoming contests can be edited.'}
+        </p>
         <Button
           type="button"
           onClick={() => router.push(`/contest/${contest.id}`)}
@@ -86,6 +106,7 @@ const UpdateContest = () => {
       isSubmitting={isUpdating || isUpdatingPoty}
       onSubmit={handleSubmit}
       onCancel={() => router.push(`/contest/${contestId}`)}
+      lockStartedFields={isRunningPoty}
     />
   );
 };

@@ -116,6 +116,8 @@ export interface Report {
   reporterId: string;
   reportedUserId: string;
   contestPhotoId: string | null;
+  /** The gallery photo shown when the report was filed (null on older reports). */
+  userPhotoId?: string | null;
   reason: ReportReason;
   details: string | null;
   status: ReportStatus;
@@ -127,6 +129,8 @@ export interface Report {
   reporter: ReportUserSummary | null;
   reportedUser: ReportUserSummary | null;
   contestPhoto: ReportContestPhotoSummary | null;
+  /** The reported image itself; null once it has been removed from the platform. */
+  reportedPhoto?: { id: string; url: string; title: string | null; userId: string } | null;
 }
 
 export type StoreProductType = 'key' | 'boost' | 'swap';
