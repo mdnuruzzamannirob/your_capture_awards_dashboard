@@ -18,13 +18,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { getContestCategories } from '@/lib/contestCategories';
 import { cn } from '@/lib/utils';
 import { useDeleteContestMutation, useGetContestQuery } from '@/store/features/contest/contestApi';
 import type { Contest } from '@/store/features/contest/types';
-import { ImageOff } from 'lucide-react';
+import { ArrowLeft, Gavel, ImageOff } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -96,9 +98,7 @@ const ContestDetails = () => {
       const response = await deleteContest({ id: contest.id }).unwrap();
       toast.success(response.message || 'Contest deleted successfully');
       setDeleteDialogOpen(false);
-      router.push(
-        contest.isPhotographyOfYear ? '/settings?tab=photography-of-the-year' : '/contest',
-      );
+      router.push(contest.isPhotographyOfYear ? '/photographer-of-the-year' : '/contest');
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -180,11 +180,29 @@ const ContestDetails = () => {
         )}
       </div>
 
-      <div className="border-border-subtle border-b bg-(--bg-inset) px-5 py-3">
-        <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
-        {categories.length > 0 && (
-          <p className="text-muted-foreground mt-0.5 truncate text-xs">{categories.join(' · ')}</p>
-        )}
+      <div className="border-border-subtle flex flex-wrap items-center justify-between gap-3 border-b bg-(--bg-inset) px-5 py-3">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold">{contest.title}</h1>
+          {categories.length > 0 && (
+            <p className="text-muted-foreground mt-0.5 truncate text-xs">
+              {categories.join(' · ')}
+            </p>
+          )}
+        </div>
+        {contest.isPhotographyOfYear ? (
+          <div className="flex shrink-0 flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/photographer-of-the-year">
+                <ArrowLeft className="size-3.5" /> POTY hub
+              </Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href={`/photographer-of-the-year/${contest.id}/judging`}>
+                <Gavel className="size-3.5" /> Rankings &amp; judging
+              </Link>
+            </Button>
+          </div>
+        ) : null}
       </div>
 
       <div className="border-border-subtle relative flex overflow-x-auto border-b bg-(--bg-inset)">

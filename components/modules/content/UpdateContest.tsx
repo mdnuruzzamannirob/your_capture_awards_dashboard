@@ -25,7 +25,12 @@ function getErrorMessage(error: unknown): string {
   return 'Something went wrong!';
 }
 
-const UpdateContest = () => {
+type UpdateContestProps = {
+  /** Where Save and Cancel lead. Defaults to the contest's details page. */
+  returnTo?: string;
+};
+
+const UpdateContest = ({ returnTo }: UpdateContestProps = {}) => {
   const router = useRouter();
   const params = useParams();
   const contestId = params?.id as string;
@@ -61,7 +66,7 @@ const UpdateContest = () => {
         await updateContest({ id: contestId, body }).unwrap();
       }
       toast.success('Contest updated successfully');
-      router.push(`/contest/${contestId}`);
+      router.push(returnTo ?? `/contest/${contestId}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -105,8 +110,20 @@ const UpdateContest = () => {
       initialValues={mapContestToFormValues(contest)}
       isSubmitting={isUpdating || isUpdatingPoty}
       onSubmit={handleSubmit}
-      onCancel={() => router.push(`/contest/${contestId}`)}
+      onCancel={() => router.push(returnTo ?? `/contest/${contestId}`)}
       lockStartedFields={isRunningPoty}
+      header={
+        contest.isPhotographyOfYear
+          ? {
+              backHref: '/photographer-of-the-year',
+              backLabel: 'Photographer of the Year',
+              title: 'Edit Photographer of the Year',
+              description: isRunningPoty
+                ? 'The contest is running. Update its presentation or extend the end date.'
+                : 'Update the dates, entry fee, rules and presentation before the contest opens.',
+            }
+          : undefined
+      }
     />
   );
 };

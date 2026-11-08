@@ -22,7 +22,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import SocialLinksTab from '@/components/modules/settings/SocialLinksTab';
-import PhotographyOfTheYearTab from '@/components/modules/settings/PhotographyOfTheYearTab';
 import { getImageFileError, WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
@@ -496,7 +495,10 @@ const SettingsContent = () => {
   const [, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
 
-  const currentTab = searchParams.get('tab') || 'profile';
+  const requestedTab = searchParams.get('tab') || 'profile';
+  // Photographer of the Year moved to its own page; keep old links working.
+  const movedToPotyPage = requestedTab === 'photography-of-the-year';
+  const currentTab = movedToPotyPage ? 'profile' : requestedTab;
 
   const { data: userData, isLoading: isUserLoading, refetch } = useGetMeQuery();
   const user = userData?.data;
@@ -504,6 +506,10 @@ const SettingsContent = () => {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (movedToPotyPage) router.replace('/photographer-of-the-year');
+  }, [movedToPotyPage, router]);
 
   const handleTabChange = (value: string) => {
     startTransition(() => {
@@ -536,12 +542,11 @@ const SettingsContent = () => {
       <Title title="Settings" description="Manage your account profile, security, and policies." />
 
       <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full space-y-5">
-        <TabsList className="grid w-full max-w-3xl grid-cols-6">
+        <TabsList className="grid w-full max-w-2xl grid-cols-4">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="change-password">Password</TabsTrigger>
           <TabsTrigger value="site-policy">Site Policy</TabsTrigger>
           <TabsTrigger value="social-links">Social Links</TabsTrigger>
-          <TabsTrigger value="photography-of-the-year">Photographer of the Year</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-4 outline-none">
@@ -560,9 +565,6 @@ const SettingsContent = () => {
           <SocialLinksTab />
         </TabsContent>
 
-        <TabsContent value="photography-of-the-year" className="space-y-4 outline-none">
-          <PhotographyOfTheYearTab />
-        </TabsContent>
       </Tabs>
     </section>
   );

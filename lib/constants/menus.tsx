@@ -7,7 +7,7 @@ import {
   MdOutlineMonochromePhotos,
   MdOutlineQuestionAnswer,
 } from 'react-icons/md';
-import { TbFlag, TbRepeat, TbUsers } from 'react-icons/tb';
+import { TbFlag, TbRepeat, TbTrophy, TbUsers } from 'react-icons/tb';
 
 export const sideMenus: SideMenu[] = [
   {
@@ -29,6 +29,11 @@ export const sideMenus: SideMenu[] = [
     name: 'Recurring Contest',
     href: '/recurring-contest',
     icon: <TbRepeat className="size-full" />,
+  },
+  {
+    name: 'Photographer of the Year',
+    href: '/photographer-of-the-year',
+    icon: <TbTrophy className="size-full" />,
   },
   {
     name: 'Reports',

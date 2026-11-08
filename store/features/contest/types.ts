@@ -181,9 +181,54 @@ export interface RankedPhoto {
   url?: string | null;
   title?: string | null;
   voteCount?: number;
+  /** POTY only: how many distinct votes the weighted voteCount came from. */
+  voterCount?: number;
   rank?: number;
   photographer?: ContestWinnerUser | null;
   user?: ContestWinnerUser | null;
+}
+
+/** Where a Photographer of the Year contest is in its life (admin view). */
+export type PotyStage = 'SCHEDULED' | 'RUNNING' | 'JUDGING' | 'PUBLISHED';
+
+export interface PotyAdminContest {
+  id: string;
+  title: string;
+  description: string;
+  banner?: string | null;
+  status: string;
+  startDate: string;
+  endDate: string;
+  entryFeeAmount: number;
+  currency?: string | null;
+  createdAt: string;
+  stage: PotyStage;
+  participantCount: number;
+  entryCount: number;
+  paidEntryCount: number;
+  potyPrizePool: Contest['potyPrizePool'] | null;
+  winnerCount: number;
+  publishedAt: string | null;
+  canEdit: boolean;
+  /** Running contests keep their start date, entry fee and rules. */
+  editLocksStartedFields: boolean;
+  canDelete: boolean;
+  deleteBlockedReason: string | null;
+}
+
+export interface PotyAdminOverview {
+  contests: PotyAdminContest[];
+  totals: {
+    contests: number;
+    scheduled: number;
+    running: number;
+    awaitingJudging: number;
+    published: number;
+    entries: number;
+    collectedFees: number;
+    prizePool: number;
+    currency: string;
+  };
 }
 
 export interface RankedPhotographer {

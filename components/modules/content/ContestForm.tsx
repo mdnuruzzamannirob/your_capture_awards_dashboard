@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { type FieldErrors, type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import ContestEditorHeader from './ContestEditorHeader';
+import ContestEditorHeader, { type ContestEditorHeaderCopy } from './ContestEditorHeader';
 import DetailsStep from './DetailsStep';
 import PotyEntryFeeStep from './PotyEntryFeeStep';
 import PrizesStep from './PrizesStep';
@@ -28,6 +28,8 @@ interface ContestFormProps {
    * have already joined under them.
    */
   lockStartedFields?: boolean;
+  /** Overrides the page header's back link, title and description. */
+  header?: ContestEditorHeaderCopy;
 }
 
 function findFirstError(errors: FieldErrors<ContestFinalValues>): string | undefined {
@@ -48,6 +50,7 @@ const ContestForm = ({
   onSubmit,
   onCancel,
   lockStartedFields = false,
+  header,
 }: ContestFormProps) => {
   const form = useForm<ContestFinalValues>({
     resolver: zodResolver(contestFinalSchema) as Resolver<ContestFinalValues>,
@@ -91,7 +94,7 @@ const ContestForm = ({
   return (
     <Form {...form}>
       <div className="mx-auto w-full max-w-345">
-        <ContestEditorHeader mode={mode === 'create' ? 'create' : 'edit'} />
+        <ContestEditorHeader mode={mode === 'create' ? 'create' : 'edit'} {...header} />
         <div className="grid items-start gap-[clamp(20px,2.4vw,36px)] min-[1280px]:grid-cols-[minmax(480px,1.08fr)_minmax(390px,0.92fr)]">
           <form
             className="grid min-w-0 gap-3"

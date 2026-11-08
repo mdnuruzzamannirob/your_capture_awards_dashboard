@@ -9,6 +9,7 @@ import {
   RankedPhotographersResponse,
   RankedPhotosResponse,
   PhotographyOfTheYearJudgingResult,
+  PotyAdminOverview,
   ContestStats,
   GetContestsResponse,
 } from './types';
@@ -34,6 +35,11 @@ export const contestApi = createApi({
     }),
     getPhotographyOfTheYearContests: builder.query<ApiSuccessResponse<Contest[]>, void>({
       query: () => '/photographer-of-the-year',
+      providesTags: [{ type: 'Contests', id: 'POTY' }],
+    }),
+    // Admin hub: every POTY contest with stage, counts and allowed actions.
+    getPotyAdminOverview: builder.query<ApiSuccessResponse<PotyAdminOverview>, void>({
+      query: () => '/photographer-of-the-year/admin/overview',
       providesTags: [{ type: 'Contests', id: 'POTY' }],
     }),
     getPhotographyOfTheYearJudgingResult: builder.query<
@@ -245,6 +251,7 @@ export const {
   useGetContestStatsQuery,
   useGetContestCreationOptionsQuery,
   useGetPhotographyOfTheYearContestsQuery,
+  useGetPotyAdminOverviewQuery,
   useGetPhotographyOfTheYearJudgingResultQuery,
   useCreateContestMutation,
   useCreatePhotographyOfTheYearContestMutation,
