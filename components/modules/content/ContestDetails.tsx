@@ -18,6 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import PotyDeleteDialog from '@/components/modules/poty/PotyDeleteDialog';
 import { Button } from '@/components/ui/button';
 import { CONTEST_DETAILS_TABS } from '@/lib/constants';
 import { getContestCategories } from '@/lib/contestCategories';
@@ -70,6 +71,10 @@ const ContestDetails = () => {
       new Date(contest.endDate ?? 0).getTime() > Date.now(),
   );
   const canManageUpcomingContest = Boolean((isUpcoming || isRunningPoty) && !contest?.deletedAt);
+  // Photographer of the Year can be deleted (permanently) at any stage.
+  const canDeleteContest = Boolean(
+    contest?.isPhotographyOfYear ? !contest.deletedAt : canManageUpcomingContest,
+  );
   // POTY has no prizes or award winners - its standing is shown in the Rank tab.
   const detailsTabs = contest?.isPhotographyOfYear
     ? CONTEST_DETAILS_TABS.filter((tab) => tab.key !== 'prizes' && tab.key !== 'winners')
@@ -98,7 +103,7 @@ const ContestDetails = () => {
       const response = await deleteContest({ id: contest.id }).unwrap();
       toast.success(response.message || 'Contest deleted successfully');
       setDeleteDialogOpen(false);
-      router.push(contest.isPhotographyOfYear ? '/photographer-of-the-year' : '/contest');
+      router.push('/contest');
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -112,7 +117,7 @@ const ContestDetails = () => {
             contest={currentContest}
             canEdit={canManageUpcomingContest}
             onEditClick={() => router.push(`/contest/${params?.id}/edit`)}
-            canDelete={canManageUpcomingContest}
+            canDelete={canDeleteContest}
             onDeleteClick={() => setDeleteDialogOpen(true)}
             isDeleting={isDeleting}
           />
@@ -235,25 +240,28 @@ const ContestDetails = () => {
 
       <div className="w-full p-5">{renderTabContent(contest)}</div>
 
+      {contest.isPhotographyOfYear ? (
+        <PotyDeleteDialog
+          contestId={contest.id}
+          title={contest.title}
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onDeleted={() => router.push('/photographer-of-the-year')}
+        />
+      ) : null}
+
       <AlertDialog
-        open={deleteDialogOpen}
+        open={deleteDialogOpen && !contest.isPhotographyOfYear}
         onOpenChange={(open) => {
           if (!isDeleting) setDeleteDialogOpen(open);
         }}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {contest.isPhotographyOfYear
-                ? 'Delete Photographer of the Year contest?'
-                : 'Delete upcoming contest?'}
-            </AlertDialogTitle>
+            <AlertDialogTitle>Delete upcoming contest?</AlertDialogTitle>
             <AlertDialogDescription>
               <span className="text-foreground font-medium">{contest.title}</span> will be archived
-              and hidden from contest lists.{' '}
-              {contest.isPhotographyOfYear
-                ? 'Entries already submitted are archived with it. If anyone has paid the entry fee, refund those payments from the Wallet page first.'
-                : 'This is only allowed before participation starts.'}
+              and hidden from contest lists. This is only allowed before participation starts.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

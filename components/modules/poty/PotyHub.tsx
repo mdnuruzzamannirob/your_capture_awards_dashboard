@@ -2,31 +2,18 @@
 
 import MetricCard from '@/components/common/MetricCard';
 import Title from '@/components/common/Title';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
-import {
-  useDeleteContestMutation,
-  useGetPotyAdminOverviewQuery,
-} from '@/store/features/contest/contestApi';
+import { useGetPotyAdminOverviewQuery } from '@/store/features/contest/contestApi';
 import type { PotyAdminContest, PotyStage } from '@/store/features/contest/types';
 import { FileText, Gavel, Plus, Trophy, Upload, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import PotyContestCard from './PotyContestCard';
+import PotyDeleteDialog from './PotyDeleteDialog';
 import PotyLearnMore from './PotyLearnMore';
-import { formatMoney, getErrorMessage, STAGE_META, STAGE_PRIORITY } from './potyUi';
+import { formatMoney, STAGE_META, STAGE_PRIORITY } from './potyUi';
 
 type Filter = 'ALL' | PotyStage;
 
@@ -63,7 +50,6 @@ const ContestListSkeleton = () => (
 
 const ContestsView = () => {
   const { data, isLoading, isError, refetch } = useGetPotyAdminOverviewQuery();
-  const [deleteContest, { isLoading: isDeleting }] = useDeleteContestMutation();
   const [filter, setFilter] = useState<Filter>('ALL');
   const [pendingDelete, setPendingDelete] = useState<PotyAdminContest | null>(null);
 
@@ -93,17 +79,6 @@ const ContestsView = () => {
   const visible = filter === 'ALL' ? contests : contests.filter((c) => c.stage === filter);
   const awaitingJudging = contests.filter((contest) => contest.stage === 'JUDGING');
   const totals = overview?.totals;
-
-  const handleDelete = async () => {
-    if (!pendingDelete) return;
-    try {
-      const response = await deleteContest({ id: pendingDelete.id }).unwrap();
-      toast.success(response.message || 'Contest deleted.');
-      setPendingDelete(null);
-    } catch (error) {
-      toast.error(getErrorMessage(error, 'Unable to delete the contest.'));
-    }
-  };
 
   if (isError) {
     return (
@@ -226,38 +201,16 @@ const ContestsView = () => {
         )}
       </div>
 
-      <AlertDialog
-        open={Boolean(pendingDelete)}
-        onOpenChange={(open) => {
-          if (!open && !isDeleting) setPendingDelete(null);
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete “{pendingDelete?.title}”?</AlertDialogTitle>
-            <AlertDialogDescription>
-              The contest is archived and hidden from the website.
-              {pendingDelete?.entryCount
-                ? ` Its ${pendingDelete.entryCount} ${pendingDelete.entryCount === 1 ? 'entry is' : 'entries are'} archived with it.`
-                : ''}{' '}
-              This cannot be undone from the dashboard.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(event) => {
-                event.preventDefault();
-                void handleDelete();
-              }}
-              disabled={isDeleting}
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              {isDeleting ? 'Deleting…' : 'Delete contest'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {pendingDelete ? (
+        <PotyDeleteDialog
+          contestId={pendingDelete.id}
+          title={pendingDelete.title}
+          open
+          onOpenChange={(open) => {
+            if (!open) setPendingDelete(null);
+          }}
+        />
+      ) : null}
     </div>
   );
 };

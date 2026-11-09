@@ -169,21 +169,8 @@ const PotyContestCard = ({
                     </DropdownMenuItem>
                   ) : null}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    variant="destructive"
-                    disabled={!contest.canDelete}
-                    onSelect={() => onDelete(contest)}
-                    className="items-start"
-                  >
-                    <Trash2 className="mt-0.5 size-4" />
-                    <span className="flex flex-col">
-                      Delete
-                      {contest.deleteBlockedReason ? (
-                        <span className="text-muted-foreground text-[11px] leading-4">
-                          {contest.deleteBlockedReason}
-                        </span>
-                      ) : null}
-                    </span>
+                  <DropdownMenuItem variant="destructive" onSelect={() => onDelete(contest)}>
+                    <Trash2 className="size-4" /> Delete permanently
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
