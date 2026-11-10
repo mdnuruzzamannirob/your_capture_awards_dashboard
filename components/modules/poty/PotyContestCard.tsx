@@ -42,7 +42,7 @@ const Stat = ({ icon, label, value }: { icon: ReactNode; label: string; value: R
 const timingLine = (contest: PotyAdminContest) => {
   switch (contest.stage) {
     case 'SCHEDULED':
-      return `Opens ${formatRelative(contest.startDate)} · ${formatDate(contest.startDate, true)}`;
+      return `Registration open · voting starts ${formatRelative(contest.startDate)} (${formatDate(contest.startDate, true)})`;
     case 'RUNNING':
       return `Closes ${formatRelative(contest.endDate)} · ${formatDate(contest.endDate, true)}`;
     case 'JUDGING':

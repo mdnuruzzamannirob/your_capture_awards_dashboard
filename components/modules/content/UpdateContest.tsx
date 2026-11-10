@@ -5,6 +5,7 @@ import { buildContestFormData, mapContestToFormValues } from '@/lib/contest';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import {
   useGetContestQuery,
+  useGetPotyAdminOverviewQuery,
   useUpdateContestMutation,
   useUpdatePhotographyOfTheYearContestMutation,
 } from '@/store/features/contest/contestApi';
@@ -50,13 +51,24 @@ const UpdateContest = ({ returnTo }: UpdateContestProps = {}) => {
       new Date(contest.endDate ?? 0).getTime() > Date.now(),
   );
   const canEditContest = Boolean(contest && (isUpcoming || isRunningPoty) && !contest.deletedAt);
+  // Photographer of the Year takes registrations while scheduled: once anyone
+  // has registered, the entry fee and rules lock (the API enforces the same).
+  const { data: potyOverview } = useGetPotyAdminOverviewQuery(undefined, {
+    skip: !contest?.isPhotographyOfYear,
+  });
+  const potyEntry = potyOverview?.data?.contests.find((item) => item.id === contestId);
+  const feeAndRulesLocked =
+    isRunningPoty ||
+    Boolean(potyEntry?.editLocks?.feeAndRules ?? (potyEntry && potyEntry.participantCount > 0));
 
   const handleSubmit = async (values: ContestFinalValues) => {
     try {
       const body = buildContestFormData(values);
+      // Locked fields are not sent; the API rejects changes to them.
       if (isRunningPoty) {
-        // Locked once the contest has started; the API rejects changes to them.
         body.delete('startDate');
+      }
+      if (feeAndRulesLocked) {
         body.delete('entryFeeAmount');
         body.delete('rules');
       }
@@ -112,6 +124,7 @@ const UpdateContest = ({ returnTo }: UpdateContestProps = {}) => {
       onSubmit={handleSubmit}
       onCancel={() => router.push(returnTo ?? `/contest/${contestId}`)}
       lockStartedFields={isRunningPoty}
+      lockFeeAndRules={feeAndRulesLocked}
       header={
         contest.isPhotographyOfYear
           ? {

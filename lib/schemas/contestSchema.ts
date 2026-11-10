@@ -87,6 +87,10 @@ export const contestDetailsSchema = z
     }
   });
 
+// Smallest paid entry fee the API accepts (backend: MIN_ENTRY_FEE_USD in
+// Contest/contest.validation.ts). 0 means the contest is free to enter.
+export const MIN_PAID_ENTRY_FEE_USD = 0.6;
+
 export const contestPrizesSchema = z
   .object({
     isMoneyContest: z.boolean().default(false),
@@ -96,7 +100,10 @@ export const contestPrizesSchema = z
     entryFeeAmount: z.coerce
       .number()
       .min(0)
-      .refine((value) => value === 0 || value >= 0.5, 'Entry fee must be 0 or at least $0.50')
+      .refine(
+        (value) => value === 0 || value >= MIN_PAID_ENTRY_FEE_USD,
+        `Entry fee must be 0 (free) or at least $${MIN_PAID_ENTRY_FEE_USD.toFixed(2)}`,
+      )
       .refine(
         (value) => Math.abs(value * 100 - Math.round(value * 100)) < 1e-8,
         'Entry fee can have at most 2 decimal places',

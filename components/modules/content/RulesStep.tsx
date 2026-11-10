@@ -245,7 +245,13 @@ function ContestLevelAwardsEditor() {
 
 // `locked` only labels the section; ContestForm disables its inputs by wrapping
 // it in a disabled <fieldset>.
-const RulesStep = ({ locked = false }: { locked?: boolean }) => {
+const RulesStep = ({
+  locked = false,
+  lockedReason = 'the contest has started',
+}: {
+  locked?: boolean;
+  lockedReason?: string;
+}) => {
   const form = useFormContext<ContestFinalValues>();
   const isPhotographyOfYear = form.watch('details.isPhotographyOfYear');
   const levels = form.watch('rules.levelRequirements');
@@ -263,7 +269,7 @@ const RulesStep = ({ locked = false }: { locked?: boolean }) => {
         </h2>
         {locked ? (
           <span className="text-muted-foreground ml-auto text-[11px]">
-            Locked, the contest has started
+            Locked, {lockedReason}
           </span>
         ) : null}
       </header>

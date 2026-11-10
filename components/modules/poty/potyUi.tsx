@@ -11,7 +11,7 @@ export const STAGE_META: Record<
 > = {
   SCHEDULED: {
     label: 'Scheduled',
-    hint: 'Not open yet. Everything can still be edited.',
+    hint: 'Registration is open. Votes count from the start date. Entry fee and rules lock once anyone registers.',
     icon: CalendarClock,
     badgeClass: 'bg-info-subtle text-info',
     dotClass: 'bg-info',

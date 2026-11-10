@@ -93,7 +93,7 @@ const StageNotice = ({ contest }: { contest: PotyAdminContest }) => {
   const notice = {
     SCHEDULED: {
       tone: 'border-info/30 bg-info-subtle',
-      text: `The contest opens ${formatRelative(contest.startDate)} (${formatDate(contest.startDate, true)}). The ranking fills in once photographers start entering.`,
+      text: `Registration is open and photographers can already submit entries. Votes count from ${formatDate(contest.startDate, true)} (${formatRelative(contest.startDate)}); until then every entry is at 0 and there is no ranking yet.`,
     },
     RUNNING: {
       tone: 'border-success/30 bg-success-subtle',

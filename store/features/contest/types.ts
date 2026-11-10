@@ -212,6 +212,8 @@ export interface PotyAdminContest {
   canEdit: boolean;
   /** Running contests keep their start date, entry fee and rules. */
   editLocksStartedFields: boolean;
+  /** Entry fee and rules lock once anyone registers; start date once running. */
+  editLocks?: { startDate: boolean; feeAndRules: boolean };
   canDelete: boolean;
   deleteBlockedReason: string | null;
 }
