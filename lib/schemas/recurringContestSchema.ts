@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import { MAX_CONTEST_CATEGORIES } from '@/lib/contestCategories';
 import { WEB_IMAGE_MIME_TYPES } from '@/lib/constants/uploads';
+import {
+  DEFAULT_CURRENCY,
+  formatCurrencyAmount,
+  MIN_PAID_ENTRY_FEE,
+  SUPPORTED_CURRENCIES,
+} from '@/lib/currency';
 
 const MAX_BANNER_SIZE = 24 * 1024 * 1024;
 const ALLOWED_BANNER_TYPES: readonly string[] = WEB_IMAGE_MIME_TYPES;
@@ -38,11 +44,11 @@ export const recurringDetailsSchema = z
     isMoneyContest: z.boolean().default(false),
     minPrize: z.coerce.number().int().min(0).default(0),
     maxPrize: z.coerce.number().int().min(0).default(0),
-    currency: z.string().trim().toUpperCase().max(3).optional(),
+    // Generated contests charge their entry fee in this currency.
+    currency: z.enum(SUPPORTED_CURRENCIES).default(DEFAULT_CURRENCY),
     entryFeeAmount: z.coerce
       .number()
       .min(0)
-      .refine((value) => value === 0 || value >= 0.5, 'Entry fee must be 0 or at least $0.50')
       .refine(
         (value) => Math.abs(value * 100 - Math.round(value * 100)) < 1e-8,
         'Entry fee can have at most 2 decimal places',
@@ -52,16 +58,21 @@ export const recurringDetailsSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.startDate >= data.endDate) {
-      ctx.addIssue({ path: ['endDate'], code: 'custom', message: 'End date must be after start date' });
+      ctx.addIssue({
+        path: ['endDate'],
+        code: 'custom',
+        message: 'End date must be after start date',
+      });
+    }
+    const minFee = MIN_PAID_ENTRY_FEE[data.currency];
+    if (data.entryFeeAmount !== 0 && data.entryFeeAmount < minFee) {
+      ctx.addIssue({
+        path: ['entryFeeAmount'],
+        code: 'custom',
+        message: `Entry fee must be 0 (free) or at least ${formatCurrencyAmount(minFee, data.currency)}`,
+      });
     }
     if (data.isMoneyContest) {
-      if (!data.currency || !/^[A-Z]{3}$/.test(data.currency)) {
-        ctx.addIssue({
-          path: ['currency'],
-          code: 'custom',
-          message: 'A valid 3-letter currency code is required',
-        });
-      }
       if (data.minPrize > data.maxPrize) {
         ctx.addIssue({
           path: ['minPrize'],

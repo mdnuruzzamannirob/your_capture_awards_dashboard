@@ -4,6 +4,7 @@ import DynamicIcon from '@/components/common/DynamicIcon';
 import { Badge } from '@/components/ui/badge';
 import { CONTEST_AWARD_OPTIONS } from '@/lib/constants';
 import { getAwardLabel } from '@/lib/contest';
+import { formatCurrencyAmount, toSupportedCurrency } from '@/lib/currency';
 import type { Contest } from '@/store/features/contest/types';
 
 const levelName: Record<string, string> = {
@@ -30,7 +31,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
   const allAwards = contest.prizes?.length ? contest.prizes : (contest.awards ?? []);
   const awards = allAwards.filter((award) => !isTierAward(award));
   const levelAwards = contest.levelAwards ?? [];
-  const currency = 'USD';
+  const currency = toSupportedCurrency(contest.currency);
 
   return (
     <div className="space-y-5">
@@ -43,7 +44,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
           <p className="text-muted-foreground text-sm">Prize range</p>
           <p className="mt-1 font-semibold">
             {contest.isMoneyContest
-              ? `${contest.minPrize ?? 0} – ${contest.maxPrize ?? 0}`
+              ? `${formatCurrencyAmount(contest.minPrize, currency)} – ${formatCurrencyAmount(contest.maxPrize, currency)}`
               : 'Not applicable'}
           </p>
         </div>
@@ -57,7 +58,7 @@ const PrizesTab = ({ contest }: { contest: Contest }) => {
           <p className="text-muted-foreground text-sm">Entry fee</p>
           <p className="mt-1 font-semibold">
             {(contest.entryFeeAmount ?? 0) > 0
-              ? `${contest.entryFeeAmount} ${currency}`
+              ? formatCurrencyAmount(contest.entryFeeAmount, currency)
               : 'Free'}
           </p>
         </div>

@@ -2,6 +2,7 @@
 
 import TipTapViewer from '@/components/common/tiptap-editor/TipTapViewer';
 import { Button } from '@/components/ui/button';
+import { formatCurrencyAmount, toSupportedCurrency } from '@/lib/currency';
 import { cn } from '@/lib/utils';
 import type { Contest } from '@/store/features/contest/types';
 import { Info, Pencil, Trash2 } from 'lucide-react';
@@ -44,6 +45,7 @@ const DetailsTab = ({
 }) => {
   const awardCount = contest.prizes?.length ?? contest.awards?.length ?? 0;
   const creatorName = contest.creator?.fullName ?? 'Unknown creator';
+  const feeCurrency = contest.potyPrizePool?.currency ?? toSupportedCurrency(contest.currency);
 
   return (
     <div className="space-y-5">
@@ -124,23 +126,24 @@ const DetailsTab = ({
             <>
               <DetailItem
                 label="Entry fee"
-                value={`$${Number(contest.entryFeeAmount ?? 0).toFixed(2)}`}
+                value={formatCurrencyAmount(contest.entryFeeAmount, feeCurrency)}
               />
               <DetailItem
                 label="Fees collected"
-                value={`$${Number(contest.potyPrizePool?.collectedFees ?? 0).toFixed(2)}`}
+                value={formatCurrencyAmount(contest.potyPrizePool?.collectedFees, feeCurrency)}
               />
               <DetailItem
                 label={`Prize pool for winners (${contest.potyPrizePool?.sharePercent ?? 40}%)`}
-                value={`$${Number(contest.potyPrizePool?.prizePool ?? 0).toFixed(2)}`}
+                value={formatCurrencyAmount(contest.potyPrizePool?.prizePool, feeCurrency)}
               />
               <DetailItem
                 label={`Platform share (${contest.potyPrizePool?.platformSharePercent ?? 60}%)`}
-                value={`$${Number(
+                value={formatCurrencyAmount(
                   contest.potyPrizePool?.platformShare ??
                     (contest.potyPrizePool?.collectedFees ?? 0) -
                       (contest.potyPrizePool?.prizePool ?? 0),
-                ).toFixed(2)}`}
+                  feeCurrency,
+                )}
               />
             </>
           ) : null}

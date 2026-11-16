@@ -20,6 +20,12 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
+  CURRENCY_LABELS,
+  DEFAULT_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  toSupportedCurrency,
+} from '@/lib/currency';
+import {
   CreateStoreProductBody,
   StoreBundleItemType,
   StoreProduct,
@@ -87,7 +93,7 @@ const mapInitialValues = (
     category,
     quantity: category === 'BUNDLES' ? 1 : (product?.quantity ?? 1),
     amount: product?.amount ?? 0,
-    currency: product?.currency ?? (category === 'BUNDLES' ? 'COINS' : 'USD'),
+    currency: category === 'BUNDLES' ? 'COINS' : toSupportedCurrency(product?.currency),
     status: product?.status ?? 'ACTIVE',
     items: category === 'BUNDLES' ? normalizeItems(product?.items) : [],
   };
@@ -104,7 +110,8 @@ const schema = z.object({
   category: z.enum(['COINS', 'BUNDLES']),
   quantity: z.number().gt(0, 'Quantity is required.').optional(),
   amount: z.number().gt(0, 'Amount is required.'),
-  currency: z.string().trim().min(1, 'Currency is required.'),
+  // Coin packs are paid through Stripe in USD or EUR; bundles are paid in coins.
+  currency: z.enum(['USD', 'EUR', 'COINS'], { message: 'Currency is required.' }),
   status: z.enum(['ACTIVE', 'INACTIVE']),
   items: z.array(
     z.object({
@@ -153,7 +160,7 @@ export default function StoreProductForm({
       ...prev,
       category: nextCategory,
       quantity: nextCategory === 'BUNDLES' ? 1 : prev.quantity || 1,
-      currency: nextCategory === 'COINS' ? 'USD' : 'COINS',
+      currency: nextCategory === 'COINS' ? DEFAULT_CURRENCY : 'COINS',
       items:
         nextCategory === 'BUNDLES'
           ? prev.items.length
@@ -366,15 +373,25 @@ export default function StoreProductForm({
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="currency">Currency *</Label>
-                    <Input
-                      id="currency"
+                    {/* Stripe checkout charges the coin pack in this currency. */}
+                    <Select
                       value={formData.currency}
-                      onChange={(e) => {
-                        setFormData((p) => ({ ...p, currency: e.target.value.toUpperCase() }));
+                      onValueChange={(value) => {
+                        setFormData((p) => ({ ...p, currency: value }));
                         setErrors((prev) => ({ ...prev, currency: undefined }));
                       }}
-                      required
-                    />
+                    >
+                      <SelectTrigger id="currency" className="h-11! w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {SUPPORTED_CURRENCIES.map((currency) => (
+                          <SelectItem key={currency} value={currency}>
+                            {CURRENCY_LABELS[currency]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     {errors.currency && (
                       <p className="text-destructive text-xs">{errors.currency}</p>
                     )}

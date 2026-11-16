@@ -10,6 +10,7 @@ import type {
 } from '@/store/features/contest/types';
 import { PHOTO_UPLOAD_MIME_TYPES, type PhotoUploadMimeType } from '@/lib/constants/uploads';
 import { getContestCategories } from '@/lib/contestCategories';
+import { DEFAULT_CURRENCY, toSupportedCurrency } from '@/lib/currency';
 
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
@@ -98,7 +99,7 @@ export function getDefaultContestValues(options?: ContestCreationOptions): Conte
       isMoneyContest: false,
       minPrize: 0,
       maxPrize: 0,
-      currency: 'USD',
+      currency: DEFAULT_CURRENCY,
       entryFeeAmount: 0,
       coin_requirement: false,
       coin_required: 0,
@@ -276,7 +277,7 @@ export function mapContestToFormValues(contest: Contest): ContestFinalValues {
       isMoneyContest: Boolean(contest.isMoneyContest),
       minPrize: Number(contest.minPrize ?? 0),
       maxPrize: Number(contest.maxPrize ?? 0),
-      currency: contest.currency ?? 'USD',
+      currency: toSupportedCurrency(contest.currency),
       entryFeeAmount: Number(contest.entryFeeAmount ?? 0),
       coin_requirement: Boolean(contest.coinRequirement ?? contest.coin_requirement),
       coin_required: Number(contest.coin_required ?? contest.entryFeeCoins ?? 0),
@@ -328,10 +329,11 @@ export function buildContestFormData(
     );
   }
   formData.append('isMoneyContest', String(prizes.isMoneyContest));
+  // Always sent: the entry fee is charged in it, with or without cash prizes.
+  formData.append('currency', prizes.currency ?? DEFAULT_CURRENCY);
   if (prizes.isMoneyContest) {
     formData.append('minPrize', String(prizes.minPrize));
     formData.append('maxPrize', String(prizes.maxPrize));
-    formData.append('currency', prizes.currency ?? 'USD');
   }
   formData.append('entryFeeAmount', String(prizes.entryFeeAmount));
   formData.append('coinRequirement', String(prizes.coin_requirement));

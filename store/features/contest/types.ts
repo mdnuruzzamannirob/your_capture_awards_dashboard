@@ -227,9 +227,12 @@ export interface PotyAdminOverview {
     awaitingJudging: number;
     published: number;
     entries: number;
-    collectedFees: number;
-    prizePool: number;
-    currency: string;
+    // Only set when every contest uses one currency; use byCurrency otherwise.
+    collectedFees: number | null;
+    prizePool: number | null;
+    currency: string | null;
+    // Fees in different currencies cannot be added up, so totals are per currency.
+    byCurrency?: Array<{ currency: string; collectedFees: number; prizePool: number }>;
   };
 }
 

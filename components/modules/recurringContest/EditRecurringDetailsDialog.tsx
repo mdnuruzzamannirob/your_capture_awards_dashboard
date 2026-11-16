@@ -8,15 +8,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { CURRENCY_LABELS, SUPPORTED_CURRENCIES } from '@/lib/currency';
 import { BannerPickerDialog } from '@/components/modules/content/DetailsStep';
 import CategoryInput from '@/components/modules/content/CategoryInput';
 import ContestRichTextEditor from '@/components/modules/content/ContestRichTextEditor';
 import { WEB_IMAGE_ACCEPT } from '@/lib/constants/uploads';
 import { buildUpdateRecurringContestFormData, getApiErrorMessage } from '@/lib/recurringContest';
-import { recurringDetailsSchema, type RecurringDetailsValues } from '@/lib/schemas/recurringContestSchema';
+import {
+  recurringDetailsSchema,
+  type RecurringDetailsValues,
+} from '@/lib/schemas/recurringContestSchema';
 import { dateToZonedInput, zonedInputToDate } from '@/lib/timezone';
 import { useUpdateRecurringContestMutation } from '@/store/features/recurringContest/recurringContestApi';
 import { contestApi } from '@/store/features/contest/contestApi';
@@ -56,6 +74,7 @@ const EditRecurringDetailsDialog = ({
   }, [open]);
 
   const isMoneyContest = form.watch('isMoneyContest');
+  const currency = form.watch('currency');
   const banner = form.watch('banner');
   const bannerUserPhotoId = form.watch('bannerUserPhotoId');
   const bannerInputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +92,10 @@ const EditRecurringDetailsDialog = ({
 
   const onSubmit = async (values: RecurringDetailsValues) => {
     try {
-      await updateRecurringContest({ id, body: buildUpdateRecurringContestFormData(values) }).unwrap();
+      await updateRecurringContest({
+        id,
+        body: buildUpdateRecurringContestFormData(values),
+      }).unwrap();
       // New categories become suggestions on the API side; refresh the cached list.
       dispatch(contestApi.util.invalidateTags([{ type: 'ContestCreationOptions', id: 'SINGLE' }]));
       toast.success('Recurring contest details updated');
@@ -93,8 +115,8 @@ const EditRecurringDetailsDialog = ({
         <Form {...form}>
           <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
             <p className="text-muted-foreground -mt-1 text-xs">
-              Changes apply to every contest generated from this template from now on. Contests
-              that have already started or ended are not changed.
+              Changes apply to every contest generated from this template from now on. Contests that
+              have already started or ended are not changed.
             </p>
 
             <FormField
@@ -227,7 +249,9 @@ const EditRecurringDetailsDialog = ({
                         type="datetime-local"
                         className="scheme-dark"
                         value={dateToZonedInput(field.value, timezone)}
-                        onChange={(event) => field.onChange(zonedInputToDate(event.target.value, timezone))}
+                        onChange={(event) =>
+                          field.onChange(zonedInputToDate(event.target.value, timezone))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -245,7 +269,9 @@ const EditRecurringDetailsDialog = ({
                         type="datetime-local"
                         className="scheme-dark"
                         value={dateToZonedInput(field.value, timezone)}
-                        onChange={(event) => field.onChange(zonedInputToDate(event.target.value, timezone))}
+                        onChange={(event) =>
+                          field.onChange(zonedInputToDate(event.target.value, timezone))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -288,13 +314,13 @@ const EditRecurringDetailsDialog = ({
             />
 
             {isMoneyContest && (
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="minPrize"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Min prize</FormLabel>
+                      <FormLabel>Min prize ({currency})</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -312,7 +338,7 @@ const EditRecurringDetailsDialog = ({
                   name="maxPrize"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Max prize</FormLabel>
+                      <FormLabel>Max prize ({currency})</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -325,41 +351,54 @@ const EditRecurringDetailsDialog = ({
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="currency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Currency</FormLabel>
-                      <FormControl>
-                        <Input placeholder="USD" maxLength={3} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
             )}
 
-            <FormField
-              control={form.control}
-              name="entryFeeAmount"
-              render={({ field }) => (
-                <FormItem className="max-w-[220px]">
-                  <FormLabel>Entry fee (USD)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      {...field}
-                      onChange={(event) => field.onChange(event.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid max-w-[460px] gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {SUPPORTED_CURRENCIES.map((currency) => (
+                          <SelectItem key={currency} value={currency}>
+                            {CURRENCY_LABELS[currency]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="entryFeeAmount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Entry fee ({currency})</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        {...field}
+                        onChange={(event) => field.onChange(event.target.value)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}

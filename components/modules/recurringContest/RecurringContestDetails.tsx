@@ -11,6 +11,7 @@ import {
   mapRecurringContestToIntervalValues,
 } from '@/lib/recurringContest';
 import { formatInTimeZone } from '@/lib/timezone';
+import { formatCurrencyAmount, toSupportedCurrency } from '@/lib/currency';
 import { getContestCategories } from '@/lib/contestCategories';
 import { useGetRecurringContestQuery } from '@/store/features/recurringContest/recurringContestApi';
 import { ArrowLeft, ImageOff, Pencil } from 'lucide-react';
@@ -147,29 +148,55 @@ const RecurringContestDetails = () => {
             </div>
 
             <div className="border-border grid gap-5 border-t pt-5 sm:grid-cols-2 lg:grid-cols-4">
-              <DetailItem label="First occurrence start" value={formatInTimeZone(contest.startDate, displayTimeZone)} />
-              <DetailItem label="First occurrence end" value={formatInTimeZone(contest.endDate, displayTimeZone)} />
-              <DetailItem label="Frequency" value={getRecurrenceLabel(contest.recurring.recurringType)} />
+              <DetailItem
+                label="First occurrence start"
+                value={formatInTimeZone(contest.startDate, displayTimeZone)}
+              />
+              <DetailItem
+                label="First occurrence end"
+                value={formatInTimeZone(contest.endDate, displayTimeZone)}
+              />
+              <DetailItem
+                label="Frequency"
+                value={getRecurrenceLabel(contest.recurring.recurringType)}
+              />
               <DetailItem label="Recurrence timezone" value={timezone} />
-              <DetailItem label="Next occurrence" value={formatInTimeZone(contest.recurring.nextOccurrence, displayTimeZone)} />
+              <DetailItem
+                label="Next occurrence"
+                value={formatInTimeZone(contest.recurring.nextOccurrence, displayTimeZone)}
+              />
               <DetailItem
                 label="Previous occurrence"
-                value={contest.recurring.previousOccurrence ? formatInTimeZone(contest.recurring.previousOccurrence, displayTimeZone) : 'None yet'}
+                value={
+                  contest.recurring.previousOccurrence
+                    ? formatInTimeZone(contest.recurring.previousOccurrence, displayTimeZone)
+                    : 'None yet'
+                }
               />
               <DetailItem
                 label="Recurrence ends"
-                value={contest.recurring.endsAt ? formatInTimeZone(contest.recurring.endsAt, displayTimeZone) : 'Never'}
+                value={
+                  contest.recurring.endsAt
+                    ? formatInTimeZone(contest.recurring.endsAt, displayTimeZone)
+                    : 'Never'
+                }
               />
               <DetailItem
                 label="Max occurrences"
                 value={contest.recurring.maxOccurrences ?? 'Unlimited'}
               />
-              <DetailItem label="Generated so far" value={contest.recurring.generatedOccurrences ?? 0} />
               <DetailItem
-                label="Entry fee (USD)"
+                label="Generated so far"
+                value={contest.recurring.generatedOccurrences ?? 0}
+              />
+              <DetailItem
+                label="Entry fee"
                 value={
                   contest.entryFeeAmount > 0
-                    ? `${contest.entryFeeAmount} USD`
+                    ? formatCurrencyAmount(
+                        contest.entryFeeAmount,
+                        toSupportedCurrency(contest.currency),
+                      )
                     : 'Free'
                 }
               />
@@ -182,8 +209,14 @@ const RecurringContestDetails = () => {
                     : 'No'
                 }
               />
-              <DetailItem label="Created at" value={formatInTimeZone(contest.createdAt, displayTimeZone)} />
-              <DetailItem label="Updated at" value={formatInTimeZone(contest.updatedAt, displayTimeZone)} />
+              <DetailItem
+                label="Created at"
+                value={formatInTimeZone(contest.createdAt, displayTimeZone)}
+              />
+              <DetailItem
+                label="Updated at"
+                value={formatInTimeZone(contest.updatedAt, displayTimeZone)}
+              />
             </div>
 
             {Boolean(contest.rules?.length) && (

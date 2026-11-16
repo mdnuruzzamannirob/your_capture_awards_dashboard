@@ -27,6 +27,7 @@ import { Coins, Package, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import StoreProductForm from './StoreProductForm';
+import { formatCurrencyAmount } from '@/lib/currency';
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   if (!error || typeof error !== 'object') return fallback;
@@ -253,7 +254,7 @@ const StoreProductManagement = () => {
                         <p className="text-muted-foreground text-xs">Price</p>
                         <p className="leading-tight font-semibold">
                           {product.category === 'COINS'
-                            ? `${product.amount} ${product.currency}`
+                            ? formatCurrencyAmount(product.amount, product.currency)
                             : `${product.amount} coins`}
                         </p>
                       </div>

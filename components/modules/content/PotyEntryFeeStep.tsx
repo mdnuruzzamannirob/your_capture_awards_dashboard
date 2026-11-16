@@ -2,8 +2,10 @@
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { MIN_PAID_ENTRY_FEE_USD, type ContestFinalValues } from '@/lib/schemas/contestSchema';
+import { formatCurrencyAmount, MIN_PAID_ENTRY_FEE } from '@/lib/currency';
+import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import { useFormContext } from 'react-hook-form';
+import ContestCurrencyField from './ContestCurrencyField';
 
 // Photographer of the Year is free (fee 0) or paid. Paid entry fees form a pot. This share of it is
 // the prize pool divided among the winners and the rest is kept by the platform
@@ -25,52 +27,57 @@ const PotyEntryFeeStep = ({
 }) => {
   const form = useFormContext<ContestFinalValues>();
   const isFree = Number(form.watch('prizes.entryFeeAmount') ?? 0) === 0;
+  const currency = form.watch('prizes.currency');
 
   return (
     <div className="border-border-subtle bg-surface-secondary space-y-3 rounded-lg border p-4">
       <div>
         <p className="text-sm font-semibold">Entry fee &amp; prize pool</p>
         <p className="text-muted-foreground mt-1 text-xs leading-5">
-          Set the fee to 0 for a free contest, or charge at least $
-          {MIN_PAID_ENTRY_FEE_USD.toFixed(2)}. When there is a fee, {PRIZE_POOL_SHARE_PERCENT}% of
+          Set the fee to 0 for a free contest, or charge at least{' '}
+          {formatCurrencyAmount(MIN_PAID_ENTRY_FEE[currency], currency)}. Entrants pay in the
+          selected currency at Stripe checkout. When there is a fee, {PRIZE_POOL_SHARE_PERCENT}% of
           all collected fees becomes the prize pool divided among the winners, and{' '}
           {PLATFORM_SHARE_PERCENT}% is kept by the platform. Judges review every submitted photo in
           Settings, the top 10 are advanced automatically by ranking, then judges choose the
           winners.
         </p>
       </div>
-      <FormField
-        control={form.control}
-        name="prizes.entryFeeAmount"
-        render={({ field }) => (
-          <FormItem className="max-w-[220px] gap-1.5">
-            <FormLabel className={labelClass}>
-              Entry fee (USD){locked ? ` (locked, ${lockedReason})` : ''}
-            </FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                // 0 is allowed (free contest). The browser's own min check would
-                // otherwise block submitting 0; the schema enforces the paid minimum.
-                min={0}
-                step="0.01"
-                inputMode="decimal"
-                className={inputClass}
-                {...field}
-                // After the spread: the field object carries its own `disabled`.
-                disabled={locked}
-                onChange={(event) => field.onChange(event.target.value)}
-              />
-            </FormControl>
-            <p className="text-muted-foreground text-[11px]">
-              {isFree
-                ? 'Free contest: anyone can join without paying.'
-                : 'Paid contest: entrants pay through Stripe.'}
-            </p>
-            <FormMessage className="text-[9px]" />
-          </FormItem>
-        )}
-      />
+      <div className="grid max-w-[460px] items-start gap-[14px] sm:grid-cols-2">
+        <ContestCurrencyField disabled={locked} />
+        <FormField
+          control={form.control}
+          name="prizes.entryFeeAmount"
+          render={({ field }) => (
+            <FormItem className="gap-1.5">
+              <FormLabel className={labelClass}>
+                Entry fee ({currency}){locked ? ` (locked, ${lockedReason})` : ''}
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  // 0 is allowed (free contest). The browser's own min check would
+                  // otherwise block submitting 0; the schema enforces the paid minimum.
+                  min={0}
+                  step="0.01"
+                  inputMode="decimal"
+                  className={inputClass}
+                  {...field}
+                  // After the spread: the field object carries its own `disabled`.
+                  disabled={locked}
+                  onChange={(event) => field.onChange(event.target.value)}
+                />
+              </FormControl>
+              <p className="text-muted-foreground text-[11px]">
+                {isFree
+                  ? 'Free contest: anyone can join without paying.'
+                  : 'Paid contest: entrants pay through Stripe.'}
+              </p>
+              <FormMessage className="text-[9px]" />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 };

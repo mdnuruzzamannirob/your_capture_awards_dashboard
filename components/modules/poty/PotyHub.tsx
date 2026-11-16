@@ -79,6 +79,18 @@ const ContestsView = () => {
   const visible = filter === 'ALL' ? contests : contests.filter((c) => c.stage === filter);
   const awaitingJudging = contests.filter((contest) => contest.stage === 'JUDGING');
   const totals = overview?.totals;
+  // One entry per currency; older APIs only send the flat USD totals.
+  const moneyTotals =
+    totals?.byCurrency ??
+    (totals?.currency
+      ? [
+          {
+            currency: totals.currency,
+            collectedFees: totals.collectedFees ?? 0,
+            prizePool: totals.prizePool ?? 0,
+          },
+        ]
+      : []);
 
   if (isError) {
     return (
@@ -115,7 +127,14 @@ const ContestsView = () => {
           value={
             isLoading
               ? '…'
-              : `${formatMoney(totals?.collectedFees, totals?.currency)} · ${formatMoney(totals?.prizePool, totals?.currency)}`
+              : moneyTotals.length
+                ? moneyTotals
+                    .map(
+                      (total) =>
+                        `${formatMoney(total.collectedFees, total.currency)} · ${formatMoney(total.prizePool, total.currency)}`,
+                    )
+                    .join(' | ')
+                : `${formatMoney(0)} · ${formatMoney(0)}`
           }
           icon={Wallet}
         />

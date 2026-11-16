@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import type { ContestFinalValues } from '@/lib/schemas/contestSchema';
 import { useFormContext } from 'react-hook-form';
+import ContestCurrencyField from './ContestCurrencyField';
 
 const inputClass =
   'h-8 rounded-md border-input bg-surface px-2.5 text-[13px] leading-[1.4] shadow-none';
@@ -40,6 +41,7 @@ const PrizesStep = () => {
   const form = useFormContext<ContestFinalValues>();
   const isMoneyContest = form.watch('prizes.isMoneyContest');
   const coinRequirement = form.watch('prizes.coin_requirement');
+  const currency = form.watch('prizes.currency');
 
   return (
     <section
@@ -56,13 +58,13 @@ const PrizesStep = () => {
         <FormSwitch name="prizes.isMoneyContest" label="Is money contest" />
 
         {isMoneyContest && (
-          <div className="grid items-start gap-[14px] sm:grid-cols-3">
+          <div className="grid items-start gap-[14px] sm:grid-cols-2">
             <FormField
               control={form.control}
               name="prizes.minPrize"
               render={({ field }) => (
                 <FormItem className="gap-1.5">
-                  <FormLabel className={labelClass}>Min prize</FormLabel>
+                  <FormLabel className={labelClass}>Min prize ({currency})</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -81,7 +83,7 @@ const PrizesStep = () => {
               name="prizes.maxPrize"
               render={({ field }) => (
                 <FormItem className="gap-1.5">
-                  <FormLabel className={labelClass}>Max prize</FormLabel>
+                  <FormLabel className={labelClass}>Max prize ({currency})</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -95,49 +97,32 @@ const PrizesStep = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="prizes.currency"
-              render={({ field }) => (
-                <FormItem className="gap-1.5">
-                  <FormLabel className={labelClass}>Currency</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="USD"
-                      maxLength={3}
-                      className={inputClass}
-                      {...field}
-                      value={field.value ?? ''}
-                      onChange={(event) => field.onChange(event.target.value.toUpperCase())}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[9px]" />
-                </FormItem>
-              )}
-            />
           </div>
         )}
 
-        <FormField
-          control={form.control}
-          name="prizes.entryFeeAmount"
-          render={({ field }) => (
-            <FormItem className="max-w-[220px] gap-1.5">
-              <FormLabel className={labelClass}>Entry fee (USD)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  min={0}
-                  step="0.01"
-                  className={inputClass}
-                  {...field}
-                  onChange={(event) => field.onChange(event.target.value)}
-                />
-              </FormControl>
-              <FormMessage className="text-[9px]" />
-            </FormItem>
-          )}
-        />
+        <div className="grid max-w-[460px] items-start gap-[14px] sm:grid-cols-2">
+          <ContestCurrencyField />
+          <FormField
+            control={form.control}
+            name="prizes.entryFeeAmount"
+            render={({ field }) => (
+              <FormItem className="gap-1.5">
+                <FormLabel className={labelClass}>Entry fee ({currency})</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    className={inputClass}
+                    {...field}
+                    onChange={(event) => field.onChange(event.target.value)}
+                  />
+                </FormControl>
+                <FormMessage className="text-[9px]" />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormSwitch name="prizes.coin_requirement" label="Coin requirement" />
 

@@ -70,6 +70,7 @@ const UpdateContest = ({ returnTo }: UpdateContestProps = {}) => {
       }
       if (feeAndRulesLocked) {
         body.delete('entryFeeAmount');
+        body.delete('currency');
         body.delete('rules');
       }
       if (contest?.isPhotographyOfYear) {

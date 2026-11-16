@@ -1,5 +1,9 @@
-import type { RecurringDetailsValues, RecurringIntervalValues } from '@/lib/schemas/recurringContestSchema';
+import type {
+  RecurringDetailsValues,
+  RecurringIntervalValues,
+} from '@/lib/schemas/recurringContestSchema';
 import { getContestCategories } from '@/lib/contestCategories';
+import { toSupportedCurrency } from '@/lib/currency';
 import type {
   RecurringContest,
   UpdateRecurringIntervalBody,
@@ -20,7 +24,7 @@ export function mapRecurringContestToDetailsValues(
     isMoneyContest: Boolean(contest.isMoneyContest),
     minPrize: Number(contest.minPrize ?? 0),
     maxPrize: Number(contest.maxPrize ?? 0),
-    currency: contest.currency ?? undefined,
+    currency: toSupportedCurrency(contest.currency),
     entryFeeAmount: Number(contest.entryFeeAmount ?? 0),
     entryFeeCoins: Number(contest.entryFeeCoins ?? 0),
   };
@@ -38,8 +42,8 @@ export function buildUpdateRecurringContestFormData(values: RecurringDetailsValu
   formData.append('isMoneyContest', String(values.isMoneyContest));
   formData.append('minPrize', String(values.isMoneyContest ? values.minPrize : 0));
   formData.append('maxPrize', String(values.isMoneyContest ? values.maxPrize : 0));
-  // An empty value clears the currency on the API side.
-  formData.append('currency', values.isMoneyContest ? (values.currency ?? '') : '');
+  // Always sent: generated contests charge their entry fee in it.
+  formData.append('currency', values.currency);
   formData.append('entryFeeAmount', String(values.entryFeeAmount));
   formData.append('entryFeeCoins', String(values.entryFeeCoins));
   formData.append('applyToUpcoming', String(values.applyToUpcoming));
